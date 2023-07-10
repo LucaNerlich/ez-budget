@@ -1,0 +1,17 @@
+[
+    {
+        "year": 2022,
+        "months": [
+            {
+                "month": 1,
+                "entries": [
+                    {
+                        "category": "",
+                        "value": 0,
+                        "date": "2022-01-01"
+                    }
+                ]
+            }
+        ]
+    }
+]
