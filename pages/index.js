@@ -7,6 +7,7 @@ export default function Index() {
 
     return (
         <Layout>
+            <a rel="me" href="https://mastodon.social/@luca00">Mastodon</a>
             <CustomHead title="EzBudget"
                         description="Add income / expense"/>
             <MainInput/>
