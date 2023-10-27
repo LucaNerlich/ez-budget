@@ -22,7 +22,7 @@
         "cypress:e2e:headless": "start-server-and-test start http://localhost:3456 cypress:headless"
     },
     "engines": {
-        "node": "16.15.0"
+        "node": "18.15.0"
     },
     "dependencies": {
         "@popperjs/core": "^2.11.8",
