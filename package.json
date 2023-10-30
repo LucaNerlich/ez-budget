@@ -1,13 +1,13 @@
 {
     "name": "ez-budget.de",
-    "version": "2.15.0",
+    "version": "2.16.0",
     "private": true,
     "repository": "https://gitlab.com/nerlich/ez-budget",
     "author": "Luca Nerlich <luca.nerlich@gmail.com>",
     "description": "EZ-Budget",
     "homepage": "https://ezbudget.de",
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev --turbo",
         "build": "npm run lint && next build",
         "lint": "next lint",
         "start": "next start"
