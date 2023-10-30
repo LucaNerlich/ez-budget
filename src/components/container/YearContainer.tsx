@@ -62,6 +62,7 @@ export default function YearContainer(props) {
                 })
             }
         })
+        allYears.reverse();
         setYearCategoryContainers(allYears);
     }, [dataContext.statsContainer]);
 
