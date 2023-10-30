@@ -1,6 +1,6 @@
 {
     "name": "ez-budget.de",
-    "version": "2.11.0",
+    "version": "2.12.0",
     "private": true,
     "repository": "https://gitlab.com/nerlich/ez-budget",
     "author": "Luca Nerlich <luca.nerlich@gmail.com>",
@@ -8,18 +8,11 @@
     "homepage": "https://ezbudget.de",
     "scripts": {
         "upgrade": "npx npm-check-updates -u && npm i",
-        "dev": "next -p 3000",
-        "build": "next build",
+        "dev": "next dev --turbo",
+        "build": "npm run lint && next build",
         "lint": "next lint",
-        "start": "next start -p 3456",
-        "postversion": "npm i &&  git add . && git commit -m 'bump version' && git push",
-        "test": "npm run jest && npm run cypress:e2e:headless",
-        "pm2": "cross-env NODE_ENV=production pm2 start npm --name 'ezbudget' -- run start",
-        "jest": "jest",
-        "cypress": "cypress open",
-        "cypress:headless": "cypress run --headless --browser chrome --config video=false,screenshotOnRunFailure=false",
-        "cypress:e2e": "start-server-and-test start http://localhost:3456 cypress",
-        "cypress:e2e:headless": "start-server-and-test start http://localhost:3456 cypress:headless"
+        "start": "next start",
+        "postversion": "npm i &&  git add . && git commit -m 'bump version' && git push"
     },
     "engines": {
         "node": "18.15.0"
@@ -42,14 +35,10 @@
         "uuid": "^9.0.1"
     },
     "devDependencies": {
-        "@testing-library/jest-dom": "^5.17.0",
-        "@testing-library/react": "^13.4.0",
-        "cypress": "^10.11.0",
+        "@types/node": "20.8.9",
         "eslint": "^8.52.0",
         "eslint-config-next": "^14.0.0",
-        "jest": "^29.7.0",
         "sass": "^1.69.5",
-        "start-server-and-test": "^1.15.4",
         "typescript": "^4.9.5"
     }
 }
