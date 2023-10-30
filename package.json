@@ -1,18 +1,16 @@
 {
     "name": "ez-budget.de",
-    "version": "2.12.0",
+    "version": "2.13.0",
     "private": true,
     "repository": "https://gitlab.com/nerlich/ez-budget",
     "author": "Luca Nerlich <luca.nerlich@gmail.com>",
     "description": "EZ-Budget",
     "homepage": "https://ezbudget.de",
     "scripts": {
-        "upgrade": "npx npm-check-updates -u && npm i",
         "dev": "next dev --turbo",
         "build": "npm run lint && next build",
         "lint": "next lint",
-        "start": "next start",
-        "postversion": "npm i &&  git add . && git commit -m 'bump version' && git push"
+        "start": "next start"
     },
     "engines": {
         "node": "18.15.0"
