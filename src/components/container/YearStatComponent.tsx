@@ -19,7 +19,7 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, categoryR
                     <h3>{currentYearStats.year} - Revenue: {statisticsService.round(currentYearStats.sum)}</h3>
 
                     <details open={opened}>
-                        <summary className="mt-3"><p>Ergebnis pro Kategorie</p></summary>
+                        <summary className="mt-3"><p style={{display: 'inline'}}>Ergebnis pro Kategorie</p></summary>
                         <div className="table-responsive">
                             <table className="table">
                                 <thead>
