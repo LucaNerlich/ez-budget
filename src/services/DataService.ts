@@ -8,7 +8,7 @@ import {sortMapByNumberValue} from "../Util";
 export const useDataService = () => {
     const statisticsService = useStatisticsService();
 
-    function init(dataContainer, setStatsContainer) {
+    function init(dataContainer: any, setStatsContainer: (arg0: any[]) => void) {
         const statsData = [];
         const rawData = dataContainer;
 
@@ -41,6 +41,14 @@ export const useDataService = () => {
         setStatsContainer(statsData)
     }
 
+    /**
+     * Retrieves the statistics for a specific year and month.
+     *
+     * @param {Array<YearStats>} statsData - The array of YearStats objects containing the statistics data.
+     * @param {number} year - The year to retrieve the statistics for.
+     * @param {number} month - The month to retrieve the statistics for.
+     * @returns {MonthStats} - The MonthStats object representing the statistics for the given year and month.
+     */
     function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats {
         let monthStat: MonthStats = undefined;
 
@@ -56,12 +64,18 @@ export const useDataService = () => {
                     }
                 }
             }
-
         });
 
         return monthStat ? monthStat : {} as MonthStats;
     }
 
+    /**
+     * Retrieves the statistics for a given year from an array of YearStats objects.
+     *
+     * @param {Array<YearStats>} statsData - The array of YearStats objects to search in.
+     * @param {number} year - The year to retrieve the statistics for.
+     * @return {YearStats} - The statistics for the given year. If no statistics are found, an empty YearStats object is returned.
+     */
     function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats {
         const filteredEntries = _.filter(statsData, function (yearStats: YearStats) {
             return yearStats.year === year;
@@ -147,6 +161,12 @@ export const useDataService = () => {
         return months;
     }
 
+    /**
+     * Retrieves the available years from the data container.
+     *
+     * @param {Array} dataContainer - The container holding the data.
+     * @return {Array} - An array of available years.
+     */
     function getAvailableYears(dataContainer) {
         const years = [];
 

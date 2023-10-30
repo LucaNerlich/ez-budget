@@ -6,6 +6,7 @@ import {useDateService} from "../../services/DateService";
 import {useDataService} from "../../services/DataService";
 import {useStatisticsService} from "../../services/StatisticsService";
 import {useColorService} from "../../services/ColorService";
+import YearStatComponent from "./YearStatComponent";
 
 export default function YearContainer(props) {
     const dateService = useDateService();
@@ -17,9 +18,12 @@ export default function YearContainer(props) {
 
     const [categoryRows, setCategoryRows] = useState([]);
     const [currentYearStats, setCurrentYearStats] = useState<YearStats>({} as YearStats);
+    const [yearStats, setYearStats] = useState<YearStats[]>([])
 
     useEffect(() => {
-        setCurrentYearStats(dataService.getStatsForYear(dataContext.statsContainer, dateService.NOW.year()))
+        const currentYear = dateService.NOW.year();
+        const availableYears = dataService.getAvailableYears(dataContext.dataContainer);
+        setCurrentYearStats(dataService.getStatsForYear(dataContext.statsContainer, currentYear))
     }, [dataContext.statsContainer]);
 
     useEffect(() => {
@@ -40,32 +44,7 @@ export default function YearContainer(props) {
 
     return (
         <div>
-            <h1 className="mt-3">
-                Übersicht - {currentYearStats.year}
-            </h1>
-            <h2>Revenue: {statisticsService.round(currentYearStats.sum)}</h2>
-
-            <hr/>
-
-            <h2>Ergebnis pro Kategorie</h2>
-
-            {/* maybe display as bar chart */}
-            <table className="table">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Kategorie</th>
-                    <th scope="col">Summe</th>
-                </tr>
-                </thead>
-                <tbody>
-                {categoryRows}
-                </tbody>
-            </table>
-            {/*<YearAllChart entries={entries}/>*/}
-
-            <hr/>
-            {/*<MonthSummary entries={entries}/>*/}
+            <YearStatComponent currentYearStats={currentYearStats} categoryRows={categoryRows}/>
         </div>
     );
 };
