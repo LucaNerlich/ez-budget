@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useDataService} from "../../services/DataService";
-import {getRandomFloat, TEST_CATEGORIES} from "../../../constants";
+import {getRandomCommentByCategory, getRandomFloat, TEST_CATEGORIES} from "../../../constants";
 import {Year} from "../../entities/raw/Year";
 import {Month} from "../../entities/raw/Month";
 import {Entry} from "../../entities/raw/Entry";
@@ -13,7 +13,7 @@ export default function TestDataGenerator(props) {
 
     const dataService = useDataService();
 
-    const [startYear, setStartYear] = useState<number>(2022);
+    const [startYear, setStartYear] = useState<number>(2019);
     const [yearsToGenerate, setYearsToGenerate] = useState<number>(10);
     const [entriesToGenerate, setEntriesToGenerate] = useState<number>(getRandomFloat(15, 30, 0));
     const [testData, setTestData] = useState<Array<Year>>([]);
@@ -24,11 +24,12 @@ export default function TestDataGenerator(props) {
         function generateEntries(year: number, month: number): Array<Entry> {
             const entries: Array<Entry> = [];
             for (let i = 0; i < entriesToGenerate; i++) {
+                const category = getRandomItemFromArray(TEST_CATEGORIES);
                 const entryData: Entry = {
-                    category: getRandomItemFromArray(TEST_CATEGORIES),
+                    category: category,
                     date: getDateString(year, month, getRandomFloat(1, latestDayInMonth, 0)),
                     value: getRandomFloat(-1000, 1000, 2),
-                    comment: 'some-comment'
+                    comment: getRandomCommentByCategory(category)
                 }
                 entries.push(entryData);
             }

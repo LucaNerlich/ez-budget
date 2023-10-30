@@ -37,17 +37,43 @@ export const INDEX_MONTH_MAP: Map<number, string> = new Map([
 ]);
 
 export const TEST_CATEGORIES: Array<string> = [
+    "Abonnements",
+    "Energie",
+    "Gesundheit",
+    "Kleidung",
+    "Gehalt",
     "Lebensmittel",
-    "Shopping",
+    "Miete",
     "Restaurants",
-    "Warmmiete",
+    "Shopping",
+    "Telefon",
     "Transport",
     "Unterhaltung",
     "Versicherungen",
-    "Abonnements",
-    "Gehalt",
-    "Sonstiges"
 ];
+
+const TEST_COMMENTS: { [key: string]: string[] } = {
+    Abonnements: ['Netflix', 'Google Drive', 'iCloud', 'Amazon Prime'],
+    Energie: ['Erdgas', 'Heizöl', 'Kohle', 'Biomasse', 'Elektrizität'],
+    Gesundheit: ['Medizin', 'Vitamine', 'Gesichtsmaske', 'Thermometer', 'Verband'],
+    Kleidung: ['Hose', 'Hemd', 'Schuhe', 'Rock', 'Pullover'],
+    Lebensmittel: ['Brot', 'Apfel', 'Wurst', 'Käse', 'Joghurt'],
+    Miete: ['Stadt-Wohnung', 'Landhaus', 'Wohnheim', 'Studio', 'Loft'],
+    Restaurants: ['Griechisch', 'Chinesisch', 'Sushi', 'Tapas', 'Donuts'],
+    Shopping: ['Klamotten', 'Games', 'Baumarkt', 'Einrichtung'],
+    Telefon: ['Festnetz', 'Mobilfunk', 'Internet'],
+    Transport: ['Auto', 'Fahrrad', 'Bus-Ticket', 'Zug-Ticket', 'Flug-Ticket'],
+    Unterhaltung: ['Buch', 'Fahrrad', 'Gitarre', 'Spielkonsole', 'Fernseher'],
+    Versicherungen: ['Hausrat', 'Lebensversicherung', 'Kfz-Versicherung', 'Haftpflicht', 'Unfallversicherung'],
+};
+
+export function getRandomCommentByCategory(category: string): string | undefined {
+    const items = TEST_COMMENTS[category];
+    if (items) {
+        return items[Math.floor(Math.random() * items.length)];
+    }
+    return undefined;
+}
 
 // getRandomFloat(1.5, 3.5, 2); // 👉️ 2.18
 export function getRandomFloat(min: number, max: number, decimals: number): number {
