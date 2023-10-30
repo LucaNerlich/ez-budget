@@ -16,38 +16,40 @@ export default function EditMonth(props) {
     return (
         <div>
             <h2>Alle Ein- und Auszahlungen</h2>
-            <table className="table">
-                <caption>Sortiert nach Kategorie</caption>
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Datum</th>
-                    <th scope="col">Kategorie</th>
-                    <th scope="col">Comment</th>
-                    <th scope="col">Summe</th>
-                </tr>
-                </thead>
-                <tbody>
-                {monthEntries &&
-                    monthEntries.map((item, index) => (
-                        <tr key={index}>
-                            <th scope="row">{index + 1}</th>
-                            <td>{new Date(item.date).toLocaleDateString('de-DE')}</td>
-                            <td>{item.category}</td>
-                            <td>
-                                {item.comment &&
-                                    <span>{item.comment}</span>}
-                            </td>
-                            <td>
+            <div className="table-responsive">
+                <table className="table">
+                    <caption>Sortiert nach Kategorie</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Datum</th>
+                        <th scope="col">Kategorie</th>
+                        <th scope="col">Comment</th>
+                        <th scope="col">Summe</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {monthEntries &&
+                        monthEntries.map((item, index) => (
+                            <tr key={index}>
+                                <th scope="row">{index + 1}</th>
+                                <td>{new Date(item.date).toLocaleDateString('de-DE')}</td>
+                                <td>{item.category}</td>
+                                <td>
+                                    {item.comment &&
+                                        <span>{item.comment}</span>}
+                                </td>
+                                <td>
                                 <span style={{backgroundColor: colorService.getPositiveNegativeColor(item.value)}}>
                                 {item.value}
                                 </span>
-                            </td>
-                        </tr>
-                    ))
-                }
-                </tbody>
-            </table>
+                                </td>
+                            </tr>
+                        ))
+                    }
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

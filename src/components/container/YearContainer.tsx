@@ -8,6 +8,17 @@ import {useStatisticsService} from "../../services/StatisticsService";
 import {useColorService} from "../../services/ColorService";
 import YearStatComponent from "./YearStatComponent";
 
+interface YearCategoryContainer {
+    year: number,
+    statsForYear: YearStats,
+    categoriesForYear: any
+}
+
+interface Category {
+    category: string,
+    sum: number,
+}
+
 export default function YearContainer(props) {
     const dateService = useDateService();
     const dataService = useDataService();
@@ -18,33 +29,63 @@ export default function YearContainer(props) {
 
     const [categoryRows, setCategoryRows] = useState([]);
     const [currentYearStats, setCurrentYearStats] = useState<YearStats>({} as YearStats);
-    const [yearStats, setYearStats] = useState<YearStats[]>([])
+    const [yearCategoryContainers, setYearCategoryContainers] = useState<YearCategoryContainer[]>([])
+
+    const mapCategoriesToRows = (categories: any) => categories?.map((value: Category, index: number) => {
+        return (
+            <tr key={index + 1}>
+                <th scope="row">{index + 1}</th>
+                <td>{value.category}</td>
+                <td>
+                <span style={{backgroundColor: colorService.getPositiveNegativeColor(value.sum)}}>
+                    {value.sum}
+                </span>
+                </td>
+            </tr>
+        );
+    });
 
     useEffect(() => {
         const currentYear = dateService.NOW.year();
-        const availableYears = dataService.getAvailableYears(dataContext.dataContainer);
+        const availableYears: number[] = dataService.getAvailableYears(dataContext.dataContainer);
         setCurrentYearStats(dataService.getStatsForYear(dataContext.statsContainer, currentYear))
+
+        const allYears: YearCategoryContainer[] = []
+        availableYears.forEach(year => {
+            if (year != currentYear) {
+                const statsForYear = dataService.getStatsForYear(dataContext.statsContainer, year);
+                const categoriesForYear = mapCategoriesToRows(statsForYear.categories);
+                allYears.push({
+                    year,
+                    statsForYear,
+                    categoriesForYear
+                })
+            }
+        })
+        setYearCategoryContainers(allYears);
     }, [dataContext.statsContainer]);
 
     useEffect(() => {
-        setCategoryRows(currentYearStats.categories?.map((value, index) => {
-            return (
-                <tr key={index + 1}>
-                    <th scope="row">{index + 1}</th>
-                    <td>{value.category}</td>
-                    <td>
-                        <span style={{backgroundColor: colorService.getPositiveNegativeColor(value.sum)}}>
-                            {value.sum}
-                        </span>
-                    </td>
-                </tr>
-            );
-        }))
-    }, [currentYearStats])
+        setCategoryRows(mapCategoriesToRows(currentYearStats.categories));
+    }, [currentYearStats]);
 
     return (
         <div>
-            <YearStatComponent currentYearStats={currentYearStats} categoryRows={categoryRows}/>
+            <h1 className="mt-3">Jahresergebnisse</h1>
+
+            <YearStatComponent currentYearStats={currentYearStats} categoryRows={categoryRows} opened={true}/>
+
+            <details>
+                <summary className="mt-4 mb-4"><h2 style={{display: "inline"}}>Archiv</h2></summary>
+
+                {yearCategoryContainers.map(container => {
+                    return <YearStatComponent
+                        key={container.year}
+                        currentYearStats={container.statsForYear}
+                        categoryRows={container.categoriesForYear}
+                        opened={false}/>
+                })}
+            </details>
         </div>
     );
 };
