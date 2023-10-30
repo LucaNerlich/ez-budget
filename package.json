@@ -21,7 +21,7 @@
         "@popperjs/core": "^2.11.8",
         "axios": "^1.6.0",
         "bootstrap": "^5.3.2",
-        "chart.js": "^3.9.1",
+        "chart.js": "^4.4.0",
         "chroma-js": "^2.4.2",
         "cross-env": "^7.0.3",
         "lodash": "^4.17.21",
