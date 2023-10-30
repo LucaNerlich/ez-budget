@@ -1,6 +1,6 @@
 {
     "name": "ez-budget.de",
-    "version": "2.13.0",
+    "version": "2.14.0",
     "private": true,
     "repository": "https://gitlab.com/nerlich/ez-budget",
     "author": "Luca Nerlich <luca.nerlich@gmail.com>",

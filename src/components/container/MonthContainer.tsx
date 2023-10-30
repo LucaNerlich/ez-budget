@@ -36,11 +36,10 @@ export default function MonthContainer(props) {
         })
     }
 
-    function updateYearMonth(e) {
-        e.preventDefault();
+    function handleMonthChange(e) {
         setYearMonth({
-            year: e.target[0].value,
-            month: e.target[1].value
+            year: yearMonth.year,
+            month: e.target.value
         })
     }
 
@@ -82,7 +81,7 @@ export default function MonthContainer(props) {
             </h1>
 
             {/* Jahr und Monatsdropdown */}
-            <form onSubmit={updateYearMonth} className="mb-3">
+            <form className="mb-3">
                 <div>
                     <div className="row">
                         <div className="col">
@@ -97,17 +96,12 @@ export default function MonthContainer(props) {
                         <div className="col">
                             {!_.isEmpty(monthOptions) &&
                                 <select ref={monthSelect} defaultValue={yearMonth.month}
+                                        onChange={(e) => handleMonthChange(e)}
                                         className="mt-3 mb-3 form-select">
                                     {monthOptions}
                                 </select>
                             }
                         </div>
-                    </div>
-                    <div className="row">
-                        {/*Submit*/}
-                        <button type="submit" className="btn btn-primary">
-                            Monatsdaten laden
-                        </button>
                     </div>
                 </div>
             </form>
