@@ -7,7 +7,7 @@
     "description": "EZ-Budget",
     "homepage": "https://ezbudget.de",
     "scripts": {
-        "dev": "next dev --turbo",
+        "dev": "next dev",
         "build": "npm run lint && next build",
         "lint": "next lint",
         "start": "next start"

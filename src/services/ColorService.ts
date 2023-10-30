@@ -23,6 +23,15 @@ export const useColorService = () => {
             .colors(amount);
     }
 
+    /**
+     * Generate a custom scale of colors between the given start and end colors.
+     *
+     * @param {string} start - The starting color in hexadecimal format (#RRGGBB).
+     * @param {string} end - The ending color in hexadecimal format (#RRGGBB).
+     * @param {number} amount - The number of colors to generate in the scale.
+     *
+     * @return {string[]} - An array of colors in the calculated scale.
+     */
     function getCustomScaleByAmount(start, end, amount) {
         return chroma
             .scale([start, end])
@@ -30,6 +39,12 @@ export const useColorService = () => {
             .colors(amount);
     }
 
+    /**
+     * Returns the color based on the positive or negative value of the given amount.
+     *
+     * @param {number} amount - The amount to determine the color for.
+     * @return {string} - The color represented as a RGBA value (e.g., rgba(0, 255, 0, 1)).
+     */
     function getPositiveNegativeColor(amount: number) {
         if (amount > 0) {
             return RGBA_GREEN;
