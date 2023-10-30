@@ -14,7 +14,7 @@ export default function TestDataGenerator(props) {
     const dataService = useDataService();
 
     const [startYear, setStartYear] = useState<number>(2022);
-    const [yearsToGenerate, setYearsToGenerate] = useState<number>(20);
+    const [yearsToGenerate, setYearsToGenerate] = useState<number>(10);
     const [entriesToGenerate, setEntriesToGenerate] = useState<number>(getRandomFloat(15, 30, 0));
     const [testData, setTestData] = useState<Array<Year>>([]);
 
