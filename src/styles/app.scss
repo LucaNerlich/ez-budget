@@ -1,5 +1,10 @@
 @import "variables";
 
+:root {
+    // https://systemfontstack.com/
+    --bs-body-font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+}
+
 .red {
     color: $color-red;
 }
