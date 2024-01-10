@@ -13,4 +13,7 @@
     <orderEntry type="library" name="jquery-3.4.1.slim" level="application" />
     <orderEntry type="library" name="bootstrap" level="application" />
   </component>
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="c14bc238-9b8d-4e75-b238-a6c1449a1e40" />
+  </component>
 </module>
