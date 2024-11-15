@@ -1,6 +1,6 @@
 {
   "name": "ez-budget.de",
-  "version": "2.20.0",
+  "version": "2.21.0",
   "private": true,
   "repository": "https://gitlab.com/nerlich/ez-budget",
   "author": "Luca Nerlich <luca.nerlich@gmail.com>",
@@ -23,7 +23,7 @@
     "babel-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.6",
-    "chroma-js": "^2.4.2",
+    "chroma-js": "^3.1.2",
     "cross-env": "^7.0.3",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
