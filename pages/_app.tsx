@@ -66,11 +66,13 @@ function App(props) {
                 <meta name="msapplication-config"
                       content="/icons/favicons/browserconfig.xml"/>
                 <meta name="theme-color" content="#ffffff"/>
+                <script defer src="https://umami-t8kgsg4o4wc4o80wgwwo484c.lucanerlich.com/script.js"
+                        data-website-id="cc45fb2f-c85e-4c87-8332-43ef11b3a215"></script>
             </Head>
             {/* https://reactjs.org/docs/strict-mode.html */}
             <React.StrictMode>
                 <div className="text-gray-800">
-                    <DataContext.Provider value={INITIAL_CONTEXT}>
+                <DataContext.Provider value={INITIAL_CONTEXT}>
                         <Component {...pageProps} />
                     </DataContext.Provider>
                 </div>
