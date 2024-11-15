@@ -20,6 +20,7 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "axios": "^1.7.7",
+    "babel-plugin-react-compiler": "^19.0.0-beta-a7bf2bd-20241110",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.6",
     "chroma-js": "^2.4.2",
