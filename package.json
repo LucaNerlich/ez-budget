@@ -1,44 +1,44 @@
 {
-    "name": "ez-budget.de",
-    "version": "2.19.0",
-    "private": true,
-    "repository": "https://gitlab.com/nerlich/ez-budget",
-    "author": "Luca Nerlich <luca.nerlich@gmail.com>",
-    "description": "EZ-Budget",
-    "homepage": "https://ezbudget.de",
-    "scripts": {
-        "dev": "next dev --turbo",
-        "build": "npm run lint && next build",
-        "lint": "next lint",
-        "start": "next start",
-        "coolify": "next start -p 3003"
-    },
-    "engines": {
-        "node": "^20",
-        "npm": "^10"
-    },
-    "dependencies": {
-        "@popperjs/core": "^2.11.8",
-        "axios": "^1.7.7",
-        "bootstrap": "^5.3.3",
-        "chart.js": "^4.4.6",
-        "chroma-js": "^2.4.2",
-        "cross-env": "^7.0.3",
-        "lodash": "^4.17.21",
-        "moment": "^2.30.1",
-        "next": "^14.2.18",
-        "react": "^18.3.1",
-        "react-chartjs-2": "^5.2.0",
-        "react-cookie": "^7.2.2",
-        "react-dom": "^18.3.1",
-        "react-loader-spinner": "^5.5.0",
-        "uuid": "^11.0.3"
-    },
-    "devDependencies": {
-        "@types/node": "20.17.6",
-        "eslint": "^8.56.0",
-        "eslint-config-next": "^14.2.18",
-        "sass": "^1.81.0",
-        "typescript": "^5.6.3"
-    }
+  "name": "ez-budget.de",
+  "version": "2.20.0",
+  "private": true,
+  "repository": "https://gitlab.com/nerlich/ez-budget",
+  "author": "Luca Nerlich <luca.nerlich@gmail.com>",
+  "description": "EZ-Budget",
+  "homepage": "https://ezbudget.de",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "npm run lint && next build",
+    "lint": "next lint",
+    "start": "next start",
+    "coolify": "next start -p 3003"
+  },
+  "engines": {
+    "node": "^20",
+    "npm": "^10"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.6",
+    "chroma-js": "^2.4.2",
+    "cross-env": "^7.0.3",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
+    "next": "15.0.3",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-chartjs-2": "^5.2.0",
+    "react-cookie": "^7.2.2",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
+    "react-loader-spinner": "^5.5.0",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.6",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "15.0.3",
+    "sass": "^1.81.0",
+    "typescript": "^5.6.3"
+  }
 }
