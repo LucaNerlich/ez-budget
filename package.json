@@ -5,7 +5,7 @@
   "repository": "https://gitlab.com/nerlich/ez-budget",
   "author": "Luca Nerlich <luca.nerlich@gmail.com>",
   "description": "EZ-Budget",
-  "homepage": "https://ezbudget.de",
+  "homepage": "https://ez-budget.lucanerlich.com",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "npm run lint && next build",
