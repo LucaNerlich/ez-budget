@@ -53,6 +53,8 @@ function App(props) {
                 <meta name="viewport"
                       content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
                       key="viewport"/>
+                {/* Robots */}
+                <meta name='robots' content='index, follow' />
                 <meta property="og:type"
                       content="website"/>
                 <meta property="og:site_name"
