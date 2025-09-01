@@ -8,9 +8,82 @@ import {sortMapByNumberValue} from "../Util";
 export const useDataService = () => {
     const statisticsService = useStatisticsService();
 
+    function getYearMonthKey(year: number, month: number): string {
+        const mm = month < 10 ? `0${month}` : `${month}`;
+        return `${year}-${mm}`;
+    }
+
+    function normalizeInput(rawInput: any): { years: any[]; recurring: any[] } {
+        if (Array.isArray(rawInput)) {
+            return { years: rawInput, recurring: [] };
+        }
+        if (rawInput && typeof rawInput === 'object') {
+            const years = rawInput.years || rawInput.data || [];
+            const recurring = rawInput.recurring || [];
+            return { years, recurring };
+        }
+        return { years: [], recurring: [] };
+    }
+
+    function findActiveRecurringFor(year: number, month: number, recurringRules: any[]): Map<string, any> {
+        const key = getYearMonthKey(year, month);
+        const active = recurringRules.filter((r) => {
+            const from: string = (r.from || r.start || r.effective_from || '').slice(0, 7);
+            const until: string | undefined = (r.until || r.end || r.effective_until || '')?.slice(0, 7) || undefined;
+            if (!from) return false;
+            const geFrom = key >= from;
+            const leUntil = until ? key <= until : true;
+            return geFrom && leUntil;
+        });
+
+        // Choose latest rule per (category, comment) tuple (max from)
+        const chosen = new Map<string, any>();
+        for (const r of active) {
+            const category = r.category;
+            const comment = r.comment || '';
+            const from = (r.from || r.start || r.effective_from || '').slice(0, 7);
+            if (!category || !from) continue;
+            const keyTuple = `${category}||${comment}`;
+            const prev = chosen.get(keyTuple);
+            if (!prev) {
+                chosen.set(keyTuple, r);
+            } else {
+                const prevFrom = (prev.from || prev.start || prev.effective_from || '').slice(0, 7);
+                if (from > prevFrom) chosen.set(keyTuple, r);
+            }
+        }
+        return chosen;
+    }
+
+    function applyRecurring(years: any[], recurringRules: any[]): any[] {
+        if (!recurringRules || recurringRules.length === 0) return years;
+        const result: any[] = [];
+        for (let i = 0; i < years.length; i++) {
+            const y = years[i];
+            const months = y.months || [];
+            const newMonths: any[] = [];
+            for (let j = 0; j < months.length; j++) {
+                const m = months[j];
+                const ymActive = findActiveRecurringFor(y.year, m.month, recurringRules);
+                // Track existing entries by (category, comment) to allow month-specific overrides
+                const existingKeys = new Set<string>((m.entries || []).map((e) => `${e.category}||${(e.comment || '')}`));
+                const mergedEntries = [...(m.entries || [])];
+                ymActive.forEach((rule, keyTuple) => {
+                    if (!existingKeys.has(keyTuple)) {
+                        mergedEntries.push({ category: rule.category, value: rule.value, comment: rule.comment });
+                    }
+                });
+                newMonths.push({ ...m, entries: mergedEntries });
+            }
+            result.push({ ...y, months: newMonths });
+        }
+        return result;
+    }
+
     function init(dataContainer: any, setStatsContainer: (arg0: any[]) => void) {
         const statsData = [];
-        const rawData = dataContainer;
+        const { years, recurring } = normalizeInput(dataContainer);
+        const rawData = applyRecurring(years, recurring);
 
         for (let i = 0; i < rawData.length; i++) {
             const yearData: Year = rawData[i];
@@ -104,10 +177,12 @@ export const useDataService = () => {
      * @param month -> number
      */
     function getAllEntriesYearMonth(dataContainer, year, month) {
-        for (let i = 0, len = dataContainer.length; i < len; i++) {
+        const { years, recurring } = normalizeInput(dataContainer);
+        const data = applyRecurring(years, recurring);
+        for (let i = 0, len = data.length; i < len; i++) {
             // if we do === comparison fails...
-            if (dataContainer[i].year == year) {
-                let monthEntries = dataContainer[i].months;
+            if (data[i].year == year) {
+                let monthEntries = data[i].months;
                 for (let j = 0, len = monthEntries.length; j < len; j++) {
                     if (monthEntries[j].month == month) {
                         const entries = monthEntries[j].entries;
@@ -147,12 +222,14 @@ export const useDataService = () => {
     }
 
     function getAvailableMonths(dataContainer, year) {
+        const { years, recurring } = normalizeInput(dataContainer);
+        const data = applyRecurring(years, recurring);
         const months = [];
 
-        for (let i = 0; i < dataContainer.length; i++) {
-            if (dataContainer[i].year == year) {
-                for (let j = 0; j < dataContainer[i].months.length; j++) {
-                    months.push(dataContainer[i].months[j].month)
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].year == year) {
+                for (let j = 0; j < data[i].months.length; j++) {
+                    months.push(data[i].months[j].month)
                 }
                 break;
             }
@@ -168,13 +245,15 @@ export const useDataService = () => {
      * @return {Array} - An array of available years.
      */
     function getAvailableYears(dataContainer) {
-        const years = [];
+        const { years, recurring } = normalizeInput(dataContainer);
+        const data = applyRecurring(years, recurring);
+        const yearList = [];
 
-        for (let i = 0; i < dataContainer.length; i++) {
-            years.push(dataContainer[i].year)
+        for (let i = 0; i < data.length; i++) {
+            yearList.push(data[i].year)
         }
 
-        return years;
+        return yearList;
     }
 
     return {

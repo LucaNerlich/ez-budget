@@ -1,10 +1,9 @@
 "use client";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState, useActionState} from "react";
 import 'moment/locale/de';
 import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataProvider";
-import {useFormState, useFormStatus} from 'react-dom'
 import {fetchRemoteJsonAction, parseLocalJsonAction} from '../../../app/actions'
 import testData from '../../../public/testdata.json'
 import isEmpty from 'lodash/isEmpty';
@@ -22,8 +21,8 @@ export default function MainInput(props) {
   const [loading, setLoading] = useState(false);
   const [remoteFileUrl, setRemoteFileUrl] = useState("");
 
-  const [remoteState, fetchRemoteAction] = useFormState(fetchRemoteJsonAction, { ok: false });
-  const [localState, parseLocalAction] = useFormState(parseLocalJsonAction, { ok: false });
+  const [remoteState, fetchRemoteAction] = useActionState(fetchRemoteJsonAction, { ok: false });
+  const [localState, parseLocalAction] = useActionState(parseLocalJsonAction, { ok: false });
 
   // on page load, set states from cookie
   useEffect(() => {
@@ -80,38 +79,6 @@ export default function MainInput(props) {
   }, [localState])
 
 // https://share.lucanerlich.com/s/fxSC52oREjRgdWE/download/testdata.json
-  const onSubmit = async (e) => {
-    e.preventDefault();
-
-    // reset alerts
-    setSuccess(false)
-    setError(false)
-    setLoading(true)
-
-    e.preventDefault();
-    if (!loadViaUrl) {
-      if (e.target[1].files[0]) {
-        dataContext.setFileName(e.target[1].files[0].name)
-        const form = new FormData();
-        form.set('localJson', e.target[1].files[0]);
-        parseLocalAction(form);
-      } else {
-        setError(true);
-        setLoading(false)
-      }
-    } else {
-      if (remoteFileUrl && remoteFileUrl.length > 0) {
-        const form = new FormData();
-        form.set('remoteUrl', remoteFileUrl);
-        // submit through server action
-        // note: useFormState handler is assigned to a form element
-        fetchRemoteAction(form);
-      } else {
-        setError(true)
-        setLoading(false)
-      }
-    }
-  };
 
   function useTestData() {
     setSuccess(true)
@@ -120,7 +87,6 @@ export default function MainInput(props) {
 
   return (
     <div>
-      <form onSubmit={onSubmit}>
         <div className="mt-3 mb-3">
           <h1 className="mb-3">Dateiupload</h1>
 
@@ -131,7 +97,7 @@ export default function MainInput(props) {
                    checked={loadViaUrl}
                    role="switch" id="flexSwitchCheckDefault"/>
             <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
-              Lade .json via URL
+              Lade .json/.yaml via URL
             </label>
           </div>
 
@@ -141,8 +107,8 @@ export default function MainInput(props) {
               <div className="input-group mb-3">
                 <input type="file"
                        name="localJson"
-                       placeholder="C:\Users\Luca\mydata.json"
-                       accept="application/json"
+                       placeholder="C:\\Users\\Luca\\mydata.(json|yaml|yml)"
+                       accept="application/json,application/x-yaml,text/yaml,.yaml,.yml,.json"
                        onChange={(e) => {
                          if (e.target.files[0]) {
                            setFileName(e.target.files[0].name)
@@ -162,7 +128,7 @@ export default function MainInput(props) {
                 <span className="input-group-text">URL</span>
                 <input type="text"
                        name="remoteUrl"
-                       placeholder="https://mycloud.com/mydata.json"
+                       placeholder="https://mycloud.com/mydata.(json|yaml|yml)"
                        className="form-control"
                        value={remoteFileUrl}
                        onChange={(e) => {
@@ -176,17 +142,12 @@ export default function MainInput(props) {
           }
 
 
-          {/*Submit*/}
           <div className="mt-3">
-            <button type="submit" className="btn btn-primary">
-              Datei einlesen
-            </button>
             <button type="button" onClick={useTestData} className="btn btn-link">
               Beispieldatei verwenden
             </button>
           </div>
         </div>
-      </form>
 
       {success &&
         <div className="mt-3 alert alert-success" role="alert">

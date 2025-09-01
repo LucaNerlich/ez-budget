@@ -8,7 +8,11 @@ import {
   Legend,
   TimeScale,
   PointElement,
-  LineElement
+  LineElement,
+  PieController,
+  BarController,
+  LineController,
+  Title
 } from 'chart.js';
 
 ChartJS.register(
@@ -20,7 +24,11 @@ ChartJS.register(
   Legend,
   TimeScale,
   PointElement,
-  LineElement
+  LineElement,
+  PieController,
+  BarController,
+  LineController,
+  Title
 );
 
 export { ChartJS };
