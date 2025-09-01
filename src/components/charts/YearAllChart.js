@@ -1,5 +1,5 @@
 "use client";
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useMemo} from "react";
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 import {useStatisticsService} from "../../services/StatisticsService";
@@ -11,15 +11,8 @@ export default function YearAllChart(props) {
     const statisticsService = useStatisticsService();
     const colorService = useColorService();
 
-    const [categorySumMap, setCategorySumMap] = useState(null);
-    const [categorySumChartConfig, setCategorySumChartConfig] = useState({});
-
-
     const entries = props.entries;
-
-    useEffect(() => {
-        setCategorySumMap(statisticsService.getSumMapForYear(entries, now.year()));
-    }, [entries]);
+    const categorySumMap = useMemo(() => statisticsService.getSumMapForYear(entries, now.year()), [entries, now, statisticsService]);
 
     const categorySumConfig = useMemo(() => {
         if (!categorySumMap) return undefined;
@@ -41,20 +34,7 @@ export default function YearAllChart(props) {
         };
     }, [categorySumMap]);
 
-    useEffect(() => {
-        if (categorySumConfig) setCategorySumChartConfig(categorySumConfig);
-    }, [categorySumConfig]);
-
-    const data = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-        datasets: [
-            {
-                label: 'Dataset 1',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            },
-        ],
-    };
+    const categorySumChartConfig = categorySumConfig || { labels: [], datasets: [{ data: [] }] };
 
     return (
         <div className="row">

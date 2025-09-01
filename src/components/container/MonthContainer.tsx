@@ -74,7 +74,8 @@ export default function MonthContainer(props) {
     useEffect(() => {
         setCurrentMonth(dataService.getStatsForYearMonth(dataContext.statsContainer, yearMonth.year, yearMonth.month))
         generateYearMonthOptions();
-    }, [dataContext.dataContainer, yearMonth])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dataContext.dataContainer, dataContext.statsContainer, yearMonth])
 
     return (
         <div>

@@ -80,7 +80,7 @@ export const useDataService = () => {
         return result;
     }
 
-    function init(dataContainer: any, setStatsContainer: (arg0: any[]) => void) {
+    function computeStatsData(dataContainer: any): any[] {
         const statsData = [];
         const { years, recurring } = normalizeInput(dataContainer);
         const rawData = applyRecurring(years, recurring);
@@ -111,6 +111,11 @@ export const useDataService = () => {
             statsData.push(yearStatsData);
         }
 
+        return statsData;
+    }
+
+    function init(dataContainer: any, setStatsContainer: (arg0: any[]) => void) {
+        const statsData = computeStatsData(dataContainer);
         setStatsContainer(statsData)
     }
 
@@ -258,6 +263,7 @@ export const useDataService = () => {
 
     return {
         init,
+        computeStatsData,
         getAllEntries,
         getAllEntriesYearMonth,
         getAllCategories,

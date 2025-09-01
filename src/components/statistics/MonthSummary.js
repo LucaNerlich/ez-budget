@@ -1,5 +1,5 @@
 "use client";
-import React, {useEffect, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {useStatisticsService} from "../../services/StatisticsService";
 import dayjs from "dayjs";
 import {Bar} from "react-chartjs-2";
@@ -13,10 +13,7 @@ export default function MonthSummary(props) {
     const chartConfigService = useChartConfigService();
     const colorService = useColorService();
 
-    const [sums, setSums] = useState([]);
-    const [sumChartConfig, setSumChartConfig] = useState({});
-
-    useEffect(() => {
+    const sums = useMemo(() => {
         const sumAll = [];
         sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '01'));
         sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '02'));
@@ -30,33 +27,31 @@ export default function MonthSummary(props) {
         sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '10'));
         sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '11'));
         sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), `12`));
-        setSums(sumAll);
-    }, [entries]);
+        return sumAll;
+    }, [entries, now, statisticsService]);
 
-    useEffect(() => {
-        if (sums) {
-            const categoryLabels = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
-            setSumChartConfig({
-                labels: categoryLabels,
-                datasets: [
-                    {
-                        label: 'Trend',
-                        type: 'line',
-                        backgroundColor: 'black',
-                        fill: false,
-                        data: statisticsService.getTrendArray(chartConfigService.getXforMonths(), sums),
-                    },
-                    {
-                        label: 'Ergebnis',
-                        type: 'bar',
-                        backgroundColor: colorService.getRedGreenForSum(sums),
-                        data: sums
-                    }
+    const sumChartConfig = useMemo(() => {
+        const categoryLabels = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+        return {
+            labels: categoryLabels,
+            datasets: [
+                {
+                    label: 'Trend',
+                    type: 'line',
+                    backgroundColor: 'black',
+                    fill: false,
+                    data: statisticsService.getTrendArray(chartConfigService.getXforMonths(), sums),
+                },
+                {
+                    label: 'Ergebnis',
+                    type: 'bar',
+                    backgroundColor: colorService.getRedGreenForSum(sums),
+                    data: sums
+                }
 
-                ]
-            });
-        }
-    }, [sums]);
+            ]
+        };
+    }, [sums, chartConfigService, colorService, statisticsService]);
 
     const data = {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -81,7 +76,7 @@ export default function MonthSummary(props) {
             <div className="col">
                 <h3>Ergebnis pro Monat</h3>
                 <Bar
-                    data={data}
+                    data={sumChartConfig}
                     options={{
                         maintainAspectRatio: true,
                     }}
