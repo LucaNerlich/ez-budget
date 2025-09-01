@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import 'bootstrap/scss/bootstrap.scss'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import Head from 'next/head'
-import '../src/styles/app.scss'
+import '../src/styles/app.css'
 import {useDataService} from "../src/services/DataService";
 import {DataContextType} from "../src/entities/raw/DataContextType";
 
