@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {useDataService} from "../services/DataService";
 import {DataContextType} from "../entities/raw/DataContextType";
 
@@ -18,14 +18,14 @@ export default function DataProvider({ children }: { children: React.ReactNode }
     dataService.init(dataContainer, setStatsContainer)
   }, [dataContainer]);
 
-  const INITIAL_CONTEXT: DataContextType = {
+  const INITIAL_CONTEXT: DataContextType = useMemo(() => ({
     dataContainer,
     setDataContainer,
     fileName,
     setFileName,
     statsContainer,
     setStatsContainer
-  }
+  }), [dataContainer, fileName, statsContainer]);
 
   return (
     <DataContext.Provider value={INITIAL_CONTEXT}>

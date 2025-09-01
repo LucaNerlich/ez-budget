@@ -1,6 +1,6 @@
 "use client";
-import React, {useEffect, useState} from "react";
-import 'chart.js/auto';
+import React, {useEffect, useMemo, useState} from "react";
+import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 import {useStatisticsService} from "../../services/StatisticsService";
 import moment from "moment";
@@ -21,27 +21,29 @@ export default function YearAllChart(props) {
         setCategorySumMap(statisticsService.getSumMapForYear(entries, now.year()));
     }, [entries]);
 
-    useEffect(() => {
-        if (categorySumMap) {
-            const categoryLabels = [];
-            const categorySums = [];
-            for (let [key, value] of categorySumMap) {
-                categoryLabels.push(key);
-                categorySums.push(value);
-            }
-
-            setCategorySumChartConfig({
-                labels: categoryLabels,
-                datasets: [
-                    {
-                        label: '',
-                        backgroundColor: colorService.getRedGreenForSum(categorySums),
-                        data: categorySums
-                    }
-                ]
-            });
+    const categorySumConfig = useMemo(() => {
+        if (!categorySumMap) return undefined;
+        const categoryLabels = [];
+        const categorySums = [];
+        for (let [key, value] of categorySumMap) {
+            categoryLabels.push(key);
+            categorySums.push(value);
         }
+        return {
+            labels: categoryLabels,
+            datasets: [
+                {
+                    label: '',
+                    backgroundColor: colorService.getRedGreenForSum(categorySums),
+                    data: categorySums
+                }
+            ]
+        };
     }, [categorySumMap]);
+
+    useEffect(() => {
+        if (categorySumConfig) setCategorySumChartConfig(categorySumConfig);
+    }, [categorySumConfig]);
 
     const data = {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -60,7 +62,7 @@ export default function YearAllChart(props) {
                 <h3>Ergebnis pro Kategorie</h3>
                 {categorySumChartConfig.datasets &&
                     <Chart type="bar"
-                           data={data}
+                           data={categorySumChartConfig}
                            options={{
                                indexAxis: 'y',
                                responsive: true,
@@ -70,7 +72,7 @@ export default function YearAllChart(props) {
                                    },
                                    title: {
                                        display: true,
-                                       text: 'Chart.js Horizontal Bar Chart',
+                                       text: 'Ergebnis pro Kategorie',
                                    },
                                },
                            }}

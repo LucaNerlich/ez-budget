@@ -6,7 +6,7 @@ import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataProvider";
 import axios from "axios";
 import testData from '../../../public/testdata.json'
-import * as _ from "lodash";
+import isEmpty from 'lodash/isEmpty';
 import {useRouter} from 'next/navigation'
 import {ROUTE_MONTHLY} from "../../../routes";
 
@@ -29,7 +29,7 @@ export default function MainInput(props) {
 
   // on data change: reset success when empty, redirect to monthly when loaded
   useEffect(() => {
-    if (_.isEmpty(dataContext.dataContainer)) {
+    if (isEmpty(dataContext.dataContainer)) {
       setSuccess(false);
     } else {
       router.push(ROUTE_MONTHLY);

@@ -1,7 +1,7 @@
 "use client";
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useMemo, useState} from "react";
 import {useColorService} from "../../services/ColorService";
-import 'chart.js/auto';
+import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 import {useStatisticsService} from "../../services/StatisticsService";
 import {DataContext} from "../../providers/DataProvider";
@@ -29,62 +29,55 @@ export default function MonthAllChart(props) {
         setIncomeMap(statisticsService.getIncomeSumPerCategoryFromEntries(monthEntries));
     }, [monthEntries]);
 
-    useEffect(() => {
-        if (expenseMap && expenseMap.size > 0) {
-            const sortedMap = sortMapByNumberValue(expenseMap);
-            const categoryLabels = [];
-            const categorySums = [];
-            for (let [key, value] of sortedMap) {
-                categoryLabels.push(key);
-                categorySums.push(value);
-            }
-
-            setChartConfigExpense({
-                labels: categoryLabels,
-                datasets: [{
-                    label: '',
-                    data: categorySums,
-                    backgroundColor: colorService.getScaleByAmount(expenseMap.size),
-                }]
-            });
-        } else {
-            setChartConfigExpense({
-                labels: [],
-                datasets: [{
-                    data: [],
-                }]
-            });
+    const expenseChartConfig = useMemo(() => {
+        if (!expenseMap || expenseMap.size === 0) {
+            return { labels: [], datasets: [{ data: [] }] };
         }
+        const sortedMap = sortMapByNumberValue(expenseMap);
+        const categoryLabels = [];
+        const categorySums = [];
+        for (let [key, value] of sortedMap) {
+            categoryLabels.push(key);
+            categorySums.push(value);
+        }
+        return {
+            labels: categoryLabels,
+            datasets: [{
+                label: '',
+                data: categorySums,
+                backgroundColor: colorService.getScaleByAmount(expenseMap.size),
+            }]
+        };
     }, [expenseMap]);
 
     useEffect(() => {
-        if (incomeMap && incomeMap.size > 0) {
-            let sortedMap = new Map([...incomeMap.entries()].sort((a, b) => b[1] - a[1]));
+        setChartConfigExpense(expenseChartConfig);
+    }, [expenseChartConfig]);
 
-            const categoryLabels = [];
-            const categorySums = [];
-            for (let [key, value] of sortedMap) {
-                categoryLabels.push(key);
-                categorySums.push(value);
-            }
-
-            setChartConfigIncome({
-                labels: categoryLabels,
-                datasets: [{
-                    label: '',
-                    data: categorySums,
-                    backgroundColor: colorService.getScaleByAmount(incomeMap.size),
-                }]
-            });
-        } else {
-            setChartConfigIncome({
-                labels: [],
-                datasets: [{
-                    data: [],
-                }]
-            });
+    const incomeChartConfig = useMemo(() => {
+        if (!incomeMap || incomeMap.size === 0) {
+            return { labels: [], datasets: [{ data: [] }] };
         }
+        let sortedMap = new Map([...incomeMap.entries()].sort((a, b) => b[1] - a[1]));
+        const categoryLabels = [];
+        const categorySums = [];
+        for (let [key, value] of sortedMap) {
+            categoryLabels.push(key);
+            categorySums.push(value);
+        }
+        return {
+            labels: categoryLabels,
+            datasets: [{
+                label: '',
+                data: categorySums,
+                backgroundColor: colorService.getScaleByAmount(incomeMap.size),
+            }]
+        };
     }, [incomeMap]);
+
+    useEffect(() => {
+        setChartConfigIncome(incomeChartConfig);
+    }, [incomeChartConfig]);
 
     return (
         <div className="container">

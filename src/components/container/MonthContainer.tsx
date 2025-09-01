@@ -2,11 +2,12 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {useDataService} from "../../services/DataService";
 import EditMonth from "../form/EditMonth";
-import MonthAllChart from "../charts/MonthAllChart";
+import dynamic from 'next/dynamic';
+const MonthAllChart = dynamic(() => import('../charts/MonthAllChart'), { ssr: false, loading: () => null });
 import {useDateService} from "../../services/DateService";
 import {DataContext} from "../../providers/DataProvider";
 import {INDEX_MONTH_MAP} from "../../../constants";
-import * as _ from "lodash";
+import isEmpty from 'lodash/isEmpty';
 import {DataContextType} from "../../entities/raw/DataContextType";
 import {MonthStats} from "../../entities/stats/MonthStats";
 import {useStatisticsService} from "../../services/StatisticsService";
@@ -86,7 +87,7 @@ export default function MonthContainer(props) {
                 <div>
                     <div className="row">
                         <div className="col">
-                            {!_.isEmpty(yearOptions) &&
+                            {!isEmpty(yearOptions) &&
                                 <select ref={yearSelect} defaultValue={yearMonth.year}
                                         onChange={(e) => handleYearChange(e)}
                                         className="mt-3 mb-3 form-select">
@@ -95,7 +96,7 @@ export default function MonthContainer(props) {
                             }
                         </div>
                         <div className="col">
-                            {!_.isEmpty(monthOptions) &&
+                            {!isEmpty(monthOptions) &&
                                 <select ref={monthSelect} defaultValue={yearMonth.month}
                                         onChange={(e) => handleMonthChange(e)}
                                         className="mt-3 mb-3 form-select">

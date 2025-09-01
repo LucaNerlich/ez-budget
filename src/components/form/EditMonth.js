@@ -3,7 +3,8 @@ import React, {useContext, useEffect, useState} from "react";
 import {useDataService} from "../../services/DataService";
 import {DataContext} from "../../providers/DataProvider";
 import {useColorService} from "../../services/ColorService";
-import _ from 'lodash';
+import isEmpty from 'lodash/isEmpty';
+import orderBy from 'lodash/orderBy';
 
 export default function EditMonth(props) {
     const dataContext = useContext(DataContext);
@@ -30,7 +31,8 @@ export default function EditMonth(props) {
 
     useEffect(() => {
         if (sortField === 'date') { // the date field should be compared as Date
-            setSortedData(sortedData.sort((a, b) => {
+            const base = monthEntries || [];
+            setSortedData([...base].sort((a, b) => {
                 let dateA = new Date(a[sortField]);
                 let dateB = new Date(b[sortField]);
 
@@ -41,7 +43,7 @@ export default function EditMonth(props) {
                 }
             }));
         } else { // sorting for string and number fields
-            setSortedData(_.orderBy(monthEntries, [sortField], [sortOrder]));
+            setSortedData(orderBy(monthEntries || [], [sortField], [sortOrder]));
         }
     }, [monthEntries, sortOrder, sortField])
 
