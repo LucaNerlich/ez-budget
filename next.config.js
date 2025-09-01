@@ -6,7 +6,11 @@ module.exports = {
         rules: {
             '*.yaml': {
                 loaders: ['yaml-loader'],
-                as: '*.yaml',
+                as: '*.js',
+            },
+            '*.yml': {
+                loaders: ['yaml-loader'],
+                as: '*.js',
             },
         },
     },
