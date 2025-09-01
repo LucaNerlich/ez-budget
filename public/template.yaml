@@ -1,12 +1,16 @@
 recurring:
   # Each rule applies from an inclusive YYYY-MM onward, optional until YYYY-MM.
   # Latest rule per category wins if overlapping.
-  - category: Warmmiete
-    value: -1390
-    from: "2022-01"
+  - category: Miete
+    value: -950
+    from: "2025-01"
   - category: Gehalt
-    value: 3333
-    from: "2022-01"
+    value: 1234
+    from: "2025-01"
+  - category: Media
+    value: -13.99
+    comment: Netflix
+    from: "2025-01"
 
 years:
   - year: 2022
