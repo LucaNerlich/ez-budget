@@ -1,6 +1,7 @@
 "use server";
 
 import axios from 'axios';
+import YAML from 'yaml';
 
 function isHttpsUrl(url: string): boolean {
   try {
@@ -23,10 +24,17 @@ export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formDa
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
-    const response = await axios.get(url, { responseType: 'json', signal: controller.signal as any });
+    const response = await axios.get(url, { responseType: 'text', signal: controller.signal as any });
     clearTimeout(timeout);
 
-    return { ok: true, data: response.data };
+    const text: string = response.data;
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = YAML.parse(text);
+    }
+    return { ok: true, data };
   } catch (e: any) {
     const message = e?.message || 'Fetch failed';
     return { ok: false, error: message };
@@ -39,11 +47,13 @@ export async function parseLocalJsonAction(_prev: LocalParseState, formData: For
   try {
     const file = formData.get('localJson') as File | null;
     if (!file) return { ok: false, error: 'No file provided' };
-    if (file.type && file.type !== 'application/json') {
-      return { ok: false, error: 'Invalid file type' };
-    }
     const text = await file.text();
-    const data = JSON.parse(text);
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = YAML.parse(text);
+    }
     return { ok: true, data };
   } catch (e: any) {
     return { ok: false, error: e?.message || 'Parse failed' };
