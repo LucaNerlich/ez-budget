@@ -74,7 +74,7 @@ export default function JsonDataGeneratorForm(props) {
                 </div>
                 <div className='row'>
                     <div className="col">
-                        <label htmlFor="comment" className="form-label">Comment</label>
+                        <label htmlFor="comment" className="form-label">Kommentar</label>
                         <input type="text"
                                className="form-control"
                                id="comment"
