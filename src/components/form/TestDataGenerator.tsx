@@ -7,7 +7,7 @@ import {Month} from "../../entities/raw/Month";
 import {Entry} from "../../entities/raw/Entry";
 import {getDateString, getRandomItemFromArray} from "../../Util";
 
-export default function TestDataGenerator(props) {
+export default function TestDataGenerator() {
 
     const latestDayInMonth: number = 28; // to avoid generating invalid dates
     const monthsToGenerate: number = 12;
@@ -99,7 +99,7 @@ export default function TestDataGenerator(props) {
                     <button type="button" className="mt-3 btn btn-success">
                         <a href={`data:text/json;charset=utf-8,${encodeURIComponent(dataService.jsFriendlyJSONStringify(testData))}`}
                            className="linkdecoration__none"
-                           download="testdata.json">
+                           download="testdata.yaml">
                             Testdaten herunterladen
                         </a>
                     </button>

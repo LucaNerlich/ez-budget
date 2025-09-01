@@ -4,7 +4,7 @@ import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataProvider";
 import {fetchRemoteJsonAction, parseLocalJsonAction} from '../../../app/actions'
-import testData from '../../../public/testdata.json'
+import testData from '../../../public/testdata'
 import isEmpty from 'lodash/isEmpty';
 import {useRouter} from 'next/navigation'
 import {ROUTE_MONTHLY} from "../../../routes";
