@@ -2,7 +2,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {useDataService} from "../../services/DataService";
 import {useDateService} from "../../services/DateService";
-import moment from "moment";
+// dateService.NOW is a dayjs instance; use explicit format string
 import {Entry} from "../../entities/raw/Entry";
 
 export default function JsonDataGeneratorForm(props) {
@@ -26,7 +26,7 @@ export default function JsonDataGeneratorForm(props) {
         const newEntry: Entry = {
             category: category,
             value: parseFloat(value),
-            date: dateService.NOW.format(moment.HTML5_FMT.DATE),
+            date: dateService.NOW.format('YYYY-MM-DD'),
         }
         if (comment) {
             newEntry.comment = comment

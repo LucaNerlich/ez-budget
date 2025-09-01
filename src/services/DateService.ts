@@ -1,7 +1,9 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween);
 
 export const useDateService = () => {
-    const NOW = moment(new Date());
+    const NOW = dayjs(new Date());
 
     /**
      * Does the input date reside in between the start and end of the given year and month?
@@ -11,9 +13,9 @@ export const useDateService = () => {
      * @returns {boolean}
      */
     function isInYearMonth(input, year, month) {
-        const inputAsString = moment(input).format('YYYY-MM-DD');
-        const date = moment(inputAsString);
-        const start = moment(`${year}-${getValidMonthString(month)}-01`);
+        const inputAsString = dayjs(input).format('YYYY-MM-DD');
+        const date = dayjs(inputAsString);
+        const start = dayjs(`${year}-${getValidMonthString(month)}-01`);
         const end = start.endOf('month');
 
         return date.isBetween(start, end, 'month', '[]');
@@ -25,7 +27,7 @@ export const useDateService = () => {
      * @returns {boolean}
      */
     function isToday(input) {
-        const date = moment(input);
+        const date = dayjs(input);
 
         return date.isSame(NOW, 'day');
     }
@@ -131,9 +133,8 @@ export const useDateService = () => {
     function isInYear(input, year) {
         const start = `${year}-01-01`;
         const end = `${year}-12-31`;
-        let date = moment(input);
-
-        return date.isBetween(start, end, null, '[]');
+        const date = dayjs(input);
+        return date.isBetween(dayjs(start), dayjs(end), 'day', '[]');
     }
 
     return {

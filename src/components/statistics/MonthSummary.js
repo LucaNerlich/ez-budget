@@ -1,14 +1,14 @@
 "use client";
 import React, {useEffect, useState} from "react";
 import {useStatisticsService} from "../../services/StatisticsService";
-import moment from "moment";
+import dayjs from "dayjs";
 import {Bar} from "react-chartjs-2";
 import {useColorService} from "../../services/ColorService";
 import {useChartConfigService} from "../../services/ChartConfigService";
 
 export default function MonthSummary(props) {
     const entries = props.entries;
-    const now = moment(new Date());
+    const now = dayjs(new Date());
     const statisticsService = useStatisticsService();
     const chartConfigService = useChartConfigService();
     const colorService = useColorService();

@@ -3,11 +3,11 @@ import React, {useEffect, useMemo, useState} from "react";
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 import {useStatisticsService} from "../../services/StatisticsService";
-import moment from "moment";
+import dayjs from "dayjs";
 import {useColorService} from "../../services/ColorService";
 
 export default function YearAllChart(props) {
-    const now = moment(new Date());
+    const now = dayjs(new Date());
     const statisticsService = useStatisticsService();
     const colorService = useColorService();
 

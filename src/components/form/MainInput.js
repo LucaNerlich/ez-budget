@@ -1,6 +1,5 @@
 "use client";
 import React, {useContext, useEffect, useState, useActionState} from "react";
-import 'moment/locale/de';
 import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataProvider";
