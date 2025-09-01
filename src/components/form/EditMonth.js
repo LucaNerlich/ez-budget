@@ -44,13 +44,14 @@ export default function EditMonth(props) {
         }
     }, [monthEntries, sortOrder, sortField])
 
+    console.log("sortedData", sortedData);
+
     return (
         <table className="table">
             <caption>Sortiert nach Kategorie</caption>
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col" onClick={() => handleSort('date')}>Datum</th>
                 <th scope="col" onClick={() => handleSort('category')}>Kategorie</th>
                 <th scope="col" onClick={() => handleSort('comment')}>Comment</th>
                 <th scope="col" onClick={() => handleSort('value')}>Summe</th>
@@ -60,7 +61,6 @@ export default function EditMonth(props) {
             {sortedData.map((item, index) => (
                 <tr key={index}>
                     <th scope="row">{index + 1}</th>
-                    <td>{new Date(item.date).toLocaleDateString('de-DE')}</td>
                     <td>{item.category}</td>
                     <td>
                         {item.comment &&
