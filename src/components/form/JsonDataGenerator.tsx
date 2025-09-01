@@ -1,3 +1,4 @@
+"use client";
 import React, {useEffect, useRef, useState} from 'react';
 import {useDataService} from "../../services/DataService";
 import {useDateService} from "../../services/DateService";

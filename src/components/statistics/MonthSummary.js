@@ -1,3 +1,4 @@
+"use client";
 import React, {useEffect, useState} from "react";
 import {useStatisticsService} from "../../services/StatisticsService";
 import moment from "moment";

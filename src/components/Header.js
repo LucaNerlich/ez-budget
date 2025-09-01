@@ -1,7 +1,8 @@
+"use client";
 import React, {useContext} from "react";
 import Link from "next/link";
 import {ROUTE_DATAINSPECTOR, ROUTE_HOME, ROUTE_MONTHLY, ROUTE_STATISTICS, ROUTE_YEARLY} from "../../routes";
-import {DataContext} from "../../pages/_app";
+import {DataContext} from "../providers/DataProvider";
 import * as _ from "lodash";
 
 export default function Header() {

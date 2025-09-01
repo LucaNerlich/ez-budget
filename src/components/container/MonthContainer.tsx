@@ -1,9 +1,10 @@
+"use client";
 import React, {useContext, useEffect, useRef, useState} from "react";
 import {useDataService} from "../../services/DataService";
 import EditMonth from "../form/EditMonth";
 import MonthAllChart from "../charts/MonthAllChart";
 import {useDateService} from "../../services/DateService";
-import {DataContext} from "../../../pages/_app";
+import {DataContext} from "../../providers/DataProvider";
 import {INDEX_MONTH_MAP} from "../../../constants";
 import * as _ from "lodash";
 import {DataContextType} from "../../entities/raw/DataContextType";

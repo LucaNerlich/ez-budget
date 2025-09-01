@@ -1,10 +1,11 @@
+"use client";
 import React, {useContext} from "react";
 import Link from 'next/link'
 import AppVersion from "./AppVersion";
 import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../constants";
 import {ROUTE_JSON_GENERATOR, ROUTE_TEMPLATE, ROUTE_TESTDATA, ROUTE_TESTDATA_GENERATOR} from "../../routes";
-import {DataContext} from "../../pages/_app";
+import {DataContext} from "../providers/DataProvider";
 
 export default function Footer() {
     const [cookies, setCookie, removeCookie] = useCookies();

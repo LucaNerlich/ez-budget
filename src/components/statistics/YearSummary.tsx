@@ -1,6 +1,7 @@
+"use client";
 import React, {useContext, useEffect, useState} from "react";
 import {DataContextType} from "../../entities/raw/DataContextType";
-import {DataContext} from "../../../pages/_app";
+import {DataContext} from "../../providers/DataProvider";
 import {YearStats} from "../../entities/stats/YearStats";
 import {INDEX_MONTH_MAP} from "../../../constants";
 import {useStatisticsService} from "../../services/StatisticsService";
