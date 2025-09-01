@@ -3,7 +3,7 @@ import MonthContainer from '../../src/components/container/MonthContainer';
 
 export const metadata = {
   title: 'Monthly',
-  description: 'View and Edit this months entries.'
+  description: 'View and edit this month\'s entries.'
 };
 
 export default function MonthlyPage() {

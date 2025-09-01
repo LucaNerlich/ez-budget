@@ -3,7 +3,7 @@ import Overview from '../../src/components/statistics/Overview';
 
 export const metadata = {
   title: 'Statistics',
-  description: 'View your budget statistics'
+  description: 'View your budget statistics.'
 };
 
 export default function StatisticsPage() {

@@ -3,7 +3,7 @@ import YearContainer from '../../src/components/container/YearContainer';
 
 export const metadata = {
   title: 'Yearly',
-  description: 'View this years summary.'
+  description: 'View this year\'s summary.'
 };
 
 export default function YearlyPage() {
