@@ -36,18 +36,20 @@ export const useDataService = () => {
             return geFrom && leUntil;
         });
 
-        // Choose latest rule per category (max from)
+        // Choose latest rule per (category, comment) tuple (max from)
         const chosen = new Map<string, any>();
         for (const r of active) {
             const category = r.category;
+            const comment = r.comment || '';
             const from = (r.from || r.start || r.effective_from || '').slice(0, 7);
             if (!category || !from) continue;
-            const prev = chosen.get(category);
+            const keyTuple = `${category}||${comment}`;
+            const prev = chosen.get(keyTuple);
             if (!prev) {
-                chosen.set(category, r);
+                chosen.set(keyTuple, r);
             } else {
                 const prevFrom = (prev.from || prev.start || prev.effective_from || '').slice(0, 7);
-                if (from > prevFrom) chosen.set(category, r);
+                if (from > prevFrom) chosen.set(keyTuple, r);
             }
         }
         return chosen;
@@ -63,11 +65,12 @@ export const useDataService = () => {
             for (let j = 0; j < months.length; j++) {
                 const m = months[j];
                 const ymActive = findActiveRecurringFor(y.year, m.month, recurringRules);
-                const existingCategories = new Set<string>((m.entries || []).map((e) => e.category));
+                // Track existing entries by (category, comment) to allow month-specific overrides
+                const existingKeys = new Set<string>((m.entries || []).map((e) => `${e.category}||${(e.comment || '')}`));
                 const mergedEntries = [...(m.entries || [])];
-                ymActive.forEach((rule, cat) => {
-                    if (!existingCategories.has(cat)) {
-                        mergedEntries.push({ category: cat, value: rule.value, comment: rule.comment });
+                ymActive.forEach((rule, keyTuple) => {
+                    if (!existingKeys.has(keyTuple)) {
+                        mergedEntries.push({ category: rule.category, value: rule.value, comment: rule.comment });
                     }
                 });
                 newMonths.push({ ...m, entries: mergedEntries });
