@@ -10,8 +10,7 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "lint": "next lint",
-    "start": "next start",
-    "coolify": "next start"
+    "start": "next start"
   },
   "engines": {
     "node": "^22",
