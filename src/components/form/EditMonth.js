@@ -1,6 +1,7 @@
+"use client";
 import React, {useContext, useEffect, useState} from "react";
 import {useDataService} from "../../services/DataService";
-import {DataContext} from "../../../pages/_app";
+import {DataContext} from "../../providers/DataProvider";
 import {useColorService} from "../../services/ColorService";
 import _ from 'lodash';
 

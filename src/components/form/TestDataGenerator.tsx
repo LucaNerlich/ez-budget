@@ -1,3 +1,4 @@
+"use client";
 import React, {useEffect, useState} from 'react';
 import {useDataService} from "../../services/DataService";
 import {getRandomCommentByCategory, getRandomFloat, TEST_CATEGORIES} from "../../../constants";

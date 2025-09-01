@@ -1,9 +1,10 @@
+"use client";
 import React, {useContext, useEffect, useState} from "react";
 import {useColorService} from "../../services/ColorService";
 import 'chart.js/auto';
 import {Chart} from 'react-chartjs-2';
 import {useStatisticsService} from "../../services/StatisticsService";
-import {DataContext} from "../../../pages/_app";
+import {DataContext} from "../../providers/DataProvider";
 import {useDataService} from "../../services/DataService";
 import {sortMapByNumberValue} from "../../Util";
 

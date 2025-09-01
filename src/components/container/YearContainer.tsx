@@ -1,5 +1,6 @@
+"use client";
 import React, {useContext, useEffect, useState} from "react";
-import {DataContext} from "../../../pages/_app";
+import {DataContext} from "../../providers/DataProvider";
 import {DataContextType} from "../../entities/raw/DataContextType";
 import {YearStats} from "../../entities/stats/YearStats";
 import {useDateService} from "../../services/DateService";
