@@ -1,44 +1,44 @@
 {
   "name": "ez-budget.de",
-  "version": "2.23.0",
+  "version": "2.24.0",
   "private": true,
-  "repository": "https://gitlab.com/nerlich/ez-budget",
+  "repository": "https://github.com/LucaNerlich/ez-budget",
   "author": "Luca Nerlich <luca.nerlich@gmail.com>",
   "description": "EZ-Budget",
   "homepage": "https://ez-budget.lucanerlich.com",
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npm run lint && next build",
+    "build": "next build --turbopack",
     "lint": "next lint",
     "start": "next start",
-    "coolify": "next start -p 3003"
+    "coolify": "next start"
   },
   "engines": {
-    "node": "^20",
+    "node": "^22",
     "npm": "^10"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "axios": "^1.7.9",
-    "babel-plugin-react-compiler": "^19.0.0-beta-e552027-20250112",
-    "bootstrap": "^5.3.3",
-    "chart.js": "^4.4.7",
+    "axios": "^1.11.0",
+    "babel-plugin-react-compiler": "^19.1.0-rc.3",
+    "bootstrap": "^5.3.8",
+    "chart.js": "^4.5.0",
     "chroma-js": "^3.1.2",
-    "cross-env": "^7.0.3",
+    "cross-env": "^10.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",
-    "next": "^15.1.7",
-    "react": "^19.0.0",
+    "next": "^15.5.2",
+    "react": "^19.1.1",
     "react-chartjs-2": "^5.3.0",
     "react-cookie": "^7.2.2",
-    "react-dom": "^19.0.0",
-    "uuid": "^11.0.5"
+    "react-dom": "^19.1.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@types/node": "20.17.6",
-    "eslint": "^9.20.1",
-    "eslint-config-next": "^15.1.7",
-    "sass": "^1.84.0",
-    "typescript": "^5.7.3"
+    "@types/node": "22.18.0",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^15.5.2",
+    "sass": "^1.91.0",
+    "typescript": "^5.9.2"
   }
 }
