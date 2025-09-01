@@ -47,8 +47,6 @@ export default function EditMonth(props) {
         }
     }, [monthEntries, sortOrder, sortField])
 
-    console.log("sortedData", sortedData);
-
     return (
         <table className="table">
             <caption>Sortiert nach Kategorie</caption>

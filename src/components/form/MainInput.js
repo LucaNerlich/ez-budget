@@ -4,7 +4,8 @@ import 'moment/locale/de';
 import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataProvider";
-import axios from "axios";
+import {useFormState, useFormStatus} from 'react-dom'
+import {fetchRemoteJsonAction, parseLocalJsonAction} from '../../../app/actions'
 import testData from '../../../public/testdata.json'
 import isEmpty from 'lodash/isEmpty';
 import {useRouter} from 'next/navigation'
@@ -20,6 +21,9 @@ export default function MainInput(props) {
   const [loadViaUrl, setLoadViaUrl] = useState(false);
   const [loading, setLoading] = useState(false);
   const [remoteFileUrl, setRemoteFileUrl] = useState("");
+
+  const [remoteState, fetchRemoteAction] = useFormState(fetchRemoteJsonAction, { ok: false });
+  const [localState, parseLocalAction] = useFormState(parseLocalJsonAction, { ok: false });
 
   // on page load, set states from cookie
   useEffect(() => {
@@ -47,22 +51,33 @@ export default function MainInput(props) {
     setCookie(COOKIE_LOAD_VIA_URL, loadViaUrl, {path: '/', expires: expiryDate, sameSite: true, secure: true})
   }, [fileName, remoteFileUrl, loadViaUrl])
 
-  // test link
-  function executeGET() {
-    axios.post('/api/getFile', {url: remoteFileUrl})
-      .then(result => {
-        dataContext.setDataContainer(result.data)
-        setError(false);
-        setSuccess(true);
-        setLoading(false);
-        router.push(ROUTE_MONTHLY);
-      })
-      .catch(error => {
-        console.error(error);
-        setError(true)
-        setLoading(false)
-      })
-  }
+  useEffect(() => {
+    if (remoteState && remoteState.ok && remoteState.data) {
+      dataContext.setDataContainer(remoteState.data);
+      setError(false);
+      setSuccess(true);
+      setLoading(false);
+      router.push(ROUTE_MONTHLY);
+    } else if (remoteState && remoteState.error) {
+      console.error(remoteState.error);
+      setError(true);
+      setLoading(false);
+    }
+  }, [remoteState])
+
+  useEffect(() => {
+    if (localState && localState.ok && localState.data) {
+      dataContext.setDataContainer(localState.data);
+      setError(false);
+      setSuccess(true);
+      setLoading(false);
+      router.push(ROUTE_MONTHLY);
+    } else if (localState && localState.error) {
+      console.error(localState.error);
+      setError(true);
+      setLoading(false);
+    }
+  }, [localState])
 
 // https://share.lucanerlich.com/s/fxSC52oREjRgdWE/download/testdata.json
   const onSubmit = async (e) => {
@@ -74,30 +89,25 @@ export default function MainInput(props) {
     setLoading(true)
 
     e.preventDefault();
-    if (loadViaUrl) {
-      if (remoteFileUrl && remoteFileUrl.length > 0) {
-        executeGET();
+    if (!loadViaUrl) {
+      if (e.target[1].files[0]) {
+        dataContext.setFileName(e.target[1].files[0].name)
+        const form = new FormData();
+        form.set('localJson', e.target[1].files[0]);
+        parseLocalAction(form);
       } else {
-        setError(true)
+        setError(true);
         setLoading(false)
       }
     } else {
-      if (e.target[1].files[0]) {
-        dataContext.setFileName(e.target[1].files[0].name)
-        // load file
-        e.target[1].files[0].text()
-          .then(result => {
-            dataContext.setDataContainer(JSON.parse(result))
-            setSuccess(true);
-            setLoading(false)
-          })
-          .catch(error => {
-            console.error(error);
-            setError(true);
-            setLoading(false)
-          })
+      if (remoteFileUrl && remoteFileUrl.length > 0) {
+        const form = new FormData();
+        form.set('remoteUrl', remoteFileUrl);
+        // submit through server action
+        // note: useFormState handler is assigned to a form element
+        fetchRemoteAction(form);
       } else {
-        setError(true);
+        setError(true)
         setLoading(false)
       }
     }
@@ -127,9 +137,10 @@ export default function MainInput(props) {
 
           {/* File Browser */}
           {!loadViaUrl &&
-            <div>
+            <form action={parseLocalAction}>
               <div className="input-group mb-3">
                 <input type="file"
+                       name="localJson"
                        placeholder="C:\Users\Luca\mydata.json"
                        accept="application/json"
                        onChange={(e) => {
@@ -139,16 +150,18 @@ export default function MainInput(props) {
                        }}
                        className="form-control"
                        id="local-json"/>
+                <button type="submit" className="btn btn-secondary">Laden</button>
               </div>
-            </div>
+            </form>
           }
 
           {/* Link Field */}
           {loadViaUrl &&
-            <div>
+            <form action={fetchRemoteAction}>
               <div className="input-group mb-3">
                 <span className="input-group-text">URL</span>
                 <input type="text"
+                       name="remoteUrl"
                        placeholder="https://mycloud.com/mydata.json"
                        className="form-control"
                        value={remoteFileUrl}
@@ -157,8 +170,9 @@ export default function MainInput(props) {
                        }}
                        id="remote-json"
                        aria-describedby="basic-addon3"/>
+                <button type="submit" className="btn btn-secondary">Laden</button>
               </div>
-            </div>
+            </form>
           }
 
 
