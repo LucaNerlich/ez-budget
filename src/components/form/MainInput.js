@@ -6,9 +6,12 @@ import {DataContext} from "../../../pages/_app";
 import axios from "axios";
 import testData from '../../../public/testdata.json'
 import * as _ from "lodash";
+import {useRouter} from 'next/router'
+import {ROUTE_MONTHLY} from "../../../routes";
 
 export default function MainInput(props) {
   const dataContext = useContext(DataContext);
+  const router = useRouter();
   const [cookies, setCookie, removeCookie] = useCookies();
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
@@ -23,10 +26,12 @@ export default function MainInput(props) {
     setLoadViaUrl(cookies[COOKIE_LOAD_VIA_URL] ? cookies[COOKIE_LOAD_VIA_URL] === 'true' : false)
   }, [])
 
-  // on data unload, reset success alert
+  // on data change: reset success when empty, redirect to monthly when loaded
   useEffect(() => {
     if (_.isEmpty(dataContext.dataContainer)) {
       setSuccess(false);
+    } else {
+      router.push(ROUTE_MONTHLY);
     }
   }, [dataContext.dataContainer])
 
@@ -48,7 +53,8 @@ export default function MainInput(props) {
         dataContext.setDataContainer(result.data)
         setError(false);
         setSuccess(true);
-        setLoading(false)
+        setLoading(false);
+        router.push(ROUTE_MONTHLY);
       })
       .catch(error => {
         console.error(error);
