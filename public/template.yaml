@@ -1,6 +1,17 @@
-- year: 2022
-  months:
-    - month: 1
-      entries:
-        - category: ""
-          value: 0
+recurring:
+  # Each rule applies from an inclusive YYYY-MM onward, optional until YYYY-MM.
+  # Latest rule per category wins if overlapping.
+  - category: Warmmiete
+    value: -1390
+    from: "2022-01"
+  - category: Gehalt
+    value: 3333
+    from: "2022-01"
+
+years:
+  - year: 2022
+    months:
+      - month: 1
+        entries:
+          - category: "Einmalige Ausgabe"
+            value: -50
