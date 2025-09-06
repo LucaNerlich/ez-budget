@@ -66,14 +66,19 @@ export const useStatisticsService = () => {
         const yearSumMap = new Map();
 
         _.forEach(entries, function (entry) {
-            if (dateService.isInYear(entry.data.timestamp.toDate(), year)) {
-                const category = entry.data.category;
-                const entryAmount = entry.data.amount;
+            // Support EzBudget entry shape
+            const category = (entry.category);
+            const value = (entry.value);
+            const date = (entry.date);
+            if (typeof category === 'undefined' || typeof value === 'undefined' || typeof date === 'undefined') {
+                return;
+            }
+            if (dateService.isInYear(date, year)) {
                 if (yearSumMap.has(category)) {
-                    const newSum = round(yearSumMap.get(category) + entryAmount);
+                    const newSum = round(yearSumMap.get(category) + value);
                     yearSumMap.set(category, newSum)
                 } else {
-                    yearSumMap.set(category, entryAmount)
+                    yearSumMap.set(category, value)
                 }
             }
         });
@@ -89,7 +94,8 @@ export const useStatisticsService = () => {
      */
     function getSumForYearMonth(entries, year, month) {
         const filteredEntries = _.filter(entries, function (entry) {
-            return dateService.isInYearMonth(entry.data.timestamp.toDate(), year, month);
+            const date = entry.date;
+            return dateService.isInYearMonth(date, year, month);
         });
 
         return getSum(filteredEntries);

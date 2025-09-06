@@ -220,10 +220,9 @@ export const useDataService = () => {
     }
 
     function jsFriendlyJSONStringify(s) {
-        return JSON.stringify(s, null, 4)
-            .replace(/\\r/g, '\r')
-            .replace(/\\n/g, '\n')
-            .replace(/\\/g, '');
+        // Preserve escapes; only prettify and normalize newlines for display
+        const json = JSON.stringify(s, null, 4);
+        return json.replace(/\r?\n/g, '\n');
     }
 
     function getAvailableMonths(dataContainer, year) {
