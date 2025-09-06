@@ -15,14 +15,14 @@ export const useDataService = () => {
 
     function normalizeInput(rawInput: any): { years: any[]; recurring: any[] } {
         if (Array.isArray(rawInput)) {
-            return { years: rawInput, recurring: [] };
+            return {years: rawInput, recurring: []};
         }
         if (rawInput && typeof rawInput === 'object') {
             const years = rawInput.years || rawInput.data || [];
             const recurring = rawInput.recurring || [];
-            return { years, recurring };
+            return {years, recurring};
         }
-        return { years: [], recurring: [] };
+        return {years: [], recurring: []};
     }
 
     function findActiveRecurringFor(year: number, month: number, recurringRules: any[]): Map<string, any> {
@@ -70,19 +70,19 @@ export const useDataService = () => {
                 const mergedEntries = [...(m.entries || [])];
                 ymActive.forEach((rule, keyTuple) => {
                     if (!existingKeys.has(keyTuple)) {
-                        mergedEntries.push({ category: rule.category, value: rule.value, comment: rule.comment });
+                        mergedEntries.push({category: rule.category, value: rule.value, comment: rule.comment});
                     }
                 });
-                newMonths.push({ ...m, entries: mergedEntries });
+                newMonths.push({...m, entries: mergedEntries});
             }
-            result.push({ ...y, months: newMonths });
+            result.push({...y, months: newMonths});
         }
         return result;
     }
 
     function computeStatsData(dataContainer: any): any[] {
         const statsData = [];
-        const { years, recurring } = normalizeInput(dataContainer);
+        const {years, recurring} = normalizeInput(dataContainer);
         const rawData = applyRecurring(years, recurring);
 
         for (let i = 0; i < rawData.length; i++) {
@@ -182,7 +182,7 @@ export const useDataService = () => {
      * @param month -> number
      */
     function getAllEntriesYearMonth(dataContainer, year, month) {
-        const { years, recurring } = normalizeInput(dataContainer);
+        const {years, recurring} = normalizeInput(dataContainer);
         const data = applyRecurring(years, recurring);
         for (let i = 0, len = data.length; i < len; i++) {
             // if we do === comparison fails...
@@ -226,7 +226,7 @@ export const useDataService = () => {
     }
 
     function getAvailableMonths(dataContainer, year) {
-        const { years, recurring } = normalizeInput(dataContainer);
+        const {years, recurring} = normalizeInput(dataContainer);
         const data = applyRecurring(years, recurring);
         const months = [];
 
@@ -249,7 +249,7 @@ export const useDataService = () => {
      * @return {Array} - An array of available years.
      */
     function getAvailableYears(dataContainer) {
-        const { years, recurring } = normalizeInput(dataContainer);
+        const {years, recurring} = normalizeInput(dataContainer);
         const data = applyRecurring(years, recurring);
         const yearList = [];
 

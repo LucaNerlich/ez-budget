@@ -1,4 +1,3 @@
-import React from 'react';
 import * as chroma from "chroma-js";
 import * as _ from "lodash";
 import {RGBA_GREEN, RGBA_RED, RGBA_WHITE} from "../../constants";

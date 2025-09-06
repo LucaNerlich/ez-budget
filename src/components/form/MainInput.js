@@ -1,5 +1,5 @@
 "use client";
-import React, {useContext, useEffect, useState, useActionState} from "react";
+import React, {useActionState, useContext, useEffect, useState} from "react";
 import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataProvider";
@@ -20,8 +20,8 @@ export default function MainInput(props) {
   const [loading, setLoading] = useState(false);
   const [remoteFileUrl, setRemoteFileUrl] = useState("");
 
-  const [remoteState, fetchRemoteAction] = useActionState(fetchRemoteJsonAction, { ok: false });
-  const [localState, parseLocalAction] = useActionState(parseLocalJsonAction, { ok: false });
+  const [remoteState, fetchRemoteAction] = useActionState(fetchRemoteJsonAction, {ok: false});
+  const [localState, parseLocalAction] = useActionState(parseLocalJsonAction, {ok: false});
 
   // on page load, set states from cookie
   useEffect(() => {
@@ -86,67 +86,67 @@ export default function MainInput(props) {
 
   return (
     <div>
-        <div className="mt-3 mb-3">
-          <h1 className="mb-3">Dateiupload</h1>
+      <div className="mt-3 mb-3">
+        <h1 className="mb-3">Dateiupload</h1>
 
-          <div className="form-check form-switch mt-3 mb-3">
-            <input onChange={(e) => setLoadViaUrl(!loadViaUrl)}
-                   className="form-check-input"
-                   type="checkbox"
-                   checked={loadViaUrl}
-                   role="switch" id="flexSwitchCheckDefault"/>
-            <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
-              Lade .json/.yaml via URL
-            </label>
-          </div>
-
-          {/* File Browser */}
-          {!loadViaUrl &&
-            <form action={parseLocalAction}>
-              <div className="input-group mb-3">
-                <input type="file"
-                       name="localJson"
-                       placeholder="C:\\Users\\Luca\\mydata.(json|yaml|yml)"
-                       accept="application/json,application/x-yaml,text/yaml,.yaml,.yml,.json"
-                       onChange={(e) => {
-                         if (e.target.files[0]) {
-                           setFileName(e.target.files[0].name)
-                         }
-                       }}
-                       className="form-control"
-                       id="local-json"/>
-                <button type="submit" className="btn btn-secondary">Laden</button>
-              </div>
-            </form>
-          }
-
-          {/* Link Field */}
-          {loadViaUrl &&
-            <form action={fetchRemoteAction}>
-              <div className="input-group mb-3">
-                <span className="input-group-text">URL</span>
-                <input type="text"
-                       name="remoteUrl"
-                       placeholder="https://mycloud.com/mydata.(json|yaml|yml)"
-                       className="form-control"
-                       value={remoteFileUrl}
-                       onChange={(e) => {
-                         setRemoteFileUrl(e.target.value)
-                       }}
-                       id="remote-json"
-                       aria-describedby="basic-addon3"/>
-                <button type="submit" className="btn btn-secondary">Laden</button>
-              </div>
-            </form>
-          }
-
-
-          <div className="mt-3">
-            <button type="button" onClick={useTestData} className="btn btn-link">
-              Beispieldatei verwenden
-            </button>
-          </div>
+        <div className="form-check form-switch mt-3 mb-3">
+          <input onChange={(e) => setLoadViaUrl(!loadViaUrl)}
+                 className="form-check-input"
+                 type="checkbox"
+                 checked={loadViaUrl}
+                 role="switch" id="flexSwitchCheckDefault"/>
+          <label className="form-check-label" htmlFor="flexSwitchCheckDefault">
+            Lade .json/.yaml via URL
+          </label>
         </div>
+
+        {/* File Browser */}
+        {!loadViaUrl &&
+          <form action={parseLocalAction}>
+            <div className="input-group mb-3">
+              <input type="file"
+                     name="localJson"
+                     placeholder="C:\\Users\\Luca\\mydata.(json|yaml|yml)"
+                     accept="application/json,application/x-yaml,text/yaml,.yaml,.yml,.json"
+                     onChange={(e) => {
+                       if (e.target.files[0]) {
+                         setFileName(e.target.files[0].name)
+                       }
+                     }}
+                     className="form-control"
+                     id="local-json"/>
+              <button type="submit" className="btn btn-secondary">Laden</button>
+            </div>
+          </form>
+        }
+
+        {/* Link Field */}
+        {loadViaUrl &&
+          <form action={fetchRemoteAction}>
+            <div className="input-group mb-3">
+              <span className="input-group-text">URL</span>
+              <input type="text"
+                     name="remoteUrl"
+                     placeholder="https://mycloud.com/mydata.(json|yaml|yml)"
+                     className="form-control"
+                     value={remoteFileUrl}
+                     onChange={(e) => {
+                       setRemoteFileUrl(e.target.value)
+                     }}
+                     id="remote-json"
+                     aria-describedby="basic-addon3"/>
+              <button type="submit" className="btn btn-secondary">Laden</button>
+            </div>
+          </form>
+        }
+
+
+        <div className="mt-3">
+          <button type="button" onClick={useTestData} className="btn btn-link">
+            Beispieldatei verwenden
+          </button>
+        </div>
+      </div>
 
       {success &&
         <div className="mt-3 alert alert-success" role="alert">

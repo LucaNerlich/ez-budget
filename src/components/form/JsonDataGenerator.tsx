@@ -89,23 +89,24 @@ export default function JsonDataGeneratorForm(props) {
                 </div>
                 <hr/>
                 {entries && entries.length > 0 &&
-                    <a href={`data:text/json;charset=utf-8,${encodeURIComponent(dataService.jsFriendlyJSONStringify(entries))}`}
-                       download="ezbudget-statistiken.json">
-                        <button type="button" className="mt-3 mb-3 btn btn-success">
-                            Json herunterladen
-                        </button>
-                    </a>
+                  <a
+                    href={`data:text/json;charset=utf-8,${encodeURIComponent(dataService.jsFriendlyJSONStringify(entries))}`}
+                    download="ezbudget-statistiken.json">
+                    <button type="button" className="mt-3 mb-3 btn btn-success">
+                      Json herunterladen
+                    </button>
+                  </a>
                 }
             </form>
 
             {entries && entries.length > 0 &&
-                <div>
+              <div>
 
-                    <h2>Deine erzeugten Daten</h2>
-                    <pre className="shadow">
+                <h2>Deine erzeugten Daten</h2>
+                <pre className="shadow">
                     {dataService.jsFriendlyJSONStringify(entries)}
                     </pre>
-                </div>
+              </div>
             }
         </div>
     );

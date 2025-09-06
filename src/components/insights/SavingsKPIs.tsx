@@ -19,12 +19,13 @@ export default function SavingsKPIs() {
             for (let j = 0; j < months.length; j++) {
                 const m = months[j];
                 const entries = (dataService as any).getAllEntriesYearMonth ? (dataService as any).getAllEntriesYearMonth(dataContext.dataContainer, y, m) : [];
-                let income = 0; let expense = 0;
+                let income = 0;
+                let expense = 0;
                 for (let k = 0; k < entries.length; k++) {
                     const v = Number(entries[k].value) || 0;
                     if (v >= 0) income += v; else expense += v;
                 }
-                rows.push({ year: y, month: m, income, expense, net: income + expense });
+                rows.push({year: y, month: m, income, expense, net: income + expense});
             }
         }
         return rows;
@@ -60,8 +61,8 @@ export default function SavingsKPIs() {
 
     if (!kpis) return null;
 
-    function ym({year, month}: {year: number; month: number}) {
-        return `${year}-${month < 10 ? '0'+month : month}`;
+    function ym({year, month}: { year: number; month: number }) {
+        return `${year}-${month < 10 ? '0' + month : month}`;
     }
 
     const nf = new Intl.NumberFormat('de-DE');
@@ -71,28 +72,36 @@ export default function SavingsKPIs() {
             <h2>Ersparnis KPIs</h2>
             <div className="row g-3">
                 <div className="col-12 col-md-3">
-                    <div className="card"><div className="card-body">
-                        <div>Sparquote (dieses Jahr)</div>
-                        <strong>{kpis.savingsRateYear}%</strong>
-                    </div></div>
+                    <div className="card">
+                        <div className="card-body">
+                            <div>Sparquote (dieses Jahr)</div>
+                            <strong>{kpis.savingsRateYear}%</strong>
+                        </div>
+                    </div>
                 </div>
                 <div className="col-12 col-md-3">
-                    <div className="card"><div className="card-body">
-                        <div>Durchschnittliche Monatsersparnis</div>
-                        <strong>{nf.format(kpis.avgMonthlySavings)}</strong>
-                    </div></div>
+                    <div className="card">
+                        <div className="card-body">
+                            <div>Durchschnittliche Monatsersparnis</div>
+                            <strong>{nf.format(kpis.avgMonthlySavings)}</strong>
+                        </div>
+                    </div>
                 </div>
                 <div className="col-12 col-md-3">
-                    <div className="card"><div className="card-body">
-                        <div>Bester Monat</div>
-                        <strong>{ym(kpis.bestMonth)}: {nf.format(kpis.bestMonth.net)}</strong>
-                    </div></div>
+                    <div className="card">
+                        <div className="card-body">
+                            <div>Bester Monat</div>
+                            <strong>{ym(kpis.bestMonth)}: {nf.format(kpis.bestMonth.net)}</strong>
+                        </div>
+                    </div>
                 </div>
                 <div className="col-12 col-md-3">
-                    <div className="card"><div className="card-body">
-                        <div>Schlechtester Monat</div>
-                        <strong>{ym(kpis.worstMonth)}: {nf.format(kpis.worstMonth.net)}</strong>
-                    </div></div>
+                    <div className="card">
+                        <div className="card-body">
+                            <div>Schlechtester Monat</div>
+                            <strong>{ym(kpis.worstMonth)}: {nf.format(kpis.worstMonth.net)}</strong>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

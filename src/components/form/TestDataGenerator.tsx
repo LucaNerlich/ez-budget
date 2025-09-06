@@ -96,21 +96,22 @@ export default function TestDataGenerator() {
                     Testdaten generieren
                 </button>
                 {testData && testData.length > 0 &&
-                    <button type="button" className="mt-3 btn btn-success">
-                        <a href={`data:text/json;charset=utf-8,${encodeURIComponent(dataService.jsFriendlyJSONStringify(testData))}`}
-                           className="linkdecoration__none"
-                           download="testdata.yaml">
-                            Testdaten herunterladen
-                        </a>
-                    </button>
+                  <button type="button" className="mt-3 btn btn-success">
+                    <a
+                      href={`data:text/json;charset=utf-8,${encodeURIComponent(dataService.jsFriendlyJSONStringify(testData))}`}
+                      className="linkdecoration__none"
+                      download="testdata.yaml">
+                      Testdaten herunterladen
+                    </a>
+                  </button>
                 }
             </div>
 
             {testData && testData.length > 0 &&
-                <div>
-                    <hr/>
-                    <pre className="shadow">{dataService.jsFriendlyJSONStringify(testData)}</pre>
-                </div>
+              <div>
+                <hr/>
+                <pre className="shadow">{dataService.jsFriendlyJSONStringify(testData)}</pre>
+              </div>
             }
 
         </div>

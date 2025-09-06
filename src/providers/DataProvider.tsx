@@ -8,30 +8,30 @@ import {DataContextType} from "../entities/raw/DataContextType";
 export const DataContext = React.createContext<DataContextType | undefined>(undefined);
 DataContext.displayName = "EzBudget Data Context";
 
-export default function DataProvider({ children }: { children: React.ReactNode }) {
-  const [fileName, setFileName] = useState("");
-  const [dataContainer, setDataContainer] = useState([]);
-  const [statsContainer, setStatsContainer] = useState([]);
-  const dataService = useDataService();
+export default function DataProvider({children}: { children: React.ReactNode }) {
+    const [fileName, setFileName] = useState("");
+    const [dataContainer, setDataContainer] = useState([]);
+    const [statsContainer, setStatsContainer] = useState([]);
+    const dataService = useDataService();
 
-  useEffect(() => {
-    dataService.init(dataContainer, setStatsContainer)
-  }, [dataContainer]);
+    useEffect(() => {
+        dataService.init(dataContainer, setStatsContainer)
+    }, [dataContainer]);
 
-  const INITIAL_CONTEXT: DataContextType = useMemo(() => ({
-    dataContainer,
-    setDataContainer,
-    fileName,
-    setFileName,
-    statsContainer,
-    setStatsContainer
-  }), [dataContainer, fileName, statsContainer]);
+    const INITIAL_CONTEXT: DataContextType = useMemo(() => ({
+        dataContainer,
+        setDataContainer,
+        fileName,
+        setFileName,
+        statsContainer,
+        setStatsContainer
+    }), [dataContainer, fileName, statsContainer]);
 
-  return (
-    <DataContext.Provider value={INITIAL_CONTEXT}>
-      {children}
-    </DataContext.Provider>
-  );
+    return (
+        <DataContext.Provider value={INITIAL_CONTEXT}>
+            {children}
+        </DataContext.Provider>
+    );
 }
 
 

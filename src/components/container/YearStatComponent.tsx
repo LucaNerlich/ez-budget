@@ -33,34 +33,34 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) 
     };
 
     useEffect(() => {
-            setCategoryRows( mapCategoriesToRows(categories, colorService));
-    },[categories])
+        setCategoryRows(mapCategoriesToRows(categories, colorService));
+    }, [categories])
 
     return (
         <div>
             {currentYearStats &&
-                <>
-                    <h3>{currentYearStats.year} - Gewinn: {statisticsService.round(currentYearStats.sum)}</h3>
+              <>
+                <h3>{currentYearStats.year} - Gewinn: {statisticsService.round(currentYearStats.sum)}</h3>
 
-                    <details open={opened}>
-                        <summary className="mt-3"><p style={{display: 'inline'}}>Ergebnis pro Kategorie</p></summary>
-                        <div className="table-responsive">
-                            <table className="table">
-                                <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col" onClick={() => sortCategories('category')}>Kategorie</th>
-                                    <th scope="col" onClick={() => sortCategories('sum')}>Summe</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {categoryRows}
-                                </tbody>
-                            </table>
-                        </div>
-                    </details>
-                    <hr/>
-                </>
+                <details open={opened}>
+                  <summary className="mt-3"><p style={{display: 'inline'}}>Ergebnis pro Kategorie</p></summary>
+                  <div className="table-responsive">
+                    <table className="table">
+                      <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col" onClick={() => sortCategories('category')}>Kategorie</th>
+                        <th scope="col" onClick={() => sortCategories('sum')}>Summe</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {categoryRows}
+                      </tbody>
+                    </table>
+                  </div>
+                </details>
+                <hr/>
+              </>
             }
         </div>
     );

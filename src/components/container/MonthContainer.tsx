@@ -3,7 +3,6 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {useDataService} from "../../services/DataService";
 import EditMonth from "../form/EditMonth";
 import dynamic from 'next/dynamic';
-const MonthAllChart = dynamic(() => import('../charts/MonthAllChart'), { ssr: false, loading: () => null });
 import {useDateService} from "../../services/DateService";
 import {DataContext} from "../../providers/DataProvider";
 import {INDEX_MONTH_MAP} from "../../../constants";
@@ -12,6 +11,8 @@ import {DataContextType} from "../../entities/raw/DataContextType";
 import {MonthStats} from "../../entities/stats/MonthStats";
 import {useStatisticsService} from "../../services/StatisticsService";
 import {useColorService} from "../../services/ColorService";
+
+const MonthAllChart = dynamic(() => import('../charts/MonthAllChart'), {ssr: false, loading: () => null});
 
 export default function MonthContainer(props) {
     // @ts-ignore
@@ -89,20 +90,20 @@ export default function MonthContainer(props) {
                     <div className="row">
                         <div className="col">
                             {!isEmpty(yearOptions) &&
-                                <select ref={yearSelect} defaultValue={yearMonth.year}
-                                        onChange={(e) => handleYearChange(e)}
-                                        className="mt-3 mb-3 form-select">
-                                    {yearOptions}
-                                </select>
+                              <select ref={yearSelect} defaultValue={yearMonth.year}
+                                      onChange={(e) => handleYearChange(e)}
+                                      className="mt-3 mb-3 form-select">
+                                  {yearOptions}
+                              </select>
                             }
                         </div>
                         <div className="col">
                             {!isEmpty(monthOptions) &&
-                                <select ref={monthSelect} defaultValue={yearMonth.month}
-                                        onChange={(e) => handleMonthChange(e)}
-                                        className="mt-3 mb-3 form-select">
-                                    {monthOptions}
-                                </select>
+                              <select ref={monthSelect} defaultValue={yearMonth.month}
+                                      onChange={(e) => handleMonthChange(e)}
+                                      className="mt-3 mb-3 form-select">
+                                  {monthOptions}
+                              </select>
                             }
                         </div>
                     </div>
@@ -112,7 +113,7 @@ export default function MonthContainer(props) {
 
             <h2>Ergebnis: &nbsp;
                 {currentMonth.sum &&
-                    <span style={{backgroundColor: colorService.getPositiveNegativeColor(currentMonth.sum)}}>
+                  <span style={{backgroundColor: colorService.getPositiveNegativeColor(currentMonth.sum)}}>
                     {statisticsService.round(currentMonth.sum)}
                     </span>
                 }

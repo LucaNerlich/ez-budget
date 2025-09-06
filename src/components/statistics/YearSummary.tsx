@@ -45,7 +45,8 @@ export default function YearSummary(props) {
                                     <th scope="row">{month.month}</th>
                                     <td>{INDEX_MONTH_MAP.get(month.month)}</td>
                                     <td>
-                                        <span style={{backgroundColor: colorService.getPositiveNegativeColor(month.sum)}}>
+                                        <span
+                                            style={{backgroundColor: colorService.getPositiveNegativeColor(month.sum)}}>
                                             {statisticsService.round(month.sum)}
                                         </span>
                                     </td>
