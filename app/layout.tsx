@@ -53,6 +53,16 @@ export const metadata: Metadata = {
             'max-image-preview': 'large',
             'max-snippet': -1,
         },
+    },
+    manifest: '/icons/favicons/site.webmanifest',
+    themeColor: '#0d6efd',
+    icons: {
+        icon: [
+            { url: '/icons/favicons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+            { url: '/icons/favicons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+            { url: '/icons/favicons/favicon.ico' }
+        ],
+        apple: '/icons/favicons/apple-touch-icon.png',
     }
 };
 
