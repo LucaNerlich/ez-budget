@@ -1,6 +1,6 @@
 import {Metadata} from "next";
-import '../src/styles/app.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../src/styles/app.css';
 import DataProvider from '../src/providers/DataProvider';
 import BootstrapClient from './BootstrapClient';
 import UmamiAnalytics from "../src/components/UmamiAnalytics";

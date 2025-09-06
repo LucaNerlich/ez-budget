@@ -58,3 +58,33 @@ th {
 
 
 
+/* Table readability enhancements */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.table thead th {
+    background-color: #f8f9fa; /* subtle header contrast */
+}
+
+.table tbody tr:nth-child(odd) > td,
+.table tbody tr:nth-child(odd) > th {
+    background-color: rgba(0, 0, 0, 0.018) !important; /* subtle shade A */
+}
+
+.table tbody tr:nth-child(even) > td,
+.table tbody tr:nth-child(even) > th {
+    background-color: rgba(0, 0, 0, 0.038) !important; /* subtle shade B */
+}
+
+.table tbody tr:hover > td,
+.table tbody tr:hover > th {
+    background-color: rgba(0, 0, 0, 0.06) !important; /* hover highlight */
+}
+
+.table td, .table th {
+    border-top: 1px solid rgba(0, 0, 0, 0.08); /* soft row separators */
+}
+
+
