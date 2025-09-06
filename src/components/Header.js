@@ -53,9 +53,7 @@ export default function Header() {
                 !isEmpty(dataContext.dataContainer) &&
                 <li className="nav-item">
                   <Link href={ROUTE_MONTHLY} className="nav-link">
-
-                    Monatsübersicht
-
+                    Monat
                   </Link>
                 </li>
               }
@@ -63,9 +61,7 @@ export default function Header() {
                 !isEmpty(dataContext.dataContainer) &&
                 <li className="nav-item">
                   <Link href={ROUTE_YEARLY} className="nav-link">
-
-                    Jahresübersicht
-
+                    Jahr
                   </Link>
                 </li>
               }
@@ -73,9 +69,7 @@ export default function Header() {
                 !isEmpty(dataContext.dataContainer) &&
                 <li className="nav-item">
                   <Link href={ROUTE_STATISTICS} className="nav-link">
-
                     Ergebnisse
-
                   </Link>
                 </li>
               }
@@ -83,19 +77,7 @@ export default function Header() {
                 !isEmpty(dataContext.dataContainer) &&
                 <li className="nav-item">
                   <Link href={ROUTE_INSIGHTS} className="nav-link">
-
                     Insights
-
-                  </Link>
-                </li>
-              }
-              {
-                !isEmpty(dataContext.dataContainer) &&
-                <li className="nav-item">
-                  <Link href={ROUTE_DATAINSPECTOR} className="nav-link">
-
-                    DataInspector
-
                   </Link>
                 </li>
               }
