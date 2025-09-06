@@ -83,24 +83,38 @@ export default function MonthAllChart(props) {
         <div className="container">
             {(incomeMap && incomeMap.size > 0) &&
                 <div className="row text-center">
-                    <div className="col">
+                    <div className="col-12 col-md-6 mb-4">
                         <h3>Einzahlungen</h3>
                         {chartConfigIncome.datasets &&
-                            <Chart type="pie"
-                                   data={chartConfigIncome}
-                                   options={{
-                                       responsive: true,
-                                   }}/>
+                            <Chart
+                                type="doughnut"
+                                data={chartConfigIncome}
+                                options={{
+                                    responsive: true,
+                                    aspectRatio: 1,
+                                    plugins: {
+                                        legend: { position: 'bottom' },
+                                        title: { display: false }
+                                    }
+                                }}
+                            />
                         }
                     </div>
-                    <div className="col">
+                    <div className="col-12 col-md-6 mb-4">
                         <h3>Auszahlungen</h3>
                         {chartConfigExpense.datasets &&
-                            <Chart type="pie"
-                                   data={chartConfigExpense}
-                                   options={{
-                                       responsive: true,
-                                   }}/>
+                            <Chart
+                                type="doughnut"
+                                data={chartConfigExpense}
+                                options={{
+                                    responsive: true,
+                                    aspectRatio: 1,
+                                    plugins: {
+                                        legend: { position: 'bottom' },
+                                        title: { display: false }
+                                    }
+                                }}
+                            />
                         }
                     </div>
                 </div>

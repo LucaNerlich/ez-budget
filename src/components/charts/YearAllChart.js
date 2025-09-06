@@ -38,24 +38,25 @@ export default function YearAllChart(props) {
 
     return (
         <div className="row">
-            <div className="col">
+            <div className="col-12">
                 <h3>Ergebnis pro Kategorie</h3>
                 {categorySumChartConfig.datasets &&
-                    <Chart type="bar"
-                           data={categorySumChartConfig}
-                           options={{
-                               indexAxis: 'y',
-                               responsive: true,
-                               plugins: {
-                                   legend: {
-                                       position: 'right',
-                                   },
-                                   title: {
-                                       display: true,
-                                       text: 'Ergebnis pro Kategorie',
-                                   },
-                               },
-                           }}
+                    <Chart
+                        type="bar"
+                        data={categorySumChartConfig}
+                        options={{
+                            indexAxis: 'y',
+                            responsive: true,
+                            aspectRatio: 1.6,
+                            plugins: {
+                                legend: { position: 'bottom' },
+                                title: { display: false }
+                            },
+                            scales: {
+                                x: { ticks: { callback: (v) => v } },
+                                y: { ticks: { autoSkip: false } }
+                            }
+                        }}
                     />
                 }
             </div>
