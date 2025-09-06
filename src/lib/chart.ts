@@ -10,6 +10,7 @@ import {
   PointElement,
   LineElement,
   PieController,
+  DoughnutController,
   BarController,
   LineController,
   Title
@@ -26,6 +27,7 @@ ChartJS.register(
   PointElement,
   LineElement,
   PieController,
+  DoughnutController,
   BarController,
   LineController,
   Title

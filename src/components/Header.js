@@ -1,7 +1,7 @@
 "use client";
 import React, {useContext} from "react";
 import Link from "next/link";
-import {ROUTE_DATAINSPECTOR, ROUTE_HOME, ROUTE_MONTHLY, ROUTE_STATISTICS, ROUTE_YEARLY} from "../../routes";
+import {ROUTE_DATAINSPECTOR, ROUTE_HOME, ROUTE_MONTHLY, ROUTE_STATISTICS, ROUTE_YEARLY, ROUTE_INSIGHTS} from "../../routes";
 import {DataContext} from "../providers/DataProvider";
 import isEmpty from 'lodash/isEmpty';
 
@@ -68,6 +68,16 @@ export default function Header() {
                                     <Link href={ROUTE_STATISTICS} className="nav-link">
                                         
                                             Ergebnisse
+                                        
+                                    </Link>
+                                </li>
+                            }
+                            {
+                                !isEmpty(dataContext.dataContainer) &&
+                                <li className="nav-item">
+                                    <Link href={ROUTE_INSIGHTS} className="nav-link">
+                                        
+                                            Insights
                                         
                                     </Link>
                                 </li>

@@ -38,24 +38,34 @@ export default function YearAllChart(props) {
 
     return (
         <div className="row">
-            <div className="col">
+            <div className="col-12">
                 <h3>Ergebnis pro Kategorie</h3>
                 {categorySumChartConfig.datasets &&
-                    <Chart type="bar"
-                           data={categorySumChartConfig}
-                           options={{
-                               indexAxis: 'y',
-                               responsive: true,
-                               plugins: {
-                                   legend: {
-                                       position: 'right',
-                                   },
-                                   title: {
-                                       display: true,
-                                       text: 'Ergebnis pro Kategorie',
-                                   },
-                               },
-                           }}
+                    <Chart
+                        type="bar"
+                        data={categorySumChartConfig}
+                        options={{
+                            indexAxis: 'y',
+                            responsive: true,
+                            aspectRatio: 1.6,
+                            plugins: {
+                                legend: { position: 'bottom' },
+                                title: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => {
+                                            const label = ctx.label || '';
+                                            const val = ctx.parsed?.x ?? ctx.parsed ?? 0;
+                                            return `${label}: ${new Intl.NumberFormat('de-DE').format(val)}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: { ticks: { callback: (v) => v } },
+                                y: { ticks: { autoSkip: false } }
+                            }
+                        }}
                     />
                 }
             </div>
