@@ -17,8 +17,11 @@ export const useColorService = () => {
      *
      */
     function getScaleByAmount(amount) {
+        const isDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const start = isDark ? '#8bb9ff' : '#f5c013';
+        const end = isDark ? '#1c4a86' : '#226ebd';
         return chroma
-            .scale(['#f5c013', '#226ebd'])
+            .scale([start, end])
             .mode('lch')
             .colors(amount);
     }
@@ -63,13 +66,14 @@ export const useColorService = () => {
      * @param sums -> array of numbers
      */
     function getRedGreenForSum(sums) {
+        const isDark = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         const colors = [];
 
         _.forEach(sums, function (value) {
             if (value > 0) {
-                colors.push(chroma(RGBA_GREEN).hex())
+                colors.push(chroma(isDark ? 'rgba(46,199,14,0.8)' : RGBA_GREEN).hex())
             } else {
-                colors.push(chroma(RGBA_RED).hex())
+                colors.push(chroma(isDark ? 'rgba(239,51,18,0.8)' : RGBA_RED).hex())
             }
         });
 

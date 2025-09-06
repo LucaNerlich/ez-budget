@@ -15,6 +15,7 @@ export default function MonthAllChart(props) {
     const dataService = useDataService();
 
     const [monthEntries, setMonthEntries] = useState([]);
+    const [showPercent, setShowPercent] = useState(false);
     const [expenseMap, setExpenseMap] = useState(null);
     const [incomeMap, setIncomeMap] = useState(null);
     // derive configs via useMemo to avoid state loops
@@ -121,8 +122,11 @@ export default function MonthAllChart(props) {
                                                     const total = data.reduce((a, b) => a + Math.abs(b), 0);
                                                     const pct = total ? Math.round((Math.abs(data[idx]) / total) * 1000) / 10 : 0;
                                                     const label = ctx.label || '';
+                                                    if (showPercent) {
+                                                        return `${label}: ${pct}%`;
+                                                    }
                                                     const val = new Intl.NumberFormat('de-DE').format(signed);
-                                                    return `${label}: ${val} (${pct}%)`;
+                                                    return `${label}: ${val}`;
                                                 }
                                             }
                                         }
@@ -152,8 +156,11 @@ export default function MonthAllChart(props) {
                                                     const total = data.reduce((a, b) => a + Math.abs(b), 0);
                                                     const pct = total ? Math.round((Math.abs(data[idx]) / total) * 1000) / 10 : 0;
                                                     const label = ctx.label || '';
+                                                    if (showPercent) {
+                                                        return `${label}: ${pct}%`;
+                                                    }
                                                     const val = new Intl.NumberFormat('de-DE').format(signed);
-                                                    return `${label}: ${val} (${pct}%)`;
+                                                    return `${label}: ${val}`;
                                                 }
                                             }
                                         }
@@ -161,6 +168,13 @@ export default function MonthAllChart(props) {
                                 }}
                             />
                         }
+                    </div>
+                    <div className="col-12">
+                        <div className="form-check form-switch d-inline-block">
+                            <input className="form-check-input" type="checkbox" id="togglePercent"
+                                   checked={showPercent} onChange={() => setShowPercent(!showPercent)} />
+                            <label className="form-check-label ms-2" htmlFor="togglePercent">Prozentwerte anzeigen</label>
+                        </div>
                     </div>
                 </div>
             }
