@@ -50,7 +50,16 @@ export default function YearAllChart(props) {
                             aspectRatio: 1.6,
                             plugins: {
                                 legend: { position: 'bottom' },
-                                title: { display: false }
+                                title: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (ctx) => {
+                                            const label = ctx.label || '';
+                                            const val = ctx.parsed?.x ?? ctx.parsed ?? 0;
+                                            return `${label}: ${new Intl.NumberFormat('de-DE').format(val)}`;
+                                        }
+                                    }
+                                }
                             },
                             scales: {
                                 x: { ticks: { callback: (v) => v } },
