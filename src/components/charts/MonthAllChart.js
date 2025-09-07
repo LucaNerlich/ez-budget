@@ -35,21 +35,21 @@ export default function MonthAllChart(props) {
     }
     const sortedMap = sortMapByNumberValue(expenseMap);
     const labels = [];
-    const rawValues = [];
+    const signedValues = [];
+    const magnitudes = [];
     for (let [key, value] of sortedMap) {
       labels.push(key);
-      rawValues.push(value); // negative sums expected for expenses
+      signedValues.push(value);
+      magnitudes.push(Math.abs(value));
     }
-    const positiveMagnitudes = rawValues.map((v) => Math.abs(v));
 
     return {
       labels,
       datasets: [{
         label: '',
-        data: positiveMagnitudes,
+        data: magnitudes,
         backgroundColor: colorService.getScaleByAmount(labels.length),
-        // keep original signed values for tooltips
-        rawValues
+        rawValues: signedValues
       }]
     };
   }, [expenseMap]);
@@ -93,6 +93,7 @@ export default function MonthAllChart(props) {
         label: '',
         data: groupedValues,
         backgroundColor: colorService.getScaleByAmount(groupedLabels.length),
+        rawValues: groupedValues
       }]
     };
   }, [incomeMap]);
