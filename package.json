@@ -1,15 +1,14 @@
 {
   "name": "ez-budget.de",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "private": true,
   "repository": "https://github.com/LucaNerlich/ez-budget",
   "author": "Luca Nerlich <luca.nerlich@gmail.com>",
   "description": "EZ-Budget",
   "homepage": "https://ez-budget.lucanerlich.com",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build --turbopack",
-    "lint": "next lint",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start"
   },
   "engines": {
@@ -19,24 +18,22 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "axios": "^1.13.2",
-    "babel-plugin-react-compiler": "19.1.0-rc.3",
+    "babel-plugin-react-compiler": "^1.0.0",
     "bootstrap": "^5.3.8",
     "chart.js": "^4.5.1",
     "chroma-js": "^3.2.0",
     "dayjs": "^1.11.19",
     "lodash": "^4.17.21",
-    "next": "^15.5.7",
-    "react": "^19.2.1",
+    "next": "^16.1.1",
+    "react": "^19.2.3",
     "react-chartjs-2": "^5.3.1",
     "react-cookie": "^7.2.2",
-    "react-dom": "^19.2.1",
+    "react-dom": "^19.2.3",
     "yaml": "^2.8.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "22.18.0",
-    "eslint": "^9.39.1",
-    "eslint-config-next": "^15.5.7",
     "typescript": "^5.9.3",
     "yaml-loader": "^0.8.1"
   },
