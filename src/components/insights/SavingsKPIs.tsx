@@ -1,52 +1,28 @@
 "use client";
-import React, {useContext, useMemo} from 'react';
-import {DataContext} from '../../providers/DataProvider';
-import {useDataService} from '../../services/DataService';
+import React, {useMemo} from 'react';
 import {useDateService} from '../../services/DateService';
+import {useCashflow} from '../../services/useCashflow';
 
 export default function SavingsKPIs() {
-    const dataContext = useContext(DataContext);
-    const dataService = useDataService();
     const dateService = useDateService();
-
-    const monthsAll = useMemo(() => {
-        const rows: Array<{ year: number; month: number; income: number; expense: number; net: number }> = [];
-        if (!dataContext.dataContainer) return rows;
-        const years = (dataService as any).getAvailableYears ? (dataService as any).getAvailableYears(dataContext.dataContainer) : [];
-        for (let i = 0; i < years.length; i++) {
-            const y = years[i];
-            const months = (dataService as any).getAvailableMonths ? (dataService as any).getAvailableMonths(dataContext.dataContainer, y) : [];
-            for (let j = 0; j < months.length; j++) {
-                const m = months[j];
-                const entries = (dataService as any).getAllEntriesYearMonth ? (dataService as any).getAllEntriesYearMonth(dataContext.dataContainer, y, m) : [];
-                let income = 0;
-                let expense = 0;
-                for (let k = 0; k < entries.length; k++) {
-                    const v = Number(entries[k].value) || 0;
-                    if (v >= 0) income += v; else expense += v;
-                }
-                rows.push({year: y, month: m, income, expense, net: income + expense});
-            }
-        }
-        return rows;
-    }, [dataContext.dataContainer, dataService]);
+    const rows = useCashflow();
 
     const kpis = useMemo(() => {
-        if (!monthsAll || monthsAll.length === 0) return null;
+        if (!rows || rows.length === 0) return null;
 
         // Current year
         const currentYear = dateService.NOW.year();
-        const thisYear = monthsAll.filter(m => m.year === currentYear);
+        const thisYear = rows.filter(m => m.year === currentYear);
         const incomeYear = thisYear.reduce((a, b) => a + b.income, 0);
         const expenseYear = thisYear.reduce((a, b) => a + b.expense, 0); // negative
         const netYear = incomeYear + expenseYear;
         const savingsRateYear = incomeYear > 0 ? Math.round(((netYear) / incomeYear) * 1000) / 10 : 0;
 
         // Average monthly savings (across all data)
-        const avgMonthlySavings = Math.round((monthsAll.reduce((a, b) => a + b.net, 0) / monthsAll.length) * 100) / 100;
+        const avgMonthlySavings = Math.round((rows.reduce((a, b) => a + b.net, 0) / rows.length) * 100) / 100;
         // Best/Worst month by net
-        const bestMonth = monthsAll.reduce((best, cur) => cur.net > best.net ? cur : best, monthsAll[0]);
-        const worstMonth = monthsAll.reduce((worst, cur) => cur.net < worst.net ? cur : worst, monthsAll[0]);
+        const bestMonth = rows.reduce((best, cur) => cur.net > best.net ? cur : best, rows[0]);
+        const worstMonth = rows.reduce((worst, cur) => cur.net < worst.net ? cur : worst, rows[0]);
 
         return {
             savingsRateYear,
@@ -57,7 +33,7 @@ export default function SavingsKPIs() {
             bestMonth,
             worstMonth
         };
-    }, [monthsAll, dateService]);
+    }, [rows, dateService]);
 
     if (!kpis) return null;
 
@@ -107,5 +83,3 @@ export default function SavingsKPIs() {
         </div>
     );
 }
-
-

@@ -21,8 +21,8 @@ export default function MonthAllChart(props) {
   // derive configs via useMemo to avoid state loops
 
   useEffect(() => {
-    setMonthEntries(dataService.getAllEntriesYearMonth(dataContext.dataContainer, props.year, props.month));
-  }, [dataContext.dataContainer, props.year, props.month]);
+    setMonthEntries(dataService.getAllEntriesYearMonth(dataContext.budget, props.year, props.month));
+  }, [dataContext.budget, props.year, props.month]);
 
   useEffect(() => {
     setExpenseMap(statisticsService.getExpenseSumPerCategoryFromEntries(monthEntries));

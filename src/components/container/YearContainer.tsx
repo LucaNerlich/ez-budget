@@ -47,7 +47,7 @@ export default function YearContainer() {
 
     useEffect(() => {
         const currentYear = dateService.NOW.year();
-        const availableYears: number[] = dataService.getAvailableYears(dataContext.dataContainer);
+        const availableYears: number[] = dataService.getAvailableYears(dataContext.budget);
 
         const allYears: YearCategoryContainer[] = []
         availableYears.forEach(year => {
@@ -61,7 +61,7 @@ export default function YearContainer() {
         })
         allYears.reverse();
         setYearCategoryContainers(allYears);
-    }, [dataContext.statsContainer]);
+    }, [dataContext.budget, dataContext.statsContainer]);
 
     return (
         <div>

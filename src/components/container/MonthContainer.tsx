@@ -47,8 +47,8 @@ export default function MonthContainer(props) {
     }
 
     function generateYearMonthOptions() {
-        const availableMonths = dataService.getAvailableMonths(dataContext.dataContainer, yearMonth.year);
-        const availableYears = dataService.getAvailableYears(dataContext.dataContainer);
+        const availableMonths = dataService.getAvailableMonths(dataContext.budget, yearMonth.year);
+        const availableYears = dataService.getAvailableYears(dataContext.budget);
 
         const yearOptionTags = [];
         availableYears.map(availableYear => {
@@ -76,7 +76,7 @@ export default function MonthContainer(props) {
         setCurrentMonth(dataService.getStatsForYearMonth(dataContext.statsContainer, yearMonth.year, yearMonth.month))
         generateYearMonthOptions();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dataContext.dataContainer, dataContext.statsContainer, yearMonth])
+    }, [dataContext.budget, dataContext.statsContainer, yearMonth])
 
     return (
         <div>

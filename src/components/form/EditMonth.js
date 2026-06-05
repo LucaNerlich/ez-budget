@@ -15,8 +15,8 @@ export default function EditMonth(props) {
   const [sortedData, setSortedData] = useState([]);
 
   useEffect(() => {
-    setMonthEntries(dataService.getAllEntriesYearMonth(dataContext.dataContainer, props.year, props.month));
-  }, [dataContext.dataContainer, props.year, props.month]);
+    setMonthEntries(dataService.getAllEntriesYearMonth(dataContext.budget, props.year, props.month));
+  }, [dataContext.budget, props.year, props.month]);
 
 
   const handleSort = (field) => {

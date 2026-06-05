@@ -171,6 +171,7 @@ logs
 **/*.back.*
 
 .next
+*.tsbuildinfo
 node_modules
 bower_components
 

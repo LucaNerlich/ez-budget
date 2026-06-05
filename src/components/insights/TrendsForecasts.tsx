@@ -1,66 +1,14 @@
 "use client";
-import React, {useContext, useMemo} from 'react';
-import {DataContext} from '../../providers/DataProvider';
-import {useDataService} from '../../services/DataService';
+import React, {useMemo} from 'react';
 import {useDateService} from '../../services/DateService';
+import {useCashflow} from '../../services/useCashflow';
+import {linearRegression, rollingAverage} from '../../services/cashflow';
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 
-function linearRegression(yValues: number[]): { a: number; b: number } {
-    const n = yValues.length;
-    const xValues = Array.from({length: n}, (_, i) => i + 1);
-    const sumX = xValues.reduce((a, b) => a + b, 0);
-    const sumY = yValues.reduce((a, b) => a + b, 0);
-    const sumXY = yValues.reduce((a, y, i) => a + y * xValues[i], 0);
-    const sumXX = xValues.reduce((a, x) => a + x * x, 0);
-    const denom = n * sumXX - sumX * sumX;
-    if (denom === 0) return {a: 0, b: 0};
-    const a = (n * sumXY - sumX * sumY) / denom; // slope
-    const b = (sumY - a * sumX) / n; // intercept
-    return {a, b};
-}
-
 export default function TrendsForecasts() {
-    const dataContext = useContext(DataContext);
-    const dataService = useDataService();
     const dateService = useDateService();
-
-    const monthly = useMemo(() => {
-        const rows: Array<{
-            key: string;
-            year: number;
-            month: number;
-            income: number;
-            expense: number;
-            net: number
-        }> = [];
-        if (!dataContext.dataContainer) return rows;
-        const years = (dataService as any).getAvailableYears ? (dataService as any).getAvailableYears(dataContext.dataContainer) : [];
-        for (let i = 0; i < years.length; i++) {
-            const y = years[i];
-            const months = (dataService as any).getAvailableMonths ? (dataService as any).getAvailableMonths(dataContext.dataContainer, y) : [];
-            for (let j = 0; j < months.length; j++) {
-                const m = months[j];
-                const entries = (dataService as any).getAllEntriesYearMonth ? (dataService as any).getAllEntriesYearMonth(dataContext.dataContainer, y, m) : [];
-                let income = 0;
-                let expense = 0;
-                for (let k = 0; k < entries.length; k++) {
-                    const v = Number(entries[k].value) || 0;
-                    if (v >= 0) income += v; else expense += v;
-                }
-                rows.push({
-                    key: `${y}-${m < 10 ? '0' + m : m}`,
-                    year: y,
-                    month: m,
-                    income,
-                    expense,
-                    net: income + expense
-                });
-            }
-        }
-        rows.sort((a, b) => a.key.localeCompare(b.key));
-        return rows;
-    }, [dataContext.dataContainer, dataService]);
+    const monthly = useCashflow();
 
     const rollingConfig = useMemo(() => {
         if (!monthly || monthly.length === 0) return {labels: [], datasets: [{data: []}]};
@@ -68,17 +16,11 @@ export default function TrendsForecasts() {
         const expense = monthly.map(m => Math.abs(m.expense)); // show as positive magnitude
         const labels = monthly.map(m => m.key);
         const window = 12;
-        const roll = (arr: number[]) => arr.map((_, idx) => {
-            const start = Math.max(0, idx - window + 1);
-            const slice = arr.slice(start, idx + 1);
-            const avg = slice.reduce((a, b) => a + b, 0) / slice.length;
-            return Math.round(avg * 100) / 100;
-        });
         return {
             labels,
             datasets: [
-                {label: 'Ø Einkommen (12M)', data: roll(income), borderColor: '#2a7', backgroundColor: 'transparent'},
-                {label: 'Ø Ausgaben (12M)', data: roll(expense), borderColor: '#e33', backgroundColor: 'transparent'}
+                {label: 'Ø Einkommen (12M)', data: rollingAverage(income, window), borderColor: '#2a7', backgroundColor: 'transparent'},
+                {label: 'Ø Ausgaben (12M)', data: rollingAverage(expense, window), borderColor: '#e33', backgroundColor: 'transparent'}
             ]
         };
     }, [monthly]);
@@ -158,5 +100,3 @@ export default function TrendsForecasts() {
         </div>
     );
 }
-
-
