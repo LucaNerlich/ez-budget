@@ -85,9 +85,11 @@ export default function MainInput(props) {
   }
 
   return (
-    <div>
+    <div className="upload-panel">
       <div className="mt-3 mb-3">
-        <h1 className="mb-3">Dateiupload</h1>
+        <h1 className="mb-2">Dateiupload</h1>
+        <p className="mb-4">Lade deine <strong>.json</strong> oder <strong>.yaml</strong> Datei –
+          alle Berechnungen passieren lokal in deinem Browser.</p>
 
         <div className="form-check form-switch mt-3 mb-3">
           <input onChange={(e) => setLoadViaUrl(!loadViaUrl)}

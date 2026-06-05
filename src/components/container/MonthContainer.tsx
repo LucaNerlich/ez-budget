@@ -109,7 +109,7 @@ export default function MonthContainer(props) {
 
             <h2>Ergebnis: &nbsp;
                 {currentMonth.sum &&
-                  <span style={{backgroundColor: getPositiveNegativeColor(currentMonth.sum)}}>
+                  <span className="amount" style={{color: getPositiveNegativeColor(currentMonth.sum)}}>
                     {round(currentMonth.sum)}
                     </span>
                 }

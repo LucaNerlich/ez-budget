@@ -1,10 +1,35 @@
-import {Metadata} from "next";
+import {Metadata, Viewport} from "next";
+import {Fraunces, IBM_Plex_Mono, IBM_Plex_Sans} from "next/font/google";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../src/styles/app.css';
 import DataProvider from '../src/providers/DataProvider';
 import BootstrapClient from './BootstrapClient';
 import UmamiAnalytics from "../src/components/UmamiAnalytics";
-import Head from "next/head";
+
+const fontDisplay = Fraunces({
+    subsets: ['latin'],
+    weight: ['400', '500', '600', '700'],
+    style: ['normal', 'italic'],
+    variable: '--font-display',
+    display: 'swap',
+});
+
+const fontBody = IBM_Plex_Sans({
+    subsets: ['latin'],
+    weight: ['300', '400', '500', '600', '700'],
+    variable: '--font-body',
+    display: 'swap',
+});
+
+const fontMono = IBM_Plex_Mono({
+    subsets: ['latin'],
+    weight: ['400', '500', '600'],
+    variable: '--font-mono',
+    display: 'swap',
+});
+
+// Runs before paint to set the theme attribute, preventing a flash of the wrong theme.
+const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-bs-theme',t);}catch(e){}})();`;
 
 export const metadata: Metadata = {
     title: {
@@ -55,7 +80,6 @@ export const metadata: Metadata = {
         },
     },
     manifest: '/icons/favicons/site.webmanifest',
-    themeColor: '#0d6efd',
     icons: {
         icon: [
             { url: '/icons/favicons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
@@ -63,17 +87,25 @@ export const metadata: Metadata = {
             { url: '/icons/favicons/favicon.ico' }
         ],
         apple: '/icons/favicons/apple-touch-icon.png',
+    },
+    other: {
+        'msapplication-TileColor': '#0c6b4f',
+        'msapplication-config': '/icons/favicons/browserconfig.xml',
     }
+};
+
+export const viewport: Viewport = {
+    themeColor: [
+        {media: '(prefers-color-scheme: light)', color: '#f5f4f1'},
+        {media: '(prefers-color-scheme: dark)', color: '#0e1311'},
+    ],
 };
 
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
-        <html lang="de">
-        <Head>
-            <meta name="msapplication-TileColor" content="#da532c"/>
-            <meta name="msapplication-config" content="/icons/favicons/browserconfig.xml"/>
-        </Head>
+        <html lang="de" className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}>
         <body>
+        <script dangerouslySetInnerHTML={{__html: themeInitScript}}/>
         <DataProvider>
             {children}
         </DataProvider>

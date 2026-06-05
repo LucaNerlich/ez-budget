@@ -1,6 +1,6 @@
-// Colors
-export const RGBA_GREEN = 'rgba(46,199,14,0.9)';
-export const RGBA_RED = 'rgba(239,51,18,0.9)';
+// Colors (chart fills)
+export const RGBA_GREEN = '#15a06a';
+export const RGBA_RED = '#d0563f';
 export const RGBA_WHITE = 'rgba(255,255,255,0.9)';
 
 // Cookies

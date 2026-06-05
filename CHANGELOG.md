@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.0] - 2026-06-05
+
+### Added
+- Light and dark theme with a toggle in the header — remembers your choice and follows your system preference.
+
+### Changed
+- Modernized the entire interface: new typography, color palette, refined cards, tables, navigation, and charts.
+
+### Fixed
+- "Prozentwerte anzeigen" now shows percentage labels directly on the income/expense charts.
+- Insights KPI cards now have equal height with aligned values.
+
 ## [3.4.1] - 2026-06-05
 
 ### Fixed

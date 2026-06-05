@@ -8,6 +8,35 @@ import {DataContext} from "../../providers/DataProvider";
 import {getEntriesForMonth} from "../../services/budget";
 import {sortMapByNumberValue} from "../../Util";
 
+// Draws "x%" centered on each slice when enabled via options.plugins.sliceLabels.show
+const sliceLabelsPlugin = {
+  id: 'sliceLabels',
+  afterDatasetsDraw(chart, _args, opts) {
+    if (!opts || !opts.show) return;
+    const dataset = chart.data.datasets[0];
+    const data = (dataset && dataset.data) || [];
+    const total = data.reduce((sum, v) => sum + Math.abs(v), 0);
+    if (!total) return;
+
+    const meta = chart.getDatasetMeta(0);
+    const {ctx} = chart;
+    ctx.save();
+    ctx.font = '600 12px "IBM Plex Mono", ui-monospace, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    meta.data.forEach((arc, i) => {
+      const pct = Math.round((Math.abs(data[i]) / total) * 1000) / 10;
+      if (pct < 4) return; // skip tiny slices to avoid clutter
+      const {x, y} = arc.tooltipPosition();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 4;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`${pct}%`, x, y);
+    });
+    ctx.restore();
+  }
+};
+
 export default function MonthAllChart(props) {
   const dataContext = useContext(DataContext);
 
@@ -105,10 +134,12 @@ export default function MonthAllChart(props) {
               <Chart
                 type="doughnut"
                 data={incomeChartConfig}
+                plugins={[sliceLabelsPlugin]}
                 options={{
                   responsive: true,
                   aspectRatio: 1,
                   plugins: {
+                    sliceLabels: {show: showPercent},
                     legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}},
                     title: {display: false},
                     tooltip: {
@@ -139,10 +170,12 @@ export default function MonthAllChart(props) {
               <Chart
                 type="doughnut"
                 data={expenseChartConfig}
+                plugins={[sliceLabelsPlugin]}
                 options={{
                   responsive: true,
                   aspectRatio: 1,
                   plugins: {
+                    sliceLabels: {show: showPercent},
                     legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}},
                     title: {display: false},
                     tooltip: {

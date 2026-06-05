@@ -43,8 +43,8 @@ export default function YearSummary(props) {
                                     <th scope="row">{month.month}</th>
                                     <td>{monthName(month.month)}</td>
                                     <td>
-                                        <span
-                                            style={{backgroundColor: getPositiveNegativeColor(month.sum)}}>
+                                        <span className="amount"
+                                            style={{color: getPositiveNegativeColor(month.sum)}}>
                                             {round(month.sum)}
                                         </span>
                                     </td>

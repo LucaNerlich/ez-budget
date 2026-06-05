@@ -28,7 +28,7 @@ export function mapCategoriesToRows(categories: Category[]) {
                 <th scope="row">{index + 1}</th>
                 <td>{value.category}</td>
                 <td>
-                    <span style={{backgroundColor: getPositiveNegativeColor(value.sum)}}>
+                    <span className="amount" style={{color: getPositiveNegativeColor(value.sum)}}>
                         {value.sum}
                     </span>
                 </td>

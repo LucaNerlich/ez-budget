@@ -64,7 +64,7 @@ export default function EditMonth(props) {
               <span>{item.comment}</span>}
           </td>
           <td>
-                    <span style={{backgroundColor: getPositiveNegativeColor(item.value)}}>
+                    <span className="amount" style={{color: getPositiveNegativeColor(item.value)}}>
                         {item.value}
                     </span>
           </td>

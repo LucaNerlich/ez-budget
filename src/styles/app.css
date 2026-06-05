@@ -1,90 +1,651 @@
-/* Variables */
-:root {
-    /* https://systemfontstack.com/ */
-    --bs-body-font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+/* ==========================================================================
+   EZ-Budget — refined "private banking" design layer over Bootstrap 5.3
+   Tokens drive both our custom components and Bootstrap's own --bs-* variables.
+   ========================================================================== */
+
+:root,
+[data-bs-theme="light"] {
+    /* Surfaces */
+    --canvas: #f3f2ed;
+    --surface: #ffffff;
+    --surface-2: #faf9f5;
+    --surface-3: #f1f0ea;
+
+    /* Ink */
+    --text: #18211c;
+    --text-muted: #5e6b62;
+    --text-faint: #8a948c;
+
+    /* Lines */
+    --border: rgba(24, 40, 31, 0.10);
+    --border-strong: rgba(24, 40, 31, 0.16);
+
+    /* Accent — deep emerald */
+    --accent: #0b6b4f;
+    --accent-strong: #095a42;
+    --accent-contrast: #ffffff;
+    --accent-soft: rgba(11, 107, 79, 0.10);
+    --accent-rgb: 11, 107, 79;
+
+    /* Semantic money colors */
+    --pos: #0f8a52;
+    --neg: #c0492f;
+
+    /* Elevation */
+    --shadow-sm: 0 1px 2px rgba(24, 40, 31, 0.06), 0 1px 3px rgba(24, 40, 31, 0.05);
+    --shadow-md: 0 4px 12px rgba(24, 40, 31, 0.07), 0 2px 6px rgba(24, 40, 31, 0.05);
+    --shadow-lg: 0 18px 50px -18px rgba(24, 40, 31, 0.30), 0 8px 20px -12px rgba(24, 40, 31, 0.18);
+
+    /* Geometry */
+    --radius: 16px;
+    --radius-sm: 11px;
+    --radius-xs: 8px;
+
     --breakpoint-md: 1200px;
-    --color-red: rgba(239, 51, 18, 0.9);
-    --color-green: rgba(46, 199, 14, 0.9);
+    --color-red: var(--neg);
+    --color-green: var(--pos);
+    color-scheme: light;
 }
 
-.red {
-    color: var(--color-red);
+[data-bs-theme="dark"] {
+    --canvas: #0d1311;
+    --surface: #161d19;
+    --surface-2: #1c2420;
+    --surface-3: #232c27;
+
+    --text: #e8ece9;
+    --text-muted: #9bab9f;
+    --text-faint: #6e7c73;
+
+    --border: rgba(255, 255, 255, 0.10);
+    --border-strong: rgba(255, 255, 255, 0.17);
+
+    --accent: #34d39b;
+    --accent-strong: #5fe0b3;
+    --accent-contrast: #06231a;
+    --accent-soft: rgba(52, 211, 155, 0.14);
+    --accent-rgb: 52, 211, 155;
+
+    --pos: #43cd86;
+    --neg: #f0735c;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.40);
+    --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 24px 60px -20px rgba(0, 0, 0, 0.70);
+
+    color-scheme: dark;
 }
 
-.green {
-    color: var(--color-green);
+/* --- Map tokens onto Bootstrap ------------------------------------------- */
+:root {
+    --bs-body-font-family: var(--font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --bs-body-bg: var(--canvas);
+    --bs-body-color: var(--text);
+    --bs-secondary-color: var(--text-muted);
+    --bs-secondary-bg: var(--surface-2);
+    --bs-tertiary-bg: var(--surface-3);
+    --bs-emphasis-color: var(--text);
+    --bs-border-color: var(--border);
+
+    --bs-primary: var(--accent);
+    --bs-primary-rgb: var(--accent-rgb);
+    --bs-link-color: var(--accent);
+    --bs-link-color-rgb: var(--accent-rgb);
+    --bs-link-hover-color: var(--accent-strong);
+
+    --bs-border-radius: var(--radius-sm);
+    --bs-border-radius-lg: var(--radius);
+    --bs-border-radius-sm: var(--radius-xs);
+
+    --bs-card-bg: var(--surface);
+    --bs-card-border-color: var(--border);
+    --bs-card-cap-bg: var(--surface-2);
+
+    --bs-emphasis-color-rgb: 24, 40, 31;
 }
 
+[data-bs-theme="dark"] {
+    --bs-emphasis-color-rgb: 232, 236, 233;
+}
+
+/* --- Base ---------------------------------------------------------------- */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: var(--canvas);
+    background-image:
+        radial-gradient(1100px 560px at 102% -8%, var(--accent-soft), transparent 55%),
+        radial-gradient(820px 480px at -8% 4%, var(--accent-soft), transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    letter-spacing: 0.005em;
+}
+
+.container {
+    max-width: 1080px;
+}
+
+h1, h2, h3, h4, .navbar-brand {
+    font-family: var(--font-display), Georgia, serif;
+    font-optical-sizing: auto;
+    letter-spacing: -0.015em;
+    color: var(--text);
+}
+
+h1 {
+    font-weight: 600;
+    font-size: clamp(1.7rem, 1.2rem + 1.7vw, 2.5rem);
+    line-height: 1.1;
+    margin-bottom: 0.6rem;
+}
+
+h2 {
+    font-weight: 600;
+    font-size: clamp(1.3rem, 1.05rem + 0.9vw, 1.7rem);
+    margin-top: 0.4rem;
+}
+
+h3 {
+    font-weight: 500;
+    font-size: 1.15rem;
+    color: var(--text);
+}
+
+p {
+    color: var(--text-muted);
+}
+
+a {
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    transition: color 0.16s ease;
+}
+
+::selection {
+    background: var(--accent-soft);
+    color: var(--text);
+}
+
+hr {
+    border-color: var(--border);
+    opacity: 1;
+}
+
+/* Numbers: monospaced, tabular so columns align */
+.num,
+.amount,
+td.amount,
+.kpi-value,
 pre {
-    box-sizing: border-box;
-    padding: 10px;
+    font-family: var(--font-mono), ui-monospace, "SF Mono", monospace;
+    font-variant-numeric: tabular-nums;
 }
 
-.dot {
-    height: 25px;
-    width: 25px;
+/* --- Navbar -------------------------------------------------------------- */
+.app-navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    padding-block: 0.55rem;
+    background: color-mix(in oklab, var(--surface) 80%, transparent);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid var(--border);
+    --bs-navbar-color: var(--text-muted);
+    --bs-navbar-hover-color: var(--text);
+    --bs-navbar-active-color: var(--accent);
+    --bs-navbar-brand-color: var(--text);
+    --bs-navbar-brand-hover-color: var(--text);
+    --bs-navbar-toggler-border-color: var(--border);
+}
+
+.app-navbar .navbar-brand {
+    font-size: 1.32rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.app-navbar .navbar-brand img {
+    filter: none;
+}
+
+.app-navbar .nav-link {
+    position: relative;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding-inline: 0.85rem;
+    border-radius: var(--radius-xs);
+    transition: color 0.16s ease, background-color 0.16s ease;
+}
+
+.app-navbar .nav-link:hover {
+    background: var(--accent-soft);
+}
+
+.app-navbar .nav-link.active {
+    color: var(--accent);
+}
+
+.app-navbar .navbar-toggler {
+    border-radius: var(--radius-xs);
+    padding: 0.35rem 0.5rem;
+}
+
+.app-navbar .navbar-toggler:focus {
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* --- Status pill --------------------------------------------------------- */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.32rem 0.72rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.status-pill .status-dot {
+    width: 0.55rem;
+    height: 0.55rem;
     border-radius: 50%;
-    display: inline-block;
+    background: var(--text-faint);
+    box-shadow: 0 0 0 0 transparent;
 }
 
-.dot__green {
-    background-color: var(--color-green);
+.status-pill.is-loaded {
+    color: var(--accent);
+    border-color: color-mix(in oklab, var(--accent) 35%, var(--border));
+    background: var(--accent-soft);
 }
 
-.dot__red {
-    background-color: var(--color-red);
+.status-pill.is-loaded .status-dot {
+    background: var(--pos);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--pos) 22%, transparent);
 }
 
-@media only screen and (min-width: calc(var(--breakpoint-md) + 1px)) {
-    .mobile__show {
-        display: none;
-    }
-}
-
-@media only screen and (max-width: var(--breakpoint-md)) {
-    .mobile__hide {
-        display: none;
-    }
-}
-
-.linkdecoration__none {
-    text-decoration: none;
-    color: white;
-}
-
-th {
+/* --- Theme toggle -------------------------------------------------------- */
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
     cursor: pointer;
+    transition: background-color 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
 }
 
+.theme-toggle:hover {
+    background: var(--accent-soft);
+    border-color: color-mix(in oklab, var(--accent) 30%, var(--border));
+    color: var(--accent);
+}
 
+.theme-toggle:active {
+    transform: scale(0.93);
+}
 
-/* Table readability enhancements */
+.theme-toggle svg {
+    width: 1.15rem;
+    height: 1.15rem;
+}
+
+/* --- Cards --------------------------------------------------------------- */
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.card .card-body {
+    padding: 1.15rem 1.25rem;
+}
+
+/* KPI cards (insights) */
+.card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.card .card-body > div:first-child {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.card .card-body strong {
+    display: block;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+
+/* --- Tables -------------------------------------------------------------- */
 .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--text);
     border-collapse: separate;
     border-spacing: 0;
+    margin-bottom: 0;
 }
 
 .table thead th {
-    background-color: #f8f9fa; /* subtle header contrast */
+    background: transparent;
+    color: var(--text-faint);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    border-bottom: 1px solid var(--border-strong);
+    padding-block: 0.7rem;
 }
 
+.table tbody td,
+.table tbody th {
+    padding-block: 0.65rem;
+    border-top: 1px solid var(--border);
+    vertical-align: middle;
+    color: var(--text);
+}
+
+/* Reset the old zebra hack; use a single soft hover instead */
+.table.table-striped > tbody > tr > td,
+.table.table-striped > tbody > tr > th,
 .table tbody tr:nth-child(odd) > td,
-.table tbody tr:nth-child(odd) > th {
-    background-color: rgba(0, 0, 0, 0.018) !important; /* subtle shade A */
-}
-
+.table tbody tr:nth-child(odd) > th,
 .table tbody tr:nth-child(even) > td,
 .table tbody tr:nth-child(even) > th {
-    background-color: rgba(0, 0, 0, 0.038) !important; /* subtle shade B */
+    background-color: transparent !important;
+}
+
+.table tbody tr {
+    transition: background-color 0.12s ease;
 }
 
 .table tbody tr:hover > td,
 .table tbody tr:hover > th {
-    background-color: rgba(0, 0, 0, 0.06) !important; /* hover highlight */
+    background-color: var(--accent-soft) !important;
 }
 
-.table td, .table th {
-    border-top: 1px solid rgba(0, 0, 0, 0.08); /* soft row separators */
+.table th {
+    cursor: pointer;
 }
 
+.table-responsive {
+    border-radius: var(--radius);
+}
 
+/* Color-coded money values: tabular mono, colored text (no neon cell fills) */
+.amount {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+.btn {
+    --bs-btn-border-radius: var(--radius-xs);
+    font-family: var(--font-body);
+    font-weight: 500;
+    transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.1s ease, box-shadow 0.16s ease;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--accent);
+    --bs-btn-border-color: var(--accent);
+    --bs-btn-color: var(--accent-contrast);
+    --bs-btn-hover-bg: var(--accent-strong);
+    --bs-btn-hover-border-color: var(--accent-strong);
+    --bs-btn-hover-color: var(--accent-contrast);
+    --bs-btn-active-bg: var(--accent-strong);
+    --bs-btn-active-border-color: var(--accent-strong);
+    --bs-btn-active-color: var(--accent-contrast);
+    --bs-btn-disabled-bg: var(--accent);
+    --bs-btn-disabled-border-color: var(--accent);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-success {
+    --bs-btn-bg: var(--accent);
+    --bs-btn-border-color: var(--accent);
+    --bs-btn-color: var(--accent-contrast);
+    --bs-btn-hover-bg: var(--accent-strong);
+    --bs-btn-hover-border-color: var(--accent-strong);
+    --bs-btn-hover-color: var(--accent-contrast);
+}
+
+.btn-secondary {
+    --bs-btn-bg: var(--surface-3);
+    --bs-btn-border-color: var(--border-strong);
+    --bs-btn-color: var(--text);
+    --bs-btn-hover-bg: var(--surface-2);
+    --bs-btn-hover-border-color: var(--accent);
+    --bs-btn-hover-color: var(--text);
+    --bs-btn-active-bg: var(--surface-2);
+    --bs-btn-active-color: var(--text);
+}
+
+.btn-link {
+    --bs-btn-color: var(--accent);
+    --bs-btn-hover-color: var(--accent-strong);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.btn:focus-visible,
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    border-color: var(--accent);
+    outline: none;
+}
+
+/* --- Forms --------------------------------------------------------------- */
+.form-control,
+.form-select {
+    background-color: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    color: var(--text);
+    padding: 0.55rem 0.8rem;
+}
+
+.form-control::placeholder {
+    color: var(--text-faint);
+}
+
+.input-group-text {
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+    color: var(--text-muted);
+    border-radius: var(--radius-xs);
+}
+
+.form-control[type="file"] {
+    padding: 0.5rem 0.8rem;
+}
+
+.form-control[type="file"]::file-selector-button {
+    background: var(--surface-3);
+    color: var(--text);
+    border: 0;
+    border-radius: var(--radius-xs);
+    padding: 0.4rem 0.8rem;
+    margin-inline-end: 0.8rem;
+    font-weight: 500;
+    transition: background-color 0.16s ease;
+}
+
+.form-control[type="file"]::file-selector-button:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.form-check-input:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px var(--accent-soft);
+    border-color: var(--accent);
+}
+
+/* --- Alerts -------------------------------------------------------------- */
+.alert {
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-info {
+    background: var(--accent-soft);
+    color: var(--text);
+    border-color: color-mix(in oklab, var(--accent) 28%, var(--border));
+}
+
+.alert-success {
+    background: color-mix(in oklab, var(--pos) 14%, var(--surface));
+    color: var(--text);
+    border-color: color-mix(in oklab, var(--pos) 40%, var(--border));
+}
+
+.alert-danger {
+    background: color-mix(in oklab, var(--neg) 13%, var(--surface));
+    color: var(--text);
+    border-color: color-mix(in oklab, var(--neg) 40%, var(--border));
+}
+
+/* --- Upload hero --------------------------------------------------------- */
+.upload-panel {
+    max-width: 640px;
+    margin: clamp(1.5rem, 5vh, 4rem) auto 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    padding: clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.upload-panel h1 {
+    letter-spacing: -0.03em;
+}
+
+.upload-panel .form-control,
+.upload-panel .form-select {
+    background: var(--surface-2);
+}
+
+/* --- Charts -------------------------------------------------------------- */
+.chart-card,
+canvas {
+    max-width: 100%;
+}
+
+/* --- Pre / code ---------------------------------------------------------- */
+pre {
+    box-sizing: border-box;
+    padding: 1rem 1.1rem;
+    background: var(--surface) !important;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    font-size: 0.85rem;
+    overflow: auto;
+}
+
+/* --- Footer -------------------------------------------------------------- */
+footer {
+    margin-top: 4rem !important;
+    padding-bottom: 2.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    color: var(--text-muted);
+}
+
+footer .btn-link {
+    padding-inline: 0.35rem;
+}
+
+/* --- Legacy utilities (kept) -------------------------------------------- */
+.red { color: var(--neg); }
+.green { color: var(--pos); }
+
+.dot {
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot__green { background-color: var(--pos); }
+.dot__red { background-color: var(--neg); }
+
+.linkdecoration__none {
+    text-decoration: none;
+    color: var(--accent-contrast);
+}
+
+@media only screen and (min-width: 576px) {
+    .mobile__show { display: none; }
+}
+
+@media only screen and (max-width: 575.98px) {
+    .mobile__hide { display: none; }
+}
+
+/* --- Motion -------------------------------------------------------------- */
+@keyframes ez-rise {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.main-content > * {
+    animation: ez-rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}

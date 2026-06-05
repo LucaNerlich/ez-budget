@@ -42,9 +42,9 @@ export default function SavingsKPIs() {
     return (
         <div className="mt-4">
             <h2>Ersparnis KPIs</h2>
-            <div className="row g-3">
+            <div className="row g-3 align-items-stretch">
                 <div className="col-12 col-md-3">
-                    <div className="card">
+                    <div className="card h-100">
                         <div className="card-body">
                             <div>Sparquote (dieses Jahr)</div>
                             <strong>{kpis.savingsRateYear}%</strong>
@@ -52,7 +52,7 @@ export default function SavingsKPIs() {
                     </div>
                 </div>
                 <div className="col-12 col-md-3">
-                    <div className="card">
+                    <div className="card h-100">
                         <div className="card-body">
                             <div>Durchschnittliche Monatsersparnis</div>
                             <strong>{nf.format(kpis.avgMonthlySavings)}</strong>
@@ -60,7 +60,7 @@ export default function SavingsKPIs() {
                     </div>
                 </div>
                 <div className="col-12 col-md-3">
-                    <div className="card">
+                    <div className="card h-100">
                         <div className="card-body">
                             <div>Bester Monat</div>
                             <strong>{monthKey(kpis.bestMonth.year, kpis.bestMonth.month)}: {nf.format(kpis.bestMonth.net)}</strong>
@@ -68,7 +68,7 @@ export default function SavingsKPIs() {
                     </div>
                 </div>
                 <div className="col-12 col-md-3">
-                    <div className="card">
+                    <div className="card h-100">
                         <div className="card-body">
                             <div>Schlechtester Monat</div>
                             <strong>{monthKey(kpis.worstMonth.year, kpis.worstMonth.month)}: {nf.format(kpis.worstMonth.net)}</strong>
