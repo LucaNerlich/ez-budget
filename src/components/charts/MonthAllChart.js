@@ -1,18 +1,15 @@
 "use client";
 import React, {useContext, useEffect, useMemo, useState} from "react";
-import {useColorService} from "../../services/ColorService";
+import {getScaleByAmount} from "../../services/colors";
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
-import {useStatisticsService} from "../../services/StatisticsService";
+import {getExpenseSumPerCategoryFromEntries, getIncomeSumPerCategoryFromEntries} from "../../services/statistics";
 import {DataContext} from "../../providers/DataProvider";
-import {useDataService} from "../../services/DataService";
+import {getEntriesForMonth} from "../../services/budget";
 import {sortMapByNumberValue} from "../../Util";
 
 export default function MonthAllChart(props) {
   const dataContext = useContext(DataContext);
-  const colorService = useColorService();
-  const statisticsService = useStatisticsService();
-  const dataService = useDataService();
 
   const [monthEntries, setMonthEntries] = useState([]);
   const [showPercent, setShowPercent] = useState(false);
@@ -21,12 +18,12 @@ export default function MonthAllChart(props) {
   // derive configs via useMemo to avoid state loops
 
   useEffect(() => {
-    setMonthEntries(dataService.getAllEntriesYearMonth(dataContext.budget, props.year, props.month));
+    setMonthEntries(getEntriesForMonth(dataContext.budget, props.year, props.month));
   }, [dataContext.budget, props.year, props.month]);
 
   useEffect(() => {
-    setExpenseMap(statisticsService.getExpenseSumPerCategoryFromEntries(monthEntries));
-    setIncomeMap(statisticsService.getIncomeSumPerCategoryFromEntries(monthEntries));
+    setExpenseMap(getExpenseSumPerCategoryFromEntries(monthEntries));
+    setIncomeMap(getIncomeSumPerCategoryFromEntries(monthEntries));
   }, [monthEntries]);
 
   const expenseChartConfig = useMemo(() => {
@@ -48,7 +45,7 @@ export default function MonthAllChart(props) {
       datasets: [{
         label: '',
         data: magnitudes,
-        backgroundColor: colorService.getScaleByAmount(labels.length),
+        backgroundColor: getScaleByAmount(labels.length),
         rawValues: signedValues
       }]
     };
@@ -92,7 +89,7 @@ export default function MonthAllChart(props) {
       datasets: [{
         label: '',
         data: groupedValues,
-        backgroundColor: colorService.getScaleByAmount(groupedLabels.length),
+        backgroundColor: getScaleByAmount(groupedLabels.length),
         rawValues: groupedValues
       }]
     };

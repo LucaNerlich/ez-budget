@@ -1,34 +1,31 @@
 "use client";
 import React, {useMemo} from "react";
-import {useStatisticsService} from "../../services/StatisticsService";
+import {getSumForYearMonth, getTrendArray} from "../../services/statistics";
 import dayjs from "dayjs";
 import {Bar} from "react-chartjs-2";
-import {useColorService} from "../../services/ColorService";
-import {useChartConfigService} from "../../services/ChartConfigService";
+import {getRedGreenForSum} from "../../services/colors";
+import {getXforMonths} from "../../services/chartConfig";
 
 export default function MonthSummary(props) {
   const entries = props.entries;
   const now = dayjs(new Date());
-  const statisticsService = useStatisticsService();
-  const chartConfigService = useChartConfigService();
-  const colorService = useColorService();
 
   const sums = useMemo(() => {
     const sumAll = [];
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '01'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '02'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '03'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '04'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '05'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '06'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '07'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '08'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '09'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '10'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), '11'));
-    sumAll.push(statisticsService.getSumForYearMonth(entries, now.year(), `12`));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '01'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '02'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '03'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '04'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '05'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '06'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '07'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '08'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '09'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '10'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), '11'));
+    sumAll.push(getSumForYearMonth(entries, now.year(), `12`));
     return sumAll;
-  }, [entries, now, statisticsService]);
+  }, [entries, now]);
 
   const sumChartConfig = useMemo(() => {
     const categoryLabels = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
@@ -40,18 +37,18 @@ export default function MonthSummary(props) {
           type: 'line',
           backgroundColor: 'black',
           fill: false,
-          data: statisticsService.getTrendArray(chartConfigService.getXforMonths(), sums),
+          data: getTrendArray(getXforMonths(), sums),
         },
         {
           label: 'Ergebnis',
           type: 'bar',
-          backgroundColor: colorService.getRedGreenForSum(sums),
+          backgroundColor: getRedGreenForSum(sums),
           data: sums
         }
 
       ]
     };
-  }, [sums, chartConfigService, colorService, statisticsService]);
+  }, [sums]);
 
   const data = {
     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],

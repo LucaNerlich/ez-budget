@@ -1,9 +1,8 @@
 'use client';
 import React, {useEffect, useState} from 'react';
-import {useStatisticsService} from "../../services/StatisticsService";
+import {round} from "../../services/statistics";
 import {YearStats} from "../../entities/stats/YearStats";
 import {Category, mapCategoriesToRows} from "./YearContainer";
-import {useColorService} from "../../services/ColorService";
 
 interface YearStatProps {
     currentYearStats: YearStats,
@@ -11,8 +10,6 @@ interface YearStatProps {
 }
 
 const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) => {
-    const statisticsService = useStatisticsService();
-    const colorService = useColorService();
     const [categories, setCategories] = useState<Category[]>(currentYearStats.categories);
     const [sortConfig, setSortConfig] = useState<{ key: keyof Category, direction: 'asc' | 'desc' } | null>(null);
     const [categoryRows, setCategoryRows] = useState([]);
@@ -33,14 +30,14 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) 
     };
 
     useEffect(() => {
-        setCategoryRows(mapCategoriesToRows(categories, colorService));
+        setCategoryRows(mapCategoriesToRows(categories));
     }, [categories])
 
     return (
         <div>
             {currentYearStats &&
               <>
-                <h3>{currentYearStats.year} - Gewinn: {statisticsService.round(currentYearStats.sum)}</h3>
+                <h3>{currentYearStats.year} - Gewinn: {round(currentYearStats.sum)}</h3>
 
                 <details open={opened}>
                   <summary className="mt-3"><p style={{display: 'inline'}}>Ergebnis pro Kategorie</p></summary>

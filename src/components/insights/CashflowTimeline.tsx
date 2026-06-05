@@ -1,17 +1,16 @@
 "use client";
 import React, {useMemo} from 'react';
-import {useDateService} from '../../services/DateService';
+import {now} from '../../services/date';
 import {useCashflow} from '../../services/useCashflow';
 import {cumulativeByYear} from '../../services/cashflow';
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 
 export default function CashflowTimeline() {
-    const dateService = useDateService();
     const rows = useCashflow();
 
     const timeline = useMemo(() => {
-        const currentYear = dateService.NOW.year();
+        const currentYear = now().year();
         const cur = cumulativeByYear(rows).get(currentYear) || [];
 
         // break-even month (first month cum >= 0)
@@ -30,7 +29,7 @@ export default function CashflowTimeline() {
         const runwayMonths = avgNet < 0 ? Math.max(0, Math.floor(lastCum / Math.abs(avgNet))) : null;
 
         return {cur, breakEven, runwayMonths};
-    }, [rows, dateService]);
+    }, [rows]);
 
     const data = useMemo(() => {
         return {

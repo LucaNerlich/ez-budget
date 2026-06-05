@@ -1,13 +1,12 @@
 "use client";
 import React, {useMemo} from 'react';
-import {useDateService} from '../../services/DateService';
+import {now} from '../../services/date';
 import {useCashflow} from '../../services/useCashflow';
 import {linearRegression, rollingAverage} from '../../services/cashflow';
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 
 export default function TrendsForecasts() {
-    const dateService = useDateService();
     const monthly = useCashflow();
 
     const rollingConfig = useMemo(() => {
@@ -26,7 +25,7 @@ export default function TrendsForecasts() {
     }, [monthly]);
 
     const yoyConfig = useMemo(() => {
-        const nowYear = dateService.NOW.year();
+        const nowYear = now().year();
         const prevYear = nowYear - 1;
         const thisYear = monthly.filter(m => m.year === nowYear);
         const lastYear = monthly.filter(m => m.year === prevYear);
@@ -43,7 +42,7 @@ export default function TrendsForecasts() {
                 {label: 'YoY Delta (Netto)', data: deltas, backgroundColor: deltas.map(v => v >= 0 ? '#2a7' : '#e33')}
             ]
         };
-    }, [monthly, dateService]);
+    }, [monthly]);
 
     const forecastConfig = useMemo(() => {
         if (!monthly || monthly.length < 3) return {labels: [], datasets: [{data: []}]};

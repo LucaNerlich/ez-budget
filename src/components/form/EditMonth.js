@@ -1,21 +1,19 @@
 "use client";
 import React, {useContext, useEffect, useState} from "react";
-import {useDataService} from "../../services/DataService";
 import {DataContext} from "../../providers/DataProvider";
-import {useColorService} from "../../services/ColorService";
+import {getEntriesForMonth} from "../../services/budget";
+import {getPositiveNegativeColor} from "../../services/colors";
 import orderBy from 'lodash/orderBy';
 
 export default function EditMonth(props) {
   const dataContext = useContext(DataContext);
-  const dataService = useDataService();
-  const colorService = useColorService();
   const [sortField, setSortField] = useState("");
   const [sortOrder, setSortOrder] = useState('asc');
   const [monthEntries, setMonthEntries] = useState([]);
   const [sortedData, setSortedData] = useState([]);
 
   useEffect(() => {
-    setMonthEntries(dataService.getAllEntriesYearMonth(dataContext.budget, props.year, props.month));
+    setMonthEntries(getEntriesForMonth(dataContext.budget, props.year, props.month));
   }, [dataContext.budget, props.year, props.month]);
 
 
@@ -66,7 +64,7 @@ export default function EditMonth(props) {
               <span>{item.comment}</span>}
           </td>
           <td>
-                    <span style={{backgroundColor: colorService.getPositiveNegativeColor(item.value)}}>
+                    <span style={{backgroundColor: getPositiveNegativeColor(item.value)}}>
                         {item.value}
                     </span>
           </td>

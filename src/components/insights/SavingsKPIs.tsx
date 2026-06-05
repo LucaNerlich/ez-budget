@@ -1,17 +1,17 @@
 "use client";
 import React, {useMemo} from 'react';
-import {useDateService} from '../../services/DateService';
+import {now} from '../../services/date';
+import {monthKey} from '../../services/month';
 import {useCashflow} from '../../services/useCashflow';
 
 export default function SavingsKPIs() {
-    const dateService = useDateService();
     const rows = useCashflow();
 
     const kpis = useMemo(() => {
         if (!rows || rows.length === 0) return null;
 
         // Current year
-        const currentYear = dateService.NOW.year();
+        const currentYear = now().year();
         const thisYear = rows.filter(m => m.year === currentYear);
         const incomeYear = thisYear.reduce((a, b) => a + b.income, 0);
         const expenseYear = thisYear.reduce((a, b) => a + b.expense, 0); // negative
@@ -33,13 +33,9 @@ export default function SavingsKPIs() {
             bestMonth,
             worstMonth
         };
-    }, [rows, dateService]);
+    }, [rows]);
 
     if (!kpis) return null;
-
-    function ym({year, month}: { year: number; month: number }) {
-        return `${year}-${month < 10 ? '0' + month : month}`;
-    }
 
     const nf = new Intl.NumberFormat('de-DE');
 
@@ -67,7 +63,7 @@ export default function SavingsKPIs() {
                     <div className="card">
                         <div className="card-body">
                             <div>Bester Monat</div>
-                            <strong>{ym(kpis.bestMonth)}: {nf.format(kpis.bestMonth.net)}</strong>
+                            <strong>{monthKey(kpis.bestMonth.year, kpis.bestMonth.month)}: {nf.format(kpis.bestMonth.net)}</strong>
                         </div>
                     </div>
                 </div>
@@ -75,7 +71,7 @@ export default function SavingsKPIs() {
                     <div className="card">
                         <div className="card-body">
                             <div>Schlechtester Monat</div>
-                            <strong>{ym(kpis.worstMonth)}: {nf.format(kpis.worstMonth.net)}</strong>
+                            <strong>{monthKey(kpis.worstMonth.year, kpis.worstMonth.month)}: {nf.format(kpis.worstMonth.net)}</strong>
                         </div>
                     </div>
                 </div>

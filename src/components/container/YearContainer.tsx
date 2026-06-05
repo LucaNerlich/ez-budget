@@ -3,9 +3,10 @@ import React, {useContext, useEffect, useState} from "react";
 import {DataContext} from "../../providers/DataProvider";
 import {DataContextType} from "../../entities/raw/DataContextType";
 import {YearStats} from "../../entities/stats/YearStats";
-import {useDateService} from "../../services/DateService";
-import {useDataService} from "../../services/DataService";
-import {useColorService} from "../../services/ColorService";
+import {now} from "../../services/date";
+import {getAvailableYears} from "../../services/budget";
+import {getStatsForYear} from "../../services/statistics";
+import {getPositiveNegativeColor} from "../../services/colors";
 import YearStatComponent from "./YearStatComponent";
 
 interface YearCategoryContainer {
@@ -19,7 +20,7 @@ export interface Category {
     sum: number,
 }
 
-export function mapCategoriesToRows(categories: Category[], colorService) {
+export function mapCategoriesToRows(categories: Category[]) {
     if (!categories) return;
     return categories.map((value: Category, index: number) => {
         return (
@@ -27,7 +28,7 @@ export function mapCategoriesToRows(categories: Category[], colorService) {
                 <th scope="row">{index + 1}</th>
                 <td>{value.category}</td>
                 <td>
-                    <span style={{backgroundColor: colorService.getPositiveNegativeColor(value.sum)}}>
+                    <span style={{backgroundColor: getPositiveNegativeColor(value.sum)}}>
                         {value.sum}
                     </span>
                 </td>
@@ -37,22 +38,18 @@ export function mapCategoriesToRows(categories: Category[], colorService) {
 }
 
 export default function YearContainer() {
-    const dateService = useDateService();
-    const dataService = useDataService();
-    const colorService = useColorService();
     // @ts-ignore
     const dataContext: DataContextType = useContext(DataContext);
 
     const [yearCategoryContainers, setYearCategoryContainers] = useState<YearCategoryContainer[]>([])
 
     useEffect(() => {
-        const currentYear = dateService.NOW.year();
-        const availableYears: number[] = dataService.getAvailableYears(dataContext.budget);
+        const availableYears: number[] = getAvailableYears(dataContext.budget);
 
         const allYears: YearCategoryContainer[] = []
         availableYears.forEach(year => {
-            const statsForYear = dataService.getStatsForYear(dataContext.statsContainer, year);
-            const categoriesForYear = mapCategoriesToRows(statsForYear.categories, colorService);
+            const statsForYear = getStatsForYear(dataContext.statsContainer, year);
+            const categoriesForYear = mapCategoriesToRows(statsForYear.categories);
             allYears.push({
                 year,
                 statsForYear,
@@ -70,7 +67,7 @@ export default function YearContainer() {
                 return <YearStatComponent
                     key={container.year}
                     currentYearStats={container.statsForYear}
-                    opened={container.year === dateService.NOW.year()}/>
+                    opened={container.year === now().year()}/>
             })}
         </div>
     );

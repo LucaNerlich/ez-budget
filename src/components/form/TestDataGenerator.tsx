@@ -1,18 +1,15 @@
 "use client";
 import React, {useEffect, useState} from 'react';
-import {useDataService} from "../../services/DataService";
 import {getRandomCommentByCategory, getRandomFloat, TEST_CATEGORIES} from "../../../constants";
 import {Year} from "../../entities/raw/Year";
 import {Month} from "../../entities/raw/Month";
 import {Entry} from "../../entities/raw/Entry";
-import {getDateString, getRandomItemFromArray} from "../../Util";
+import {getDateString, getRandomItemFromArray, jsFriendlyJSONStringify} from "../../Util";
 
 export default function TestDataGenerator() {
 
     const latestDayInMonth: number = 28; // to avoid generating invalid dates
     const monthsToGenerate: number = 12;
-
-    const dataService = useDataService();
 
     const [startYear, setStartYear] = useState<number>(2019);
     const [yearsToGenerate, setYearsToGenerate] = useState<number>(10);
@@ -98,7 +95,7 @@ export default function TestDataGenerator() {
                 {testData && testData.length > 0 &&
                   <button type="button" className="mt-3 btn btn-success">
                     <a
-                      href={`data:text/json;charset=utf-8,${encodeURIComponent(dataService.jsFriendlyJSONStringify(testData))}`}
+                      href={`data:text/json;charset=utf-8,${encodeURIComponent(jsFriendlyJSONStringify(testData))}`}
                       className="linkdecoration__none"
                       download="testdata.yaml">
                       Testdaten herunterladen
@@ -110,7 +107,7 @@ export default function TestDataGenerator() {
             {testData && testData.length > 0 &&
               <div>
                 <hr/>
-                <pre className="shadow">{dataService.jsFriendlyJSONStringify(testData)}</pre>
+                <pre className="shadow">{jsFriendlyJSONStringify(testData)}</pre>
               </div>
             }
 

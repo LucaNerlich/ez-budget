@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.4.1] - 2026-06-05
+
+### Fixed
+- March now displays consistently as "März" across the monthly header, yearly table, and month dropdown.
+
+### Changed
+- Refactored budget statistics, date, color, month, and chart helpers into plain, directly testable modules.
+
+### Removed
+- Removed the unused and unvalidated `/api/getFile` server endpoint.
+
 ## [3.4.0] - 2026-06-05
 
 ### Added

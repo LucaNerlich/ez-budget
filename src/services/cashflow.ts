@@ -1,5 +1,6 @@
 import {Budget} from "../entities/raw/Budget";
 import {getAvailableMonths, getAvailableYears, getEntriesForMonth} from "./budget";
+import {monthKey} from "./month";
 
 /**
  * Pure cashflow logic. No React. This is the test surface that three insight
@@ -15,10 +16,6 @@ export interface CashflowRow {
     income: number;
     expense: number;
     net: number;
-}
-
-function monthKey(year: number, month: number): string {
-    return `${year}-${month < 10 ? '0' + month : month}`;
 }
 
 export function monthlyCashflow(budget: Budget): CashflowRow[] {

@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '../../src/components/Layout';
 import JsonDataGeneratorForm from '../../src/components/form/JsonDataGenerator';
-import {useDataService} from '../../src/services/DataService';
+import {jsFriendlyJSONStringify} from '../../src/Util';
 
 const demoJson = [
   { category: 'Warmmiete', value: -1390, date: '2022-01-01', comment: 'some-comment' },
@@ -14,7 +14,6 @@ export const metadata = {
 };
 
 export default function JsonGeneratorPage() {
-  const dataService = useDataService();
   return (
     <Layout>
       <h1>EzBudget Json Generator</h1>
@@ -22,7 +21,7 @@ export default function JsonGeneratorPage() {
         vorhandenes Dokument sämtlicher Daten. Dieses Formular soll lediglich das Erzeugen der
         Kategorie-Wertpaare beschleunigen.</p>
       <h2>Output Beispiel</h2>
-      <pre className="shadow">{dataService.jsFriendlyJSONStringify(demoJson)}</pre>
+      <pre className="shadow">{jsFriendlyJSONStringify(demoJson)}</pre>
       <h2>Eintragsgenerator</h2>
       <div className="alert alert-danger" role="alert">
         Lade das generierte Json runter, bevor du die Seite wechselst oder neu lädst! Andernfalls ist es

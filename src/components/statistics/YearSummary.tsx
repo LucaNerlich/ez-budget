@@ -3,15 +3,13 @@ import React, {useContext, useEffect, useState} from "react";
 import {DataContextType} from "../../entities/raw/DataContextType";
 import {DataContext} from "../../providers/DataProvider";
 import {YearStats} from "../../entities/stats/YearStats";
-import {INDEX_MONTH_MAP} from "../../../constants";
-import {useStatisticsService} from "../../services/StatisticsService";
-import {useColorService} from "../../services/ColorService";
+import {monthName} from "../../services/month";
+import {round} from "../../services/statistics";
+import {getPositiveNegativeColor} from "../../services/colors";
 
 export default function YearSummary(props) {
     // @ts-ignore
     const dataContext: DataContextType = useContext(DataContext);
-    const statisticsService = useStatisticsService();
-    const colorService = useColorService();
 
     const [tableBodies, setTableBodies] = useState([]);
 
@@ -27,7 +25,7 @@ export default function YearSummary(props) {
                 <tr>
                     <th scope="row">{i + 1}</th>
                     <td>{yearStat.year}</td>
-                    <td>{statisticsService.round(yearStat.sum)}</td>
+                    <td>{round(yearStat.sum)}</td>
                 </tr>
                 <tr>
                     <td colSpan={3}>
@@ -43,11 +41,11 @@ export default function YearSummary(props) {
                             {yearStat.months.map((month) => {
                                 return <tr key={month.month}>
                                     <th scope="row">{month.month}</th>
-                                    <td>{INDEX_MONTH_MAP.get(month.month)}</td>
+                                    <td>{monthName(month.month)}</td>
                                     <td>
                                         <span
-                                            style={{backgroundColor: colorService.getPositiveNegativeColor(month.sum)}}>
-                                            {statisticsService.round(month.sum)}
+                                            style={{backgroundColor: getPositiveNegativeColor(month.sum)}}>
+                                            {round(month.sum)}
                                         </span>
                                     </td>
                                 </tr>

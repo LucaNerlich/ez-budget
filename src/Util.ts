@@ -12,3 +12,11 @@ export function getRandomItemFromArray(array) {
 export function getDateString(year: number, month: number, day: number): string {
     return year + "-" + month + "-" + day
 }
+
+/**
+ * Pretty-print JSON for display: 4-space indent, normalized newlines.
+ */
+export function jsFriendlyJSONStringify(s: any): string {
+    const json = JSON.stringify(s, null, 4);
+    return json.replace(/\r?\n/g, '\n');
+}

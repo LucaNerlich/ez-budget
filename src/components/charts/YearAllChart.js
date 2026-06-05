@@ -2,17 +2,15 @@
 import React, {useMemo} from "react";
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
-import {useStatisticsService} from "../../services/StatisticsService";
+import {getSumMapForYear} from "../../services/statistics";
 import dayjs from "dayjs";
-import {useColorService} from "../../services/ColorService";
+import {getRedGreenForSum} from "../../services/colors";
 
 export default function YearAllChart(props) {
   const now = dayjs(new Date());
-  const statisticsService = useStatisticsService();
-  const colorService = useColorService();
 
   const entries = props.entries;
-  const categorySumMap = useMemo(() => statisticsService.getSumMapForYear(entries, now.year()), [entries, now, statisticsService]);
+  const categorySumMap = useMemo(() => getSumMapForYear(entries, now.year()), [entries, now]);
 
   const categorySumConfig = useMemo(() => {
     if (!categorySumMap) return undefined;
@@ -27,7 +25,7 @@ export default function YearAllChart(props) {
       datasets: [
         {
           label: '',
-          backgroundColor: colorService.getRedGreenForSum(categorySums),
+          backgroundColor: getRedGreenForSum(categorySums),
           data: categorySums
         }
       ]

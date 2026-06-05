@@ -1,14 +1,11 @@
 "use client";
 import React, {useEffect, useRef, useState} from 'react';
-import {useDataService} from "../../services/DataService";
-import {useDateService} from "../../services/DateService";
-// dateService.NOW is a dayjs instance; use explicit format string
+import {now} from "../../services/date";
+import {jsFriendlyJSONStringify} from "../../Util";
 import {Entry} from "../../entities/raw/Entry";
 
 export default function JsonDataGeneratorForm(props) {
 
-    const dataService = useDataService();
-    const dateService = useDateService();
     const generatorForm = useRef(null);
     const focusRef = useRef(null)
     const [entries, setEntries] = useState([]);
@@ -26,7 +23,7 @@ export default function JsonDataGeneratorForm(props) {
         const newEntry: Entry = {
             category: category,
             value: parseFloat(value),
-            date: dateService.NOW.format('YYYY-MM-DD'),
+            date: now().format('YYYY-MM-DD'),
         }
         if (comment) {
             newEntry.comment = comment
@@ -90,7 +87,7 @@ export default function JsonDataGeneratorForm(props) {
                 <hr/>
                 {entries && entries.length > 0 &&
                   <a
-                    href={`data:text/json;charset=utf-8,${encodeURIComponent(dataService.jsFriendlyJSONStringify(entries))}`}
+                    href={`data:text/json;charset=utf-8,${encodeURIComponent(jsFriendlyJSONStringify(entries))}`}
                     download="ezbudget-statistiken.json">
                     <button type="button" className="mt-3 mb-3 btn btn-success">
                       Json herunterladen
@@ -104,7 +101,7 @@ export default function JsonDataGeneratorForm(props) {
 
                 <h2>Deine erzeugten Daten</h2>
                 <pre className="shadow">
-                    {dataService.jsFriendlyJSONStringify(entries)}
+                    {jsFriendlyJSONStringify(entries)}
                     </pre>
               </div>
             }
