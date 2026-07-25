@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.2] - 2026-07-25
+
+### Removed
+- Removed the service worker and offline page — no longer needed.
+
 ## [3.5.1] - 2026-07-25
 
 ### Fixed
