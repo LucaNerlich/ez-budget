@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.3] - 2026-07-25
+
+### Fixed
+- Example data download link no longer returns a 404 — testdata.yaml is now served as a static asset.
+- Suppressed React hydration warnings on the root HTML element to avoid console noise.
+
 ## [3.5.2] - 2026-07-25
 
 ### Removed

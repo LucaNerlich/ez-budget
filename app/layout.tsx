@@ -103,7 +103,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
-        <html lang="de" className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`}>
+        <html lang="de" className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`} suppressHydrationWarning>
         <body>
         <script dangerouslySetInnerHTML={{__html: themeInitScript}}/>
         <DataProvider>
