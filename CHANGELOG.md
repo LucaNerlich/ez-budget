@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.1] - 2026-07-25
+
+### Fixed
+- Content Security Policy now allows analytics connections to umami.lucanerlich.com.
+
+### Changed
+- Updated project dependencies to their latest versions.
+
 ## [3.5.0] - 2026-06-05
 
 ### Added
