@@ -4,6 +4,8 @@ import axios from 'axios';
 import YAML from 'yaml';
 import { z } from 'zod';
 import dns from 'node:dns/promises';
+import https from 'node:https';
+import type {LookupFunction} from 'node:net';
 // net.isPrivate is not available; implement our own private IP detection
 
 function isHttpsUrl(url: string): boolean {
@@ -48,28 +50,47 @@ const DataSchema = z.union([
   }),
 ]);
 
-async function assertRemoteSafe(url: string) {
-  const u = new URL(url);
-  const hostname = u.hostname;
-  const addrs = await dns.lookup(hostname, { all: true });
-  const isPrivateAddress = (ip: string): boolean => {
-    if (ip === '::1' || ip === '127.0.0.1') return true;
-    // IPv4 private ranges
-    if (/^10\./.test(ip)) return true;
-    if (/^192\.168\./.test(ip)) return true;
-    if (/^172\.(1[6-9]|2\d|3[0-1])\./.test(ip)) return true;
-    if (/^169\.254\./.test(ip)) return true; // link-local
-    // IPv6 ULA/link-local
-    if (/^fc/i.test(ip) || /^fd/i.test(ip)) return true; // fc00::/7
-    if (/^fe80/i.test(ip)) return true; // link-local
-    if (/^::ffff:127\./.test(ip)) return true; // IPv4-mapped loopback
+function isPrivateIPv4(ip: string): boolean {
+    if (ip === '0.0.0.0') return true; // unspecified
+    const parts = ip.split('.').map(Number);
+    if (parts.length !== 4 || parts.some((p) => Number.isNaN(p))) return true;
+    const [a, b] = parts;
+    if (a === 10) return true; // RFC1918
+    if (a === 127) return true; // loopback
+    if (a === 192 && b === 168) return true; // RFC1918
+    if (a === 172 && b >= 16 && b <= 31) return true; // RFC1918
+    if (a === 169 && b === 254) return true; // link-local
+    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT 100.64.0.0/10
     return false;
-  };
-  const isPrivate = addrs.some((a) => isPrivateAddress(a.address));
-  if (isPrivate) throw new Error('Refusing to fetch private network addresses');
-  // Restrict ports to standard HTTP/HTTPS
-  const port = u.port ? parseInt(u.port, 10) : (u.protocol === 'https:' ? 443 : 80);
-  if (![80, 443].includes(port)) throw new Error('Refusing to fetch non-standard ports');
+}
+
+function isPrivateAddress(ip: string): boolean {
+    if (!ip) return true;
+    if (ip.startsWith('::ffff:')) {
+        const v4 = ip.slice(7);
+        return v4.includes(':') || isPrivateIPv4(v4); // IPv4-mapped IPv6
+    }
+    if (!ip.includes(':')) return isPrivateIPv4(ip);
+    if (ip === '::' || ip === '::1') return true; // unspecified / loopback
+    const first = ip.split(':')[0];
+    if (/^fc/i.test(first) || /^fd/i.test(first)) return true; // ULA fc00::/7
+    if (/^fe[89ab]/i.test(first)) return true; // link-local fe80::/10
+    return false;
+}
+
+async function assertRemoteSafe(url: string): Promise<Array<{address: string, family: number}>> {
+    const u = new URL(url);
+    const hostname = u.hostname;
+    const addrs = await Promise.race([
+        dns.lookup(hostname, {all: true}),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('DNS lookup timed out')), 10000)),
+    ]);
+    if (!addrs || addrs.length === 0) throw new Error('Could not resolve host');
+    if (addrs.some((a) => isPrivateAddress(a.address))) throw new Error('Refusing to fetch private network addresses');
+    // Restrict ports to standard HTTP/HTTPS
+    const port = u.port ? parseInt(u.port, 10) : (u.protocol === 'https:' ? 443 : 80);
+    if (![80, 443].includes(port)) throw new Error('Refusing to fetch non-standard ports');
+    return addrs.map((a) => ({address: a.address, family: a.family}));
 }
 
 export type RemoteFetchState = { ok: boolean; data?: any; error?: string };
@@ -81,7 +102,19 @@ export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formDa
       return { ok: false, error: 'Invalid URL. Only HTTPS is allowed.' };
     }
 
-    await assertRemoteSafe(url);
+    const validAddrs = await assertRemoteSafe(url);
+    // Pin the validated addresses so a second (attacker-controlled) DNS lookup cannot resolve elsewhere.
+    const pinnedLookup: LookupFunction = (hostname, options, callback) => {
+        const family = typeof options === 'number' ? options : (options?.family ?? 0);
+        const match = validAddrs.find((a) => family === 0 || a.family === family) ?? validAddrs[0];
+        if (!match) {
+            callback(new Error('Hostname did not resolve to a validated address'), '', 0);
+            return;
+        }
+        callback(null, match.address, match.family);
+    };
+    const httpsAgent = new https.Agent({lookup: pinnedLookup});
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
@@ -89,6 +122,8 @@ export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formDa
       responseType: 'text',
       signal: controller.signal as any,
       maxContentLength: 2 * 1024 * 1024,
+      maxRedirects: 0,
+      httpsAgent,
       transformResponse: (d, h) => d,
       validateStatus: (s) => s >= 200 && s < 400
     });
