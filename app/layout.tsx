@@ -1,32 +1,12 @@
 import {Metadata, Viewport} from "next";
-import {Fraunces, IBM_Plex_Mono, IBM_Plex_Sans} from "next/font/google";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../src/styles/app.css';
 import DataProvider from '../src/providers/DataProvider';
 import BootstrapClient from './BootstrapClient';
 import UmamiAnalytics from "../src/components/UmamiAnalytics";
 
-const fontDisplay = Fraunces({
-    subsets: ['latin'],
-    weight: ['400', '500', '600', '700'],
-    style: ['normal', 'italic'],
-    variable: '--font-display',
-    display: 'swap',
-});
-
-const fontBody = IBM_Plex_Sans({
-    subsets: ['latin'],
-    weight: ['300', '400', '500', '600', '700'],
-    variable: '--font-body',
-    display: 'swap',
-});
-
-const fontMono = IBM_Plex_Mono({
-    subsets: ['latin'],
-    weight: ['400', '500', '600'],
-    variable: '--font-mono',
-    display: 'swap',
-});
+// Fonts are provided by the system font stack defined in src/styles/app.css
+// (--font-display, --font-body, --font-mono); no remote fonts are fetched.
 
 // Runs before paint to set the theme attribute, preventing a flash of the wrong theme.
 const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-bs-theme',t);}catch(e){}})();`;
@@ -103,7 +83,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({children}: { children: React.ReactNode }) {
     return (
-        <html lang="de" className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable}`} suppressHydrationWarning>
+        <html lang="de" suppressHydrationWarning>
         <body>
         <script dangerouslySetInnerHTML={{__html: themeInitScript}}/>
         <DataProvider>
