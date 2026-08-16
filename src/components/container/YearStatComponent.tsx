@@ -14,6 +14,10 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) 
     const [sortConfig, setSortConfig] = useState<{ key: keyof Category, direction: 'asc' | 'desc' } | null>(null);
     const [categoryRows, setCategoryRows] = useState([]);
 
+    useEffect(() => {
+        setCategories(currentYearStats.categories);
+    }, [currentYearStats.categories]);
+
     const sortCategories = (key: keyof Category) => {
         if (!categories) return;
         let direction: 'asc' | 'desc' = 'asc';

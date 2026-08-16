@@ -35,6 +35,9 @@ export default function JsonDataGeneratorForm(props) {
         if (generatorForm) {
             generatorForm.current.reset();
         }
+        if (focusRef.current) {
+            focusRef.current.focus();
+        }
     };
 
     /*
@@ -79,7 +82,7 @@ export default function JsonDataGeneratorForm(props) {
                     </div>
                 </div>
                 <div>
-                    <button type="submit" onBlur={() => focusRef.current.focus()}
+                    <button type="submit"
                             className="mt-3 btn btn-primary">
                         Hinzufuegen
                     </button>
