@@ -2,7 +2,7 @@
 import React, {useMemo} from 'react';
 import {now} from '../../services/date';
 import {useCashflow} from '../../services/useCashflow';
-import {cumulativeByYear} from '../../services/cashflow';
+import {cumulativeByYear, totalCumulative} from '../../services/cashflow';
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 
@@ -22,10 +22,11 @@ export default function CashflowTimeline() {
             }
         }
 
-        // runway: if current monthly burn negative, months until zero at current avg
-        const monthsThisYear = rows.filter(r => r.year === currentYear);
-        const avgNet = monthsThisYear.length ? (monthsThisYear.reduce((a, b) => a + b.net, 0) / monthsThisYear.length) : 0;
-        const lastCum = cur.length ? cur[cur.length - 1].cum : 0;
+        // runway: last cumulative across all data (carries prior-year savings),
+        // avg burn over the most recent 12 months of available data
+        const lastCum = totalCumulative(rows);
+        const recentRows = rows.slice(-12);
+        const avgNet = recentRows.length ? (recentRows.reduce((a, b) => a + b.net, 0) / recentRows.length) : 0;
         const runwayMonths = avgNet < 0 ? Math.max(0, Math.floor(lastCum / Math.abs(avgNet))) : null;
 
         return {cur, breakEven, runwayMonths};

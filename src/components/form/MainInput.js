@@ -29,12 +29,10 @@ export default function MainInput(props) {
     setLoadViaUrl(cookies[COOKIE_LOAD_VIA_URL] ? cookies[COOKIE_LOAD_VIA_URL] === 'true' : false)
   }, [])
 
-  // on data change: reset success when empty, redirect to monthly when loaded
+  // on data change: reset success when data is empty
   useEffect(() => {
     if (isEmpty(dataContext.dataContainer)) {
       setSuccess(false);
-    } else {
-      router.push(ROUTE_MONTHLY);
     }
   }, [dataContext.dataContainer])
 
@@ -82,6 +80,7 @@ export default function MainInput(props) {
   function useTestData() {
     setSuccess(true)
     dataContext.setDataContainer(testData);
+    router.push(ROUTE_MONTHLY);
   }
 
   return (
@@ -106,6 +105,7 @@ export default function MainInput(props) {
         {!loadViaUrl &&
           <form action={parseLocalAction}>
             <div className="input-group mb-3">
+              <label htmlFor="local-json" className="input-group-text">Datei</label>
               <input type="file"
                      name="localJson"
                      placeholder="C:\\Users\\Luca\\mydata.(json|yaml|yml)"
@@ -126,7 +126,7 @@ export default function MainInput(props) {
         {loadViaUrl &&
           <form action={fetchRemoteAction}>
             <div className="input-group mb-3">
-              <span className="input-group-text">URL</span>
+              <label htmlFor="remote-json" className="input-group-text">URL</label>
               <input type="text"
                      name="remoteUrl"
                      placeholder="https://mycloud.com/mydata.(json|yaml|yml)"
@@ -135,8 +135,7 @@ export default function MainInput(props) {
                      onChange={(e) => {
                        setRemoteFileUrl(e.target.value)
                      }}
-                     id="remote-json"
-                     aria-describedby="basic-addon3"/>
+                     id="remote-json"/>
               <button type="submit" className="btn btn-secondary">Laden</button>
             </div>
           </form>

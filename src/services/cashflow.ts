@@ -56,6 +56,18 @@ export function cumulativeByYear(rows: CashflowRow[]): Map<number, Array<{ key: 
 }
 
 /**
+ * Running total across all years (does not reset at year boundaries).
+ * Returns the cumulative net over all rows.
+ */
+export function totalCumulative(rows: CashflowRow[]): number {
+    let total = 0;
+    for (let i = 0; i < rows.length; i++) {
+        total += rows[i].net;
+    }
+    return total;
+}
+
+/**
  * Trailing simple moving average over `window` points, rounded to 2 decimals.
  */
 export function rollingAverage(values: number[], window: number): number[] {

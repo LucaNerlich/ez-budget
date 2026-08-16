@@ -42,6 +42,12 @@ export default function YearContainer() {
     const dataContext: DataContextType = useContext(DataContext);
 
     const [yearCategoryContainers, setYearCategoryContainers] = useState<YearCategoryContainer[]>([])
+    // avoid a hydration mismatch at year boundaries: "opened" is date-dependent
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const availableYears: number[] = getAvailableYears(dataContext.budget);
@@ -67,7 +73,7 @@ export default function YearContainer() {
                 return <YearStatComponent
                     key={container.year}
                     currentYearStats={container.statsForYear}
-                    opened={container.year === now().year()}/>
+                    opened={mounted && container.year === now().year()}/>
             })}
         </div>
     );

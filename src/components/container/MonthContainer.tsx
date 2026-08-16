@@ -22,16 +22,30 @@ export default function MonthContainer(props) {
     const monthSelect = useRef(null);
     const [yearOptions, setYearOptions] = useState([]);
     const [monthOptions, setMonthOptions] = useState([]);
+    // neutral values during SSR/hydration; filled after mount to avoid
+    // hydration mismatches at month/year boundaries
+    const [mounted, setMounted] = useState(false);
     const [yearMonth, setYearMonth] = useState({
-        year: now().year(),
-        month: now().month() + 1
+        year: 0,
+        month: 0
     })
     const [currentMonth, setCurrentMonth] = useState<MonthStats>({} as MonthStats);
 
-    function handleYearChange(e) {
+    useEffect(() => {
         setYearMonth({
-            year: e.target.value,
-            month: yearMonth.month
+            year: now().year(),
+            month: now().month() + 1
+        });
+        setMounted(true);
+    }, [])
+
+    function handleYearChange(e) {
+        const year = e.target.value;
+        const availableMonths = getAvailableMonths(dataContext.budget, year);
+        const month = availableMonths.length > 0 ? Math.min(...availableMonths) : yearMonth.month;
+        setYearMonth({
+            year: year,
+            month: month
         })
     }
 
@@ -77,7 +91,7 @@ export default function MonthContainer(props) {
     return (
         <div>
             <h1 className="mt-3">
-                Übersicht {monthName(yearMonth.month)} - {yearMonth.year}
+                {mounted ? `Übersicht ${monthName(yearMonth.month)} - ${yearMonth.year}` : 'Übersicht'}
             </h1>
 
             {/* Jahr und Monatsdropdown */}
@@ -86,20 +100,26 @@ export default function MonthContainer(props) {
                     <div className="row">
                         <div className="col">
                             {!isEmpty(yearOptions) &&
-                              <select ref={yearSelect} defaultValue={yearMonth.year}
-                                      onChange={(e) => handleYearChange(e)}
-                                      className="mt-3 mb-3 form-select">
-                                  {yearOptions}
-                              </select>
+                              <div>
+                                  <label htmlFor="month-year-select" className="form-label">Jahr</label>
+                                  <select ref={yearSelect} id="month-year-select" value={yearMonth.year}
+                                          onChange={(e) => handleYearChange(e)}
+                                          className="mb-3 form-select">
+                                      {yearOptions}
+                                  </select>
+                              </div>
                             }
                         </div>
                         <div className="col">
                             {!isEmpty(monthOptions) &&
-                              <select ref={monthSelect} defaultValue={yearMonth.month}
-                                      onChange={(e) => handleMonthChange(e)}
-                                      className="mt-3 mb-3 form-select">
-                                  {monthOptions}
-                              </select>
+                              <div>
+                                  <label htmlFor="month-select" className="form-label">Monat</label>
+                                  <select ref={monthSelect} id="month-select" value={yearMonth.month}
+                                          onChange={(e) => handleMonthChange(e)}
+                                          className="mb-3 form-select">
+                                      {monthOptions}
+                                  </select>
+                              </div>
                             }
                         </div>
                     </div>

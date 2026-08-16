@@ -17,11 +17,20 @@ export function now() {
 }
 
 /**
+ * Date-only portion of an input: strips time-of-day from strings starting with
+ * "YYYY-MM-DD" (e.g. "2024-01-01T00:30:00Z") so month/year attribution does not
+ * depend on the viewer's timezone. Other inputs are passed through untouched.
+ */
+function dateOnly(input: any): any {
+    const s = String(input ?? '');
+    return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : input;
+}
+
+/**
  * Does the input date reside between the start and end of the given year and month?
  */
 export function isInYearMonth(input: any, year: number | string, month: number | string): boolean {
-    const inputAsString = dayjs(input).format('YYYY-MM-DD');
-    const date = dayjs(inputAsString);
+    const date = dayjs(dateOnly(input));
     const start = dayjs(`${year}-${pad(month)}-01`);
     const end = start.endOf('month');
     return date.isBetween(start, end, 'month', '[]');
@@ -40,6 +49,6 @@ export function isToday(input: any): boolean {
 export function isInYear(input: any, year: number | string): boolean {
     const start = `${year}-01-01`;
     const end = `${year}-12-31`;
-    const date = dayjs(input);
+    const date = dayjs(dateOnly(input));
     return date.isBetween(dayjs(start), dayjs(end), 'day', '[]');
 }

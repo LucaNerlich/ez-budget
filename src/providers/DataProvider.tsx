@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {toBudget} from "../services/budget";
 import {computeStatsData} from "../services/statistics";
 import {DataContextType} from "../entities/raw/DataContextType";
@@ -12,14 +12,13 @@ DataContext.displayName = "EzBudget Data Context";
 export default function DataProvider({children}: { children: React.ReactNode }) {
     const [fileName, setFileName] = useState("");
     const [dataContainer, setDataContainer] = useState([]);
-    const [statsContainer, setStatsContainer] = useState([]);
 
     // Resolve the raw upload into a Budget once per change (recurring expanded here).
     const budget = useMemo(() => toBudget(dataContainer), [dataContainer]);
 
-    useEffect(() => {
-        setStatsContainer(computeStatsData(budget))
-    }, [budget]);
+    // Derive stats in the same commit as the budget change so consumers never
+    // see a new budget paired with the previous file's stats.
+    const statsContainer = useMemo(() => computeStatsData(budget), [budget]);
 
     const INITIAL_CONTEXT: DataContextType = useMemo(() => ({
         dataContainer,
@@ -27,8 +26,7 @@ export default function DataProvider({children}: { children: React.ReactNode }) 
         budget,
         fileName,
         setFileName,
-        statsContainer,
-        setStatsContainer
+        statsContainer
     }), [dataContainer, budget, fileName, statsContainer]);
 
     return (

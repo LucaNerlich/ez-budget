@@ -15,10 +15,9 @@ export default function DataInspectorPage() {
 
       {dataContext.statsContainer && dataContext.statsContainer.length > 0 &&
         <a href={`data:text/json;charset=utf-8,${encodeURIComponent(jsFriendlyJSONStringify(dataContext.statsContainer))}`}
-           download="ezbudget-statistiken.json">
-          <button type="button" className="mt-3 btn btn-primary">
-            Statistiken herunterladen
-          </button>
+           download="ezbudget-statistiken.json"
+           className="mt-3 btn btn-primary">
+          Statistiken herunterladen
         </a>
       }
       <hr/>
