@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {Budget} from '../entities/raw/Budget';
-import {cumulativeByYear, linearRegression, monthlyCashflow, rollingAverage} from './cashflow';
+import {cumulativeByYear, linearRegression, monthlyCashflow, rollingAverage, totalCumulative} from './cashflow';
 
 const budget: Budget = {
     years: [
@@ -53,6 +53,18 @@ describe('cumulativeByYear', () => {
 
         const y2024 = byYear.get(2024)!;
         expect(y2024.map(p => p.cum)).toEqual([700]);
+    });
+});
+
+describe('totalCumulative', () => {
+    it('carries the running total across year boundaries', () => {
+        const rows = monthlyCashflow(budget);
+        // 750 + 600 + 700, never resetting at a year boundary
+        expect(totalCumulative(rows)).toBe(2050);
+    });
+
+    it('returns 0 for an empty dataset', () => {
+        expect(totalCumulative([])).toBe(0);
     });
 });
 

@@ -37,26 +37,18 @@ export default function Footer() {
 
               <AppVersion builtBy/>
 
-              <button type="button" className="btn btn-link">
-                  <Link href={ROUTE_JSON_GENERATOR}>
-                      Json Generator
-                  </Link>
-              </button>
-              <button type="button" className="btn btn-link">
-                  <Link href={ROUTE_DATAINSPECTOR} className="nav-link">
-                      DataInspector
-                  </Link>
-              </button>
-              <button type="button" className="btn btn-link">
-                  <Link href={ROUTE_TESTDATA} download>
-                      Beispieldatei runterladen
-                  </Link>
-              </button>
-              <button type="button" className="btn btn-link">
-                  <Link href={ROUTE_TESTDATA_GENERATOR}>
-                      Beispieldaten generieren
-                  </Link>
-              </button>
+              <Link href={ROUTE_JSON_GENERATOR} className="btn btn-link">
+                  Json Generator
+              </Link>
+              <Link href={ROUTE_DATAINSPECTOR} className="btn btn-link">
+                  DataInspector
+              </Link>
+              <Link href={ROUTE_TESTDATA} download className="btn btn-link">
+                  Beispieldatei runterladen
+              </Link>
+              <Link href={ROUTE_TESTDATA_GENERATOR} className="btn btn-link">
+                  Beispieldaten generieren
+              </Link>
               <div className="col">
                   <button type="button" className="btn btn-link" onClick={deleteCookies}>
                       Cookies löschen
@@ -64,11 +56,9 @@ export default function Footer() {
                   <button type="button" className="btn btn-link" onClick={unloadData}>
                       Geladene Daten resetten
                   </button>
-                  <button type="button" className="btn btn-link">
-                      <Link href={ROUTE_TEMPLATE} download>
-                          Leeres Template runterladen
-                      </Link>
-                  </button>
+                  <Link href={ROUTE_TEMPLATE} download className="btn btn-link">
+                      Leeres Template runterladen
+                  </Link>
               </div>
           </div>
       </footer>

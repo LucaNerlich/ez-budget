@@ -47,7 +47,7 @@ export default function TestDataGenerator() {
         }
 
         // generate Years
-        for (let i = startYear; i <= startYear + yearsToGenerate; i++) {
+        for (let i = startYear; i < startYear + yearsToGenerate; i++) {
             const yearData: Year = {
                 year: i,
                 months: generateMonths(i)
@@ -93,14 +93,12 @@ export default function TestDataGenerator() {
                     Testdaten generieren
                 </button>
                 {testData && testData.length > 0 &&
-                  <button type="button" className="mt-3 btn btn-success">
-                    <a
-                      href={`data:text/json;charset=utf-8,${encodeURIComponent(jsFriendlyJSONStringify(testData))}`}
-                      className="linkdecoration__none"
-                      download="testdata.yaml">
-                      Testdaten herunterladen
-                    </a>
-                  </button>
+                  <a
+                    href={`data:text/json;charset=utf-8,${encodeURIComponent(jsFriendlyJSONStringify(testData))}`}
+                    className="mt-3 btn btn-success linkdecoration__none"
+                    download="testdata.json">
+                    Testdaten herunterladen
+                  </a>
                 }
             </div>
 

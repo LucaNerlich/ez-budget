@@ -19,7 +19,7 @@ function isHttpsUrl(url: string): boolean {
 
 const RecurringSchema = z.object({
   category: z.string().min(1),
-  value: z.number(),
+  value: z.number().finite(),
   comment: z.string().optional(),
   from: z.string().regex(/^\d{4}-\d{2}$/),
   until: z.string().regex(/^\d{4}-\d{2}$/).optional(),
@@ -27,7 +27,7 @@ const RecurringSchema = z.object({
 
 const EntrySchema = z.object({
   category: z.string().min(1),
-  value: z.number(),
+  value: z.number().finite(),
   comment: z.string().optional(),
   date: z.string().optional(),
 });
@@ -95,6 +95,26 @@ async function assertRemoteSafe(url: string): Promise<Array<{address: string, fa
 
 export type RemoteFetchState = { ok: boolean; data?: any; error?: string };
 
+const SAFE_REMOTE_ERRORS: Record<string, string> = {
+    'DNS lookup timed out': 'Could not resolve the hostname (request timed out).',
+    'Could not resolve host': 'Could not resolve the hostname.',
+    'Refusing to fetch private network addresses': 'The requested address is not allowed.',
+    'Refusing to fetch non-standard ports': 'The URL uses a port that is not allowed.',
+};
+
+function remoteErrorMessage(e: any): string {
+    if (e && typeof e.message === 'string' && SAFE_REMOTE_ERRORS[e.message]) {
+        return SAFE_REMOTE_ERRORS[e.message];
+    }
+    if (e && (e.code === 'ERR_CANCELED' || e.code === 'ECONNABORTED' || e.name === 'AbortError' || e.name === 'CanceledError')) {
+        return 'The request timed out.';
+    }
+    if (e && e.response && typeof e.response.status === 'number') {
+        return `The server responded with status ${e.response.status}.`;
+    }
+    return 'Could not load the file. Please check the URL and try again.';
+}
+
 export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formData: FormData): Promise<RemoteFetchState> {
   try {
     const url = String(formData.get('remoteUrl') || '').trim();
@@ -143,8 +163,8 @@ export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formDa
     }
     return { ok: true, data: parsed.data };
   } catch (e: any) {
-    const message = e?.message || 'Fetch failed';
-    return { ok: false, error: message };
+    console.error('fetchRemoteJsonAction: failed to load remote file', e);
+    return { ok: false, error: remoteErrorMessage(e) };
   }
 }
 
@@ -168,7 +188,8 @@ export async function parseLocalJsonAction(_prev: LocalParseState, formData: For
     }
     return { ok: true, data: parsed.data };
   } catch (e: any) {
-    return { ok: false, error: e?.message || 'Parse failed' };
+    console.error('parseLocalJsonAction: failed to parse local file', e);
+    return { ok: false, error: 'Could not read the file. Please check that it contains valid JSON or YAML.' };
   }
 }
 

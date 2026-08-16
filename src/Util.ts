@@ -10,7 +10,7 @@ export function getRandomItemFromArray(array) {
 }
 
 export function getDateString(year: number, month: number, day: number): string {
-    return year + "-" + month + "-" + day
+    return year + "-" + String(month).padStart(2, '0') + "-" + String(day).padStart(2, '0')
 }
 
 /**

@@ -7,6 +7,5 @@ export interface DataContextType {
     budget: Budget,
     fileName: string,
     setFileName: Function,
-    statsContainer: Array<YearStats>,
-    setStatsContainer: Function
+    statsContainer: Array<YearStats>
 }
