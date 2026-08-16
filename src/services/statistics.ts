@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import {isInYear, isInYearMonth} from "./date";
 import {Year} from "../entities/raw/Year";
 import {Month} from "../entities/raw/Month";
 import {Entry} from "../entities/raw/Entry";
@@ -7,6 +6,7 @@ import {Budget} from "../entities/raw/Budget";
 import {MonthStats} from "../entities/stats/MonthStats";
 import {YearStats} from "../entities/stats/YearStats";
 import {sortMapByNumberValue} from "../Util";
+import {getEntriesForMonth} from "./budget";
 
 /**
  * Budget statistics. Plain functions — the test surface.
@@ -64,41 +64,39 @@ export function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
 }
 
 /**
- * Map of yearly sum per category.
+ * Map of yearly sum per category, over the resolved Budget (entries are attributed
+ * by month membership, so recurring-derived entries without a `date` are included).
  */
-export function getSumMapForYear(entries, year): Map<string, number> {
+export function getSumMapForYear(budget: Budget, year: number | string): Map<string, number> {
     const yearSumMap = new Map();
+    const target = Number(year);
+    const yearData = budget && budget.years ? budget.years.find((y) => y.year === target) : undefined;
+    if (!yearData) return yearSumMap;
 
-    _.forEach(entries, function (entry) {
-        const category = (entry.category);
-        const value = (entry.value);
-        const date = (entry.date);
-        if (typeof category === 'undefined' || typeof value === 'undefined' || typeof date === 'undefined') {
-            return;
-        }
-        if (isInYear(date, year)) {
+    _.forEach(yearData.months, function (monthData) {
+        _.forEach(monthData.entries, function (entry) {
+            const category = (entry.category);
+            const value = (entry.value);
+            if (typeof category === 'undefined' || typeof value === 'undefined') {
+                return;
+            }
             if (yearSumMap.has(category)) {
                 const newSum = round(yearSumMap.get(category) + value);
                 yearSumMap.set(category, newSum)
             } else {
                 yearSumMap.set(category, value)
             }
-        }
+        });
     });
 
     return yearSumMap;
 }
 
 /**
- * Income/expense sum for the given year and month.
+ * Income/expense sum for the given year and month of the resolved Budget.
  */
-export function getSumForYearMonth(entries, year, month): number {
-    const filteredEntries = _.filter(entries, function (entry) {
-        const date = entry.date;
-        return isInYearMonth(date, year, month);
-    });
-
-    return getSum(filteredEntries);
+export function getSumForYearMonth(budget: Budget, year: number | string, month: number | string): number {
+    return getSum(getEntriesForMonth(budget, year, month));
 }
 
 export function getSumPerCategoryFromEntries(entries): Map<string, number> {
@@ -166,10 +164,8 @@ export function getTrendArray(xArray, yArray): number[] {
 
     const sumXY = [];
     _.forEach(xArray, function (x, i) {
-        if (typeof yArray[i] === 'undefined') {
-            sumXY.push(x);
-        } else {
-            sumXY.push(x + yArray[i])
+        if (typeof yArray[i] !== 'undefined') {
+            sumXY.push(x * yArray[i])
         }
     });
 
@@ -179,6 +175,7 @@ export function getTrendArray(xArray, yArray): number[] {
     });
     const quotient2 = Math.pow(_.sum(xArray), 2)
     const quotient = (n * quotient1) - quotient2;
+    if (quotient === 0) return yTrends;
 
     const a = dividend / quotient;
     const b = (_.sum(yArray) - (a * _.sum(xArray))) / n;
