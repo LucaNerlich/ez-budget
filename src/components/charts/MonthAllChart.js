@@ -126,8 +126,9 @@ export default function MonthAllChart(props) {
 
   return (
     <div className="container">
-      {(incomeMap && incomeMap.size > 0) &&
+      {((incomeMap && incomeMap.size > 0) || (expenseMap && expenseMap.size > 0)) &&
         <div className="row text-center">
+          {incomeMap && incomeMap.size > 0 &&
           <div className="col-12 col-md-6 mb-4">
             <h3>Einzahlungen</h3>
             {incomeChartConfig.datasets &&
@@ -164,6 +165,8 @@ export default function MonthAllChart(props) {
               />
             }
           </div>
+          }
+          {expenseMap && expenseMap.size > 0 &&
           <div className="col-12 col-md-6 mb-4">
             <h3>Auszahlungen</h3>
             {expenseChartConfig.datasets &&
@@ -200,6 +203,7 @@ export default function MonthAllChart(props) {
               />
             }
           </div>
+          }
           <div className="col-12">
             <div className="form-check form-switch d-inline-block">
               <input className="form-check-input" type="checkbox" id="togglePercent"
