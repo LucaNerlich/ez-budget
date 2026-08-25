@@ -3,6 +3,7 @@ import React, {useMemo} from 'react';
 import {now} from '../../services/date';
 import {useCashflow} from '../../services/useCashflow';
 import {linearRegression, rollingAverage} from '../../services/cashflow';
+import {monthKey, pad} from '../../services/month';
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
 
@@ -37,7 +38,7 @@ export default function TrendsForecasts() {
         };
         const deltas = labels.map(m => Math.round((valFor(thisYear, m) - valFor(lastYear, m)) * 100) / 100);
         return {
-            labels: labels.map(m => String(m).padStart(2, '0')),
+            labels: labels.map(pad),
             datasets: [
                 {label: 'YoY Delta (Netto)', data: deltas, backgroundColor: deltas.map(v => v >= 0 ? '#2a7' : '#e33')}
             ]
@@ -57,9 +58,9 @@ export default function TrendsForecasts() {
         });
         const labelsFc = Array.from({length: horizon}, (_, i) => {
             const last = monthly[monthly.length - 1];
-            const base = new Date(`${last.year}-${String(last.month).padStart(2, '0')}-01`);
+            const base = new Date(`${monthKey(last.year, last.month)}-01`);
             const d = new Date(base.getFullYear(), base.getMonth() + i + 1, 1);
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            return monthKey(d.getFullYear(), d.getMonth() + 1);
         });
         return {
             labels: [...labelsHist, ...labelsFc],

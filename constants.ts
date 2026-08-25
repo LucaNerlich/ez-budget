@@ -1,3 +1,5 @@
+import {getRandomItemFromArray} from "./src/Util";
+
 // Colors (chart fills)
 export const RGBA_GREEN = '#15a06a';
 export const RGBA_RED = '#d0563f';
@@ -41,11 +43,7 @@ const TEST_COMMENTS: { [key: string]: string[] } = {
 };
 
 export function getRandomCommentByCategory(category: string): string | undefined {
-    const items = TEST_COMMENTS[category];
-    if (items) {
-        return items[Math.floor(Math.random() * items.length)];
-    }
-    return undefined;
+    return getRandomItemFromArray(TEST_COMMENTS[category]);
 }
 
 // getRandomFloat(1.5, 3.5, 2); // 👉️ 2.18
