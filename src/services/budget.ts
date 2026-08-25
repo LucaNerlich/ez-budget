@@ -87,7 +87,7 @@ export function findYear(budget: Budget, year: number | string): Year | undefine
     return budget.years.find((y) => y.year === Number(year));
 }
 
-export function findMonth(budget: Budget, year: number | string, month: number | string): Month | undefined {
+function findMonth(budget: Budget, year: number | string, month: number | string): Month | undefined {
     return findYear(budget, year)?.months.find((m) => m.month === Number(month));
 }
 

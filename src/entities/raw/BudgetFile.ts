@@ -7,7 +7,7 @@ import {z} from 'zod';
  * here once via zod before it may enter a Budget.
  */
 
-export const RecurringSchema = z.object({
+const RecurringSchema = z.object({
     category: z.string().min(1),
     value: z.number().finite(),
     comment: z.string().optional(),
@@ -15,19 +15,19 @@ export const RecurringSchema = z.object({
     until: z.string().regex(/^\d{4}-\d{2}$/).optional(),
 });
 
-export const EntrySchema = z.object({
+const EntrySchema = z.object({
     category: z.string().min(1),
     value: z.number().finite(),
     comment: z.string().optional(),
     date: z.string().optional(),
 });
 
-export const MonthSchema = z.object({
+const MonthSchema = z.object({
     month: z.number().int().min(1).max(12),
     entries: z.array(EntrySchema).default([]),
 });
 
-export const YearSchema = z.object({
+const YearSchema = z.object({
     year: z.number().int().min(1900),
     months: z.array(MonthSchema).default([]),
 });
