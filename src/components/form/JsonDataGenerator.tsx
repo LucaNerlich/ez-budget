@@ -40,17 +40,8 @@ export default function JsonDataGeneratorForm(props) {
         }
     };
 
-    /*
-  todo date? maybe default immer aktueller Monat der 1.?
-  reuse dateinput von ezbudget 1.0?
-
-  maybe use focus trap to cycle through form with tab
-  https://github.com/focus-trap/focus-trap
-   */
-
     return (
         <div>
-            <strong>WORK IN PROGRESS</strong>
             <form ref={generatorForm} onSubmit={onSubmit}>
                 <div className="row">
                     <div className="col">

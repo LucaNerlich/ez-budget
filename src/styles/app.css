@@ -381,7 +381,7 @@ pre {
     color: var(--text);
 }
 
-/* Reset the old zebra hack; use a single soft hover instead */
+/* Neutralize Bootstrap's striped/odd-even row backgrounds; rows highlight via hover only */
 .table.table-striped > tbody > tr > td,
 .table.table-striped > tbody > tr > th,
 .table tbody tr:nth-child(odd) > td,
@@ -610,7 +610,7 @@ footer .btn-link {
     padding-inline: 0.35rem;
 }
 
-/* --- Legacy utilities (kept) -------------------------------------------- */
+/* --- Utilities ----------------------------------------------------------- */
 .red { color: var(--neg); }
 .green { color: var(--pos); }
 

@@ -1,6 +1,5 @@
 /**
  * Single source for month formatting: zero-padding, German names, and YYYY-MM keys.
- * Replaces the scattered 12-case switches, INDEX_MONTH_MAP, and inline ternaries.
  */
 export const MONTH_NAMES_DE: Record<number, string> = {
     1: 'Januar',
@@ -19,7 +18,7 @@ export const MONTH_NAMES_DE: Record<number, string> = {
 
 /**
  * Zero-pad a 1..12 month to two digits ("01".."12"). Out-of-range input is
- * returned as-is (preserves the previous getValidMonthString fallback).
+ * returned as-is.
  */
 export function pad(month: number | string): string {
     const n = Number(month);

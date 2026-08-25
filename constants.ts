@@ -48,7 +48,6 @@ export function getRandomCommentByCategory(category: string): string | undefined
     return undefined;
 }
 
-// getRandomFloat(1.5, 3.5, 2); // 👉️ 2.18
 export function getRandomFloat(min: number, max: number, decimals: number): number {
     const str = (Math.random() * (max - min) + min).toFixed(decimals);
 
