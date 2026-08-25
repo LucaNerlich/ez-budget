@@ -19,7 +19,7 @@ export function round(float: number): number {
 /**
  * Income/expense sum for the given year.
  */
-export function getSumForYear(yearData: Year): number {
+function getSumForYear(yearData: Year): number {
     let sum = 0;
     const months: Array<Month> = yearData.months;
 
@@ -33,7 +33,7 @@ export function getSumForYear(yearData: Year): number {
     return sum;
 }
 
-export function getCategorySums(monthData: Array<Month>): Map<string, number> {
+function getCategorySums(monthData: Array<Month>): Map<string, number> {
     let allEntries = [];
 
     for (let i = 0; i < monthData.length; i++) {
@@ -43,7 +43,7 @@ export function getCategorySums(monthData: Array<Month>): Map<string, number> {
     return getSumPerCategoryFromEntries(allEntries);
 }
 
-export function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
+function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
     const monthStats: Array<MonthStats> = [];
 
     for (let i = 0; i < monthsData.length; i++) {
@@ -99,7 +99,7 @@ export function getSumForYearMonth(budget: Budget, year: number | string, month:
     return getSum(getEntriesForMonth(budget, year, month));
 }
 
-export function getSumPerCategoryFromEntries(entries): Map<string, number> {
+function getSumPerCategoryFromEntries(entries): Map<string, number> {
     const sums = new Map();
 
     _.forEach(entries, function (entry) {
@@ -188,7 +188,7 @@ export function getTrendArray(xArray, yArray): number[] {
     return yTrends;
 }
 
-export function getSum(entries): number {
+function getSum(entries): number {
     return round(_.sum(entries.map((item) => {
         return parseFloat(item.value);
     })));

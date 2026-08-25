@@ -1,8 +1,3 @@
-// Colors (chart fills)
-export const RGBA_GREEN = '#15a06a';
-export const RGBA_RED = '#d0563f';
-export const RGBA_WHITE = 'rgba(255,255,255,0.9)';
-
 // Cookies
 export const COOKIE_LOAD_VIA_URL: string = 'loadViaUrl'
 export const COOKIE_REMOTE_FILE_URL: string = 'remoteFileUrl'

@@ -2,7 +2,7 @@
  * Single source for month formatting: zero-padding, German names, and YYYY-MM keys.
  * Replaces the scattered 12-case switches, INDEX_MONTH_MAP, and inline ternaries.
  */
-export const MONTH_NAMES_DE: Record<number, string> = {
+const MONTH_NAMES_DE: Record<number, string> = {
     1: 'Januar',
     2: 'Februar',
     3: 'März',

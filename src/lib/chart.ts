@@ -37,7 +37,7 @@ ChartJS.register(
  * Align Chart.js typography/colors with the active design theme. Reads the live
  * computed token values so charts adapt when the user toggles light/dark.
  */
-export function applyChartTheme() {
+function applyChartTheme() {
     if (typeof window === 'undefined') return;
     const styles = getComputedStyle(document.documentElement);
     const ink = styles.getPropertyValue('--text-muted').trim() || '#5e6b62';
@@ -61,7 +61,4 @@ if (typeof window !== 'undefined') {
         Object.values(ChartJS.instances).forEach((c) => c.update());
     });
 }
-
-export {ChartJS};
-
 
