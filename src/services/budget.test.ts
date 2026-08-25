@@ -14,7 +14,7 @@ describe('toBudget — input shape', () => {
 
     it('returns an empty budget for junk input', () => {
         expect(toBudget(null).years).toEqual([]);
-        expect(toBudget(42 as unknown).years).toEqual([]);
+        expect(toBudget(42).years).toEqual([]);
     });
 });
 

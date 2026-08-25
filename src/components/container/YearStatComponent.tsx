@@ -5,8 +5,7 @@ import {getPositiveNegativeColor} from "../../services/colors";
 import {Category} from "../../entities/stats/Category";
 import {YearStats} from "../../entities/stats/YearStats";
 
-export function mapCategoriesToRows(categories: Category[]) {
-    if (!categories) return;
+function mapCategoriesToRows(categories: Category[]): React.ReactElement[] {
     return categories.map((value: Category, index: number) => {
         return (
             <tr key={index + 1}>
@@ -30,14 +29,13 @@ interface YearStatProps {
 const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) => {
     const [categories, setCategories] = useState<Category[]>(currentYearStats.categories);
     const [sortConfig, setSortConfig] = useState<{ key: keyof Category, direction: 'asc' | 'desc' } | null>(null);
-    const [categoryRows, setCategoryRows] = useState([]);
+    const [categoryRows, setCategoryRows] = useState<React.ReactElement[]>([]);
 
     useEffect(() => {
         setCategories(currentYearStats.categories);
     }, [currentYearStats.categories]);
 
     const sortCategories = (key: keyof Category) => {
-        if (!categories) return;
         let direction: 'asc' | 'desc' = 'asc';
         if (sortConfig?.key === key && sortConfig.direction === 'asc') {
             direction = 'desc';

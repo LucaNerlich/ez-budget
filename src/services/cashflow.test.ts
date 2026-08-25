@@ -25,11 +25,11 @@ describe('monthlyCashflow', () => {
         const rows = monthlyCashflow(budget);
         expect(rows.map(r => r.key)).toEqual(['2023-01', '2023-02', '2024-01']);
 
-        const jan23 = rows.find(r => r.key === '2023-01')!;
+        const jan23 = rows.find(r => r.key === '2023-01');
         // value 0 counts as income (>= 0)
-        expect(jan23.income).toBe(1000);
-        expect(jan23.expense).toBe(-250);
-        expect(jan23.net).toBe(750);
+        expect(jan23?.income).toBe(1000);
+        expect(jan23?.expense).toBe(-250);
+        expect(jan23?.net).toBe(750);
     });
 
     it('sorts ascending by YYYY-MM key across years', () => {
@@ -48,11 +48,11 @@ describe('cumulativeByYear', () => {
         const rows = monthlyCashflow(budget);
         const byYear = cumulativeByYear(rows);
 
-        const y2023 = byYear.get(2023)!;
-        expect(y2023.map(p => p.cum)).toEqual([750, 1350]); // 750, then +600
+        const y2023 = byYear.get(2023);
+        expect(y2023?.map(p => p.cum)).toEqual([750, 1350]); // 750, then +600
 
-        const y2024 = byYear.get(2024)!;
-        expect(y2024.map(p => p.cum)).toEqual([700]);
+        const y2024 = byYear.get(2024);
+        expect(y2024?.map(p => p.cum)).toEqual([700]);
     });
 });
 

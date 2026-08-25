@@ -21,10 +21,9 @@ const MONTH_NAMES_DE: Record<number, string> = {
  * Zero-pad a 1..12 month to two digits ("01".."12"). Out-of-range input is
  * returned as-is (preserves the previous getValidMonthString fallback).
  */
-export function pad(month: number | string): string {
-    const n = Number(month);
-    if (Number.isInteger(n) && n >= 1 && n <= 12) {
-        return String(n).padStart(2, '0');
+export function pad(month: number): string {
+    if (Number.isInteger(month) && month >= 1 && month <= 12) {
+        return String(month).padStart(2, '0');
     }
     return String(month);
 }
@@ -32,13 +31,13 @@ export function pad(month: number | string): string {
 /**
  * German month name for 1..12, or "ERROR" for anything else.
  */
-export function monthName(month: number | string): string {
-    return MONTH_NAMES_DE[Number(month)] ?? 'ERROR';
+export function monthName(month: number): string {
+    return MONTH_NAMES_DE[month] ?? 'ERROR';
 }
 
 /**
  * "YYYY-MM" key for a (year, month) pair.
  */
-export function monthKey(year: number | string, month: number | string): string {
+export function monthKey(year: number, month: number): string {
     return `${year}-${pad(month)}`;
 }

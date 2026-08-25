@@ -19,17 +19,17 @@ export function now() {
 /**
  * Date-only portion of an input: strips time-of-day from strings starting with
  * "YYYY-MM-DD" (e.g. "2024-01-01T00:30:00Z") so month/year attribution does not
- * depend on the viewer's timezone. Other inputs are passed through untouched.
+ * depend on the viewer's timezone. Missing input passes through untouched.
  */
-function dateOnly(input: any): any {
-    const s = String(input ?? '');
-    return /^\d{4}-\d{2}-\d{2}/.test(s) ? s.slice(0, 10) : input;
+function dateOnly(input: string | null | undefined): string | null | undefined {
+    if (typeof input !== 'string') return input;
+    return /^\d{4}-\d{2}-\d{2}/.test(input) ? input.slice(0, 10) : input;
 }
 
 /**
  * Does the input date reside between the start and end of the given year and month?
  */
-export function isInYearMonth(input: any, year: number | string, month: number | string): boolean {
+export function isInYearMonth(input: string | null | undefined, year: number, month: number): boolean {
     const date = dayjs(dateOnly(input));
     const start = dayjs(`${year}-${pad(month)}-01`);
     const end = start.endOf('month');
@@ -39,7 +39,7 @@ export function isInYearMonth(input: any, year: number | string, month: number |
 /**
  * Does the input date reside between the start and end of the given year?
  */
-export function isInYear(input: any, year: number | string): boolean {
+export function isInYear(input: string | null | undefined, year: number): boolean {
     const start = `${year}-01-01`;
     const end = `${year}-12-31`;
     const date = dayjs(dateOnly(input));

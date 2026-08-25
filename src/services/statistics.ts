@@ -4,6 +4,7 @@ import {Month} from "../entities/raw/Month";
 import {Entry} from "../entities/raw/Entry";
 import {Budget} from "../entities/raw/Budget";
 import {MonthStats} from "../entities/stats/MonthStats";
+import {Category} from "../entities/stats/Category";
 import {YearStats} from "../entities/stats/YearStats";
 import {sortMapByNumberValue} from "../Util";
 import {findYear, getEntriesForMonth} from "./budget";
@@ -49,10 +50,7 @@ function getCategorySums(monthData: Array<Month>): Map<string, number> {
 
 function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
     return monthsData.map(function (monthData): MonthStats {
-        const monthStat = {} as MonthStats;
-        monthStat.month = monthData.month;
-        monthStat.sum = round(sumEntryValues(monthData.entries));
-        return monthStat;
+        return {month: monthData.month, sum: round(sumEntryValues(monthData.entries))};
     });
 }
 
@@ -77,15 +75,15 @@ export function getSumForYearMonth(budget: Budget, year: number | string, month:
     return getSum(getEntriesForMonth(budget, year, month));
 }
 
-function getSumPerCategoryFromEntries(entries): Map<string, number> {
+function getSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
     return sumByCategory(entries);
 }
 
-export function getExpenseSumPerCategoryFromEntries(entries): Map<string, number> {
+export function getExpenseSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
     return sumByCategory(entries, (entry) => entry.value < 0);
 }
 
-export function getIncomeSumPerCategoryFromEntries(entries): Map<string, number> {
+export function getIncomeSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
     return sumByCategory(entries, (entry) => entry.value > 0);
 }
 
@@ -93,13 +91,14 @@ export function getIncomeSumPerCategoryFromEntries(entries): Map<string, number>
  * Linear trend y-values for the given x/y series.
  * https://math.stackexchange.com/questions/204020
  */
-export function getTrendArray(xArray, yArray): number[] {
-    const xs = [];
-    const ys = [];
+export function getTrendArray(xArray: number[], yArray: Array<number | undefined>): number[] {
+    const xs: number[] = [];
+    const ys: number[] = [];
     _.forEach(xArray, function (x, i) {
-        if (typeof yArray[i] !== 'undefined') {
+        const y = yArray[i];
+        if (typeof y !== 'undefined') {
             xs.push(x);
-            ys.push(yArray[i]);
+            ys.push(y);
         }
     });
 
@@ -111,9 +110,9 @@ export function getTrendArray(xArray, yArray): number[] {
     });
 }
 
-function getSum(entries): number {
+function getSum(entries: Entry[]): number {
     return round(_.sum(entries.map((item) => {
-        return parseFloat(item.value);
+        return Number(item.value);
     })));
 }
 
@@ -132,55 +131,33 @@ export function computeStatsData(budget: Budget): YearStats[] {
         const categorySumsMap = getCategorySums(yearData.months);
         const sortedCategorySumsMap = sortMapByNumberValue(categorySumsMap);
 
-        const categorySums = [];
+        const categorySums: Category[] = [];
         sortedCategorySumsMap.forEach((value, key) => {
             categorySums.push({category: key, sum: value})
         })
 
-        const yearStatsData: YearStats = {} as YearStats;
-        yearStatsData.year = yearData.year;
-        yearStatsData.sum = round(sumForYear);
-        yearStatsData.months = monthStats;
-        yearStatsData.categories = categorySums;
-
-        statsData.push(yearStatsData);
+        statsData.push({
+            year: yearData.year,
+            sum: round(sumForYear),
+            months: monthStats,
+            categories: categorySums,
+        });
     }
 
     return statsData;
 }
 
 /**
- * MonthStats for a given year and month from precomputed stats.
+ * MonthStats for a given year and month from precomputed stats; null when absent.
  */
-export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats {
-    let monthStat: MonthStats = undefined;
-
-    _.filter(statsData, function (yearStats: YearStats) {
-        if (yearStats.year == year) {
-            const months: Array<MonthStats> = yearStats.months;
-            for (let i = 0; i < months.length; i++) {
-                if (months[i].month == month) {
-                    monthStat = months[i];
-                    return;
-                }
-            }
-        }
-    });
-
-    return monthStat ? monthStat : {} as MonthStats;
+export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats | null {
+    const yearStats = statsData.find((candidate) => candidate.year === year);
+    return yearStats ? yearStats.months.find((m) => m.month === month) ?? null : null;
 }
 
 /**
- * YearStats for a given year from precomputed stats.
+ * YearStats for a given year from precomputed stats; null when absent.
  */
-export function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats {
-    const filteredEntries = _.filter(statsData, function (yearStats: YearStats) {
-        return yearStats.year === year;
-    });
-
-    if (filteredEntries && filteredEntries.length > 0) {
-        return filteredEntries[0];
-    }
-
-    return {} as YearStats;
+export function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats | null {
+    return statsData.find((candidate) => candidate.year === year) ?? null;
 }

@@ -10,12 +10,12 @@ import YearStatComponent from "./YearStatComponent";
 
 interface YearCategoryContainer {
     year: number,
-    statsForYear: YearStats
+    statsForYear: YearStats,
 }
 
 export default function YearContainer() {
-    // @ts-ignore
-    const dataContext: DataContextType = useContext(DataContext);
+    const dataContext = useContext(DataContext);
+    if (!dataContext) throw new Error('YearContainer requires a DataProvider');
 
     const [yearCategoryContainers, setYearCategoryContainers] = useState<YearCategoryContainer[]>([])
     // avoid a hydration mismatch at year boundaries: "opened" is date-dependent
@@ -31,9 +31,10 @@ export default function YearContainer() {
         const allYears: YearCategoryContainer[] = []
         availableYears.forEach(year => {
             const statsForYear = getStatsForYear(dataContext.statsContainer, year);
+            if (!statsForYear) return;
             allYears.push({
                 year,
-                statsForYear
+                statsForYear,
             })
         })
         allYears.reverse();

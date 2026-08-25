@@ -8,7 +8,7 @@ export default function ThemeToggle() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        const current = (document.documentElement.getAttribute("data-bs-theme") as Theme) || "light";
+        const current = document.documentElement.getAttribute("data-bs-theme") === "dark" ? "dark" : "light";
         setTheme(current);
         setMounted(true);
     }, []);

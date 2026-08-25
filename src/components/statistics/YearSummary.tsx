@@ -1,21 +1,20 @@
 "use client";
 import React, {useContext, useEffect, useState} from "react";
-import {DataContextType} from "../../entities/raw/DataContextType";
 import {DataContext} from "../../providers/DataProvider";
 import {YearStats} from "../../entities/stats/YearStats";
 import {monthName} from "../../services/month";
 import {round} from "../../services/statistics";
 import {getPositiveNegativeColor} from "../../services/colors";
 
-export default function YearSummary(props) {
-    // @ts-ignore
-    const dataContext: DataContextType = useContext(DataContext);
+export default function YearSummary() {
+    const dataContext = useContext(DataContext);
+    if (!dataContext) throw new Error('YearSummary requires a DataProvider');
 
-    const [tableBodies, setTableBodies] = useState([]);
+    const [tableBodies, setTableBodies] = useState<React.ReactElement[]>([]);
 
 
     useEffect(() => {
-        const tableBodyDivs = [];
+        const tableBodyDivs: React.ReactElement[] = [];
         const statsContainer = dataContext.statsContainer;
         for (let i = 0; i < statsContainer.length; i++) {
             const yearStat: YearStats = statsContainer[i];

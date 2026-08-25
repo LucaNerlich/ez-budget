@@ -17,12 +17,12 @@ export default function TestDataGenerator() {
     const [testData, setTestData] = useState<Array<Year>>([]);
 
     function generateTestData() {
-        const generatedData = [];
+        const generatedData: Year[] = [];
 
         function generateEntries(year: number, month: number): Array<Entry> {
             const entries: Array<Entry> = [];
             for (let i = 0; i < entriesToGenerate; i++) {
-                const category = getRandomItemFromArray(TEST_CATEGORIES);
+                const category = getRandomItemFromArray(TEST_CATEGORIES) ?? '';
                 const entryData: Entry = {
                     category: category,
                     date: getDateString(year, month, getRandomFloat(1, latestDayInMonth, 0)),
