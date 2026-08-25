@@ -46,7 +46,6 @@ export default function TestDataGenerator() {
             return months;
         }
 
-        // generate Years
         for (let i = startYear; i < startYear + yearsToGenerate; i++) {
             const yearData: Year = {
                 year: i,

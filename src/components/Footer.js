@@ -17,7 +17,6 @@ export default function Footer() {
     const [removeCookie] = useCookies();
     const dataContext = useContext(DataContext);
 
-    // delete all cookies
     function deleteCookies() {
         removeCookie(COOKIE_LOAD_VIA_URL)
         removeCookie(COOKIE_REMOTE_FILE_URL)

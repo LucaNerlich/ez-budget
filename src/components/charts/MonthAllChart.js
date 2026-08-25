@@ -86,7 +86,6 @@ export default function MonthAllChart(props) {
   const [showPercent, setShowPercent] = useState(false);
   const [expenseMap, setExpenseMap] = useState(null);
   const [incomeMap, setIncomeMap] = useState(null);
-  // derive configs via useMemo to avoid state loops
 
   useEffect(() => {
     setMonthEntries(getEntriesForMonth(dataContext.budget, props.year, props.month));

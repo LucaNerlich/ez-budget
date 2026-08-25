@@ -1,6 +1,5 @@
 /**
  * Single source for month formatting: zero-padding, German names, and YYYY-MM keys.
- * Replaces the scattered 12-case switches, INDEX_MONTH_MAP, and inline ternaries.
  */
 const MONTH_NAMES_DE: Record<number, string> = {
     1: 'Januar',

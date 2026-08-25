@@ -4,8 +4,8 @@ import {monthKey} from "./month";
 import {leastSquaresFit} from "./regression";
 
 /**
- * Pure cashflow logic. No React. This is the test surface that three insight
- * modules used to each re-implement.
+ * Pure Cashflow logic over a resolved Budget. No React — the test surface;
+ * useCashflow() is the thin adapter.
  *
  * Invariants: expense stays negative; net = income + expense; rows are sorted
  * ascending by key ("YYYY-MM") and carry raw (unrounded) numbers.
