@@ -6,7 +6,7 @@ import {Budget} from "../entities/raw/Budget";
 import {MonthStats} from "../entities/stats/MonthStats";
 import {YearStats} from "../entities/stats/YearStats";
 import {sortMapByNumberValue} from "../Util";
-import {getEntriesForMonth} from "./budget";
+import {findYear, getEntriesForMonth} from "./budget";
 import {leastSquaresFit} from "./regression";
 
 /**
@@ -17,51 +17,43 @@ export function round(float: number): number {
     return Math.round((float + Number.EPSILON) * 100) / 100;
 }
 
+function sumEntryValues(entries: Array<Entry>): number {
+    return entries.reduce((sum, entry) => sum + entry.value, 0);
+}
+
+function sumByCategory(entries: Array<Entry>, predicate?: (entry: Entry) => boolean): Map<string, number> {
+    const sums = new Map<string, number>();
+
+    _.forEach(entries, function (entry) {
+        if (predicate && !predicate(entry)) {
+            return;
+        }
+        const category = entry.category;
+        const value = entry.value;
+        sums.set(category, sums.has(category) ? round(sums.get(category) + value) : value);
+    });
+
+    return sums;
+}
+
 /**
  * Income/expense sum for the given year.
  */
 export function getSumForYear(yearData: Year): number {
-    let sum = 0;
-    const months: Array<Month> = yearData.months;
-
-    for (let i = 0; i < months.length; i++) {
-        const entries = months[i].entries;
-        for (let j = 0; j < entries.length; j++) {
-            sum = sum + entries[j].value;
-        }
-    }
-
-    return sum;
+    return sumEntryValues(_.flatMap(yearData.months, 'entries'));
 }
 
 export function getCategorySums(monthData: Array<Month>): Map<string, number> {
-    let allEntries = [];
-
-    for (let i = 0; i < monthData.length; i++) {
-        allEntries = allEntries.concat(monthData[i].entries);
-    }
-
-    return getSumPerCategoryFromEntries(allEntries);
+    return sumByCategory(_.flatMap(monthData, 'entries'));
 }
 
 export function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
-    const monthStats: Array<MonthStats> = [];
-
-    for (let i = 0; i < monthsData.length; i++) {
-        let sum = 0;
-        const entries: Array<Entry> = monthsData[i].entries;
-
-        for (let j = 0; j < entries.length; j++) {
-            sum = sum + entries[j].value;
-        }
-
-        const monthStat: MonthStats = {} as MonthStats;
-        monthStat.month = monthsData[i].month;
-        monthStat.sum = round(sum);
-        monthStats.push(monthStat);
-    }
-
-    return monthStats;
+    return monthsData.map(function (monthData): MonthStats {
+        const monthStat = {} as MonthStats;
+        monthStat.month = monthData.month;
+        monthStat.sum = round(sumEntryValues(monthData.entries));
+        return monthStat;
+    });
 }
 
 /**
@@ -69,28 +61,13 @@ export function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
  * by month membership, so recurring-derived entries without a `date` are included).
  */
 export function getSumMapForYear(budget: Budget, year: number | string): Map<string, number> {
-    const yearSumMap = new Map();
-    const target = Number(year);
-    const yearData = budget && budget.years ? budget.years.find((y) => y.year === target) : undefined;
-    if (!yearData) return yearSumMap;
+    const yearData = findYear(budget, year);
+    if (!yearData) return new Map();
 
-    _.forEach(yearData.months, function (monthData) {
-        _.forEach(monthData.entries, function (entry) {
-            const category = (entry.category);
-            const value = (entry.value);
-            if (typeof category === 'undefined' || typeof value === 'undefined') {
-                return;
-            }
-            if (yearSumMap.has(category)) {
-                const newSum = round(yearSumMap.get(category) + value);
-                yearSumMap.set(category, newSum)
-            } else {
-                yearSumMap.set(category, value)
-            }
-        });
-    });
-
-    return yearSumMap;
+    return sumByCategory(
+        _.flatMap(yearData.months, 'entries'),
+        (entry) => typeof entry.category !== 'undefined' && typeof entry.value !== 'undefined',
+    );
 }
 
 /**
@@ -101,58 +78,15 @@ export function getSumForYearMonth(budget: Budget, year: number | string, month:
 }
 
 export function getSumPerCategoryFromEntries(entries): Map<string, number> {
-    const sums = new Map();
-
-    _.forEach(entries, function (entry) {
-        const category = entry.category;
-        const entryAmount = entry.value;
-        if (sums.has(category)) {
-            const newSum = round(sums.get(category) + entryAmount);
-            sums.set(category, newSum)
-        } else {
-            sums.set(category, entryAmount)
-        }
-    });
-
-    return sums;
+    return sumByCategory(entries);
 }
 
 export function getExpenseSumPerCategoryFromEntries(entries): Map<string, number> {
-    const sums = new Map();
-
-    _.forEach(entries, function (entry) {
-        const category = entry.category;
-        const entryAmount = entry.value;
-        if (entryAmount < 0) {
-            if (sums.has(category)) {
-                const newSum = round(sums.get(category) + entryAmount);
-                sums.set(category, newSum)
-            } else {
-                sums.set(category, entryAmount)
-            }
-        }
-    });
-
-    return sums;
+    return sumByCategory(entries, (entry) => entry.value < 0);
 }
 
 export function getIncomeSumPerCategoryFromEntries(entries): Map<string, number> {
-    const sums = new Map();
-
-    _.forEach(entries, function (entry) {
-        const category = entry.category;
-        const entryAmount = entry.value;
-        if (entryAmount > 0) {
-            if (sums.has(category)) {
-                const newSum = round(sums.get(category) + entryAmount);
-                sums.set(category, newSum)
-            } else {
-                sums.set(category, entryAmount)
-            }
-        }
-    });
-
-    return sums;
+    return sumByCategory(entries, (entry) => entry.value > 0);
 }
 
 /**

@@ -2,6 +2,7 @@ import {Budget} from "../entities/raw/Budget";
 import {Year} from "../entities/raw/Year";
 import {Month} from "../entities/raw/Month";
 import {Entry} from "../entities/raw/Entry";
+import {monthKey} from "./month";
 
 /**
  * Pure budget model. No React. The test surface for income/expense logic.
@@ -10,11 +11,6 @@ import {Entry} from "../entities/raw/Entry";
  * the shape and expands Recurring rules once, producing a resolved Budget that the
  * rest of the app reads.
  */
-
-function getYearMonthKey(year: number, month: number): string {
-    const mm = month < 10 ? `0${month}` : `${month}`;
-    return `${year}-${mm}`;
-}
 
 function normalizeInput(rawInput: any): { years: any[]; recurring: any[] } {
     if (Array.isArray(rawInput)) {
@@ -29,7 +25,7 @@ function normalizeInput(rawInput: any): { years: any[]; recurring: any[] } {
 }
 
 function findActiveRecurringFor(year: number, month: number, recurringRules: any[]): Map<string, any> {
-    const key = getYearMonthKey(year, month);
+    const key = monthKey(year, month);
     const active = recurringRules.filter((r) => {
         const from: string = (r.from || r.start || r.effective_from || '').slice(0, 7);
         const until: string | undefined = (r.until || r.end || r.effective_until || '')?.slice(0, 7) || undefined;
@@ -96,10 +92,17 @@ export function getAvailableYears(budget: Budget): number[] {
     return budget.years.map((y) => y.year);
 }
 
+export function findYear(budget: Budget, year: number | string): Year | undefined {
+    if (!budget || !budget.years) return undefined;
+    return budget.years.find((y) => y.year === Number(year));
+}
+
+export function findMonth(budget: Budget, year: number | string, month: number | string): Month | undefined {
+    return findYear(budget, year)?.months.find((m) => m.month === Number(month));
+}
+
 export function getAvailableMonths(budget: Budget, year: number | string): number[] {
-    if (!budget || !budget.years) return [];
-    const target = Number(year);
-    const found = budget.years.find((y) => y.year === target);
+    const found = findYear(budget, year);
     return found ? found.months.map((m) => m.month) : [];
 }
 
@@ -107,12 +110,7 @@ export function getAvailableMonths(budget: Budget, year: number | string): numbe
  * Entries for one month, sorted by category. Returns [] when the month is absent.
  */
 export function getEntriesForMonth(budget: Budget, year: number | string, month: number | string): Entry[] {
-    if (!budget || !budget.years) return [];
-    const targetYear = Number(year);
-    const targetMonth = Number(month);
-    const foundYear = budget.years.find((y) => y.year === targetYear);
-    if (!foundYear) return [];
-    const foundMonth = foundYear.months.find((m) => m.month === targetMonth);
+    const foundMonth = findMonth(budget, year, month);
     if (!foundMonth) return [];
     return [...foundMonth.entries].sort((a, b) => {
         const nameA = a.category.toUpperCase();
