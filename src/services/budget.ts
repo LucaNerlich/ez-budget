@@ -21,9 +21,7 @@ function normalizeInput(rawInput: any): { years: any[]; recurring: any[] } {
         return {years: rawInput, recurring: []};
     }
     if (rawInput && typeof rawInput === 'object') {
-        const years = rawInput.years || rawInput.data || [];
-        const recurring = rawInput.recurring || [];
-        return {years, recurring};
+        return {years: rawInput.years || [], recurring: rawInput.recurring || []};
     }
     return {years: [], recurring: []};
 }
@@ -31,8 +29,8 @@ function normalizeInput(rawInput: any): { years: any[]; recurring: any[] } {
 function findActiveRecurringFor(year: number, month: number, recurringRules: any[]): Map<string, any> {
     const key = getYearMonthKey(year, month);
     const active = recurringRules.filter((r) => {
-        const from: string = (r.from || r.start || r.effective_from || '').slice(0, 7);
-        const until: string | undefined = (r.until || r.end || r.effective_until || '')?.slice(0, 7) || undefined;
+        const from: string = r.from ? String(r.from).slice(0, 7) : '';
+        const until: string | undefined = r.until ? String(r.until).slice(0, 7) : undefined;
         if (!from) return false;
         const geFrom = key >= from;
         const leUntil = until ? key <= until : true;
@@ -44,15 +42,14 @@ function findActiveRecurringFor(year: number, month: number, recurringRules: any
     for (const r of active) {
         const category = r.category;
         const comment = r.comment || '';
-        const from = (r.from || r.start || r.effective_from || '').slice(0, 7);
+        const from = String(r.from || '').slice(0, 7);
         if (!category || !from) continue;
         const keyTuple = `${category}||${comment}`;
         const prev = chosen.get(keyTuple);
         if (!prev) {
             chosen.set(keyTuple, r);
         } else {
-            const prevFrom = (prev.from || prev.start || prev.effective_from || '').slice(0, 7);
-            if (from > prevFrom) chosen.set(keyTuple, r);
+            if (from > String(prev.from).slice(0, 7)) chosen.set(keyTuple, r);
         }
     }
     return chosen;
