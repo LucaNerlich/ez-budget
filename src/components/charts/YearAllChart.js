@@ -13,7 +13,6 @@ export default function YearAllChart(props) {
   const categorySumMap = useMemo(() => getSumMapForYear(entries, now.year()), [entries, now]);
 
   const categorySumConfig = useMemo(() => {
-    if (!categorySumMap) return undefined;
     const categoryLabels = [];
     const categorySums = [];
     for (let [key, value] of categorySumMap) {
@@ -32,16 +31,13 @@ export default function YearAllChart(props) {
     };
   }, [categorySumMap]);
 
-  const categorySumChartConfig = categorySumConfig || {labels: [], datasets: [{data: []}]};
-
   return (
     <div className="row">
       <div className="col-12">
         <h3>Ergebnis pro Kategorie</h3>
-        {categorySumChartConfig.datasets &&
-          <Chart
+        <Chart
             type="bar"
-            data={categorySumChartConfig}
+            data={categorySumConfig}
             options={{
               indexAxis: 'y',
               responsive: true,
@@ -52,8 +48,8 @@ export default function YearAllChart(props) {
                 tooltip: {
                   callbacks: {
                     label: (ctx) => {
-                      const label = ctx.label || '';
-                      const val = ctx.parsed?.x ?? ctx.parsed ?? 0;
+                      const label = ctx.label;
+                      const val = ctx.parsed.x;
                       return `${label}: ${new Intl.NumberFormat('de-DE').format(val)}`;
                     }
                   }
@@ -65,7 +61,6 @@ export default function YearAllChart(props) {
               }
             }}
           />
-        }
       </div>
     </div>
   );

@@ -70,16 +70,13 @@ export function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
 export function getSumMapForYear(budget: Budget, year: number | string): Map<string, number> {
     const yearSumMap = new Map();
     const target = Number(year);
-    const yearData = budget && budget.years ? budget.years.find((y) => y.year === target) : undefined;
+    const yearData = budget.years.find((y) => y.year === target);
     if (!yearData) return yearSumMap;
 
     _.forEach(yearData.months, function (monthData) {
         _.forEach(monthData.entries, function (entry) {
             const category = (entry.category);
             const value = (entry.value);
-            if (typeof category === 'undefined' || typeof value === 'undefined') {
-                return;
-            }
             if (yearSumMap.has(category)) {
                 const newSum = round(yearSumMap.get(category) + value);
                 yearSumMap.set(category, newSum)
@@ -199,7 +196,7 @@ export function getSum(entries): number {
  */
 export function computeStatsData(budget: Budget): YearStats[] {
     const statsData: YearStats[] = [];
-    const years = budget && budget.years ? budget.years : [];
+    const years = budget.years;
 
     for (let i = 0; i < years.length; i++) {
         const yearData: Year = years[i];
@@ -228,6 +225,8 @@ export function computeStatsData(budget: Budget): YearStats[] {
 
 /**
  * MonthStats for a given year and month from precomputed stats.
+ * Returns an empty stats object when absent — callers legitimately query
+ * before a month/year is selected (e.g. the neutral pre-mount state).
  */
 export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats {
     let monthStat: MonthStats = undefined;
@@ -248,16 +247,12 @@ export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, 
 }
 
 /**
- * YearStats for a given year from precomputed stats.
+ * YearStats for a given year from precomputed stats. Every requested year must
+ * exist in the stats derived from the same Budget — a miss is an invariant
+ * violation and fails loudly instead of returning a hollow default.
  */
 export function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats {
-    const filteredEntries = _.filter(statsData, function (yearStats: YearStats) {
-        return yearStats.year === year;
-    });
-
-    if (filteredEntries && filteredEntries.length > 0) {
-        return filteredEntries[0];
-    }
-
-    return {} as YearStats;
+    const found = statsData.find((yearStats: YearStats) => yearStats.year === year);
+    if (!found) throw new Error(`No stats computed for year ${year}`);
+    return found;
 }

@@ -28,8 +28,7 @@ export default function EditMonth(props) {
 
   useEffect(() => {
     if (sortField === 'date') { // the date field should be compared as Date
-      const base = monthEntries || [];
-      setSortedData([...base].sort((a, b) => {
+      setSortedData([...monthEntries].sort((a, b) => {
         let dateA = new Date(a[sortField]);
         let dateB = new Date(b[sortField]);
 
@@ -40,7 +39,7 @@ export default function EditMonth(props) {
         }
       }));
     } else { // sorting for string and number fields
-      setSortedData(orderBy(monthEntries || [], [sortField], [sortOrder]));
+      setSortedData(orderBy(monthEntries, [sortField], [sortOrder]));
     }
   }, [monthEntries, sortOrder, sortField])
 

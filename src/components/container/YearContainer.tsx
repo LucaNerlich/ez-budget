@@ -21,7 +21,6 @@ export interface Category {
 }
 
 export function mapCategoriesToRows(categories: Category[]) {
-    if (!categories) return;
     return categories.map((value: Category, index: number) => {
         return (
             <tr key={index + 1}>

@@ -9,6 +9,8 @@ import {CashflowRow, monthlyCashflow} from "./cashflow";
  */
 export function useCashflow(): CashflowRow[] {
     const dataContext = useContext(DataContext);
-    const budget = dataContext?.budget;
-    return useMemo(() => (budget ? monthlyCashflow(budget) : []), [budget]);
+    if (!dataContext) {
+        throw new Error('useCashflow must be used within a DataProvider');
+    }
+    return useMemo(() => monthlyCashflow(dataContext.budget), [dataContext.budget]);
 }

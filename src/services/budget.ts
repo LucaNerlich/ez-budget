@@ -31,9 +31,8 @@ function normalizeInput(rawInput: any): { years: any[]; recurring: any[] } {
 function findActiveRecurringFor(year: number, month: number, recurringRules: any[]): Map<string, any> {
     const key = getYearMonthKey(year, month);
     const active = recurringRules.filter((r) => {
-        const from: string = (r.from || r.start || r.effective_from || '').slice(0, 7);
-        const until: string | undefined = (r.until || r.end || r.effective_until || '')?.slice(0, 7) || undefined;
-        if (!from) return false;
+        const from: string = r.from.slice(0, 7);
+        const until: string | undefined = r.until?.slice(0, 7);
         const geFrom = key >= from;
         const leUntil = until ? key <= until : true;
         return geFrom && leUntil;
@@ -42,35 +41,31 @@ function findActiveRecurringFor(year: number, month: number, recurringRules: any
     // Choose latest rule per (category, comment) tuple (max from)
     const chosen = new Map<string, any>();
     for (const r of active) {
-        const category = r.category;
         const comment = r.comment || '';
-        const from = (r.from || r.start || r.effective_from || '').slice(0, 7);
-        if (!category || !from) continue;
-        const keyTuple = `${category}||${comment}`;
+        const keyTuple = `${r.category}||${comment}`;
         const prev = chosen.get(keyTuple);
         if (!prev) {
             chosen.set(keyTuple, r);
-        } else {
-            const prevFrom = (prev.from || prev.start || prev.effective_from || '').slice(0, 7);
-            if (from > prevFrom) chosen.set(keyTuple, r);
+        } else if (r.from.slice(0, 7) > prev.from.slice(0, 7)) {
+            chosen.set(keyTuple, r);
         }
     }
     return chosen;
 }
 
 function applyRecurring(years: any[], recurringRules: any[]): Year[] {
-    if (!recurringRules || recurringRules.length === 0) return years;
+    if (recurringRules.length === 0) return years;
     const result: Year[] = [];
     for (let i = 0; i < years.length; i++) {
         const y = years[i];
-        const months = y.months || [];
+        const months = y.months;
         const newMonths: Month[] = [];
         for (let j = 0; j < months.length; j++) {
             const m = months[j];
             const ymActive = findActiveRecurringFor(y.year, m.month, recurringRules);
             // Track existing entries by (category, comment) to allow month-specific overrides
-            const existingKeys = new Set<string>((m.entries || []).map((e) => `${e.category}||${(e.comment || '')}`));
-            const mergedEntries: Entry[] = [...(m.entries || [])];
+            const existingKeys = new Set<string>(m.entries.map((e) => `${e.category}||${e.comment || ''}`));
+            const mergedEntries: Entry[] = [...m.entries];
             ymActive.forEach((rule, keyTuple) => {
                 if (!existingKeys.has(keyTuple)) {
                     mergedEntries.push({category: rule.category, value: rule.value, comment: rule.comment});
@@ -92,12 +87,10 @@ export function toBudget(rawInput: unknown): Budget {
 }
 
 export function getAvailableYears(budget: Budget): number[] {
-    if (!budget || !budget.years) return [];
     return budget.years.map((y) => y.year);
 }
 
 export function getAvailableMonths(budget: Budget, year: number | string): number[] {
-    if (!budget || !budget.years) return [];
     const target = Number(year);
     const found = budget.years.find((y) => y.year === target);
     return found ? found.months.map((m) => m.month) : [];
@@ -107,7 +100,6 @@ export function getAvailableMonths(budget: Budget, year: number | string): numbe
  * Entries for one month, sorted by category. Returns [] when the month is absent.
  */
 export function getEntriesForMonth(budget: Budget, year: number | string, month: number | string): Entry[] {
-    if (!budget || !budget.years) return [];
     const targetYear = Number(year);
     const targetMonth = Number(month);
     const foundYear = budget.years.find((y) => y.year === targetYear);

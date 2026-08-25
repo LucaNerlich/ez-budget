@@ -19,7 +19,6 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) 
     }, [currentYearStats.categories]);
 
     const sortCategories = (key: keyof Category) => {
-        if (!categories) return;
         let direction: 'asc' | 'desc' = 'asc';
         if (sortConfig?.key === key && sortConfig.direction === 'asc') {
             direction = 'desc';
@@ -39,30 +38,26 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) 
 
     return (
         <div>
-            {currentYearStats &&
-              <>
-                <h3>{currentYearStats.year} - Gewinn: {round(currentYearStats.sum)}</h3>
+            <h3>{currentYearStats.year} - Gewinn: {round(currentYearStats.sum)}</h3>
 
-                <details open={opened}>
-                  <summary className="mt-3"><p style={{display: 'inline'}}>Ergebnis pro Kategorie</p></summary>
-                  <div className="table-responsive">
-                    <table className="table">
-                      <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col" onClick={() => sortCategories('category')}>Kategorie</th>
-                        <th scope="col" onClick={() => sortCategories('sum')}>Summe</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      {categoryRows}
-                      </tbody>
-                    </table>
-                  </div>
-                </details>
-                <hr/>
-              </>
-            }
+            <details open={opened}>
+              <summary className="mt-3"><p style={{display: 'inline'}}>Ergebnis pro Kategorie</p></summary>
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" onClick={() => sortCategories('category')}>Kategorie</th>
+                    <th scope="col" onClick={() => sortCategories('sum')}>Summe</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {categoryRows}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+            <hr/>
         </div>
     );
 }
