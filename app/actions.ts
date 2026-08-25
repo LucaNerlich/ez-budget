@@ -95,6 +95,21 @@ async function assertRemoteSafe(url: string): Promise<Array<{address: string, fa
 
 export type RemoteFetchState = { ok: boolean; data?: any; error?: string };
 
+function parseBudgetPayload(text: string): RemoteFetchState {
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = YAML.parse(text);
+  }
+  const parsed = DataSchema.safeParse(data);
+  if (!parsed.success) {
+    const first = parsed.error.issues[0];
+    return { ok: false, error: `Invalid data at ${first.path.join('.')}: ${first.message}` };
+  }
+  return { ok: true, data: parsed.data };
+}
+
 const SAFE_REMOTE_ERRORS: Record<string, string> = {
     'DNS lookup timed out': 'Could not resolve the hostname (request timed out).',
     'Could not resolve host': 'Could not resolve the hostname.',
@@ -150,18 +165,7 @@ export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formDa
     clearTimeout(timeout);
 
     const text: string = response.data;
-    let data: any;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = YAML.parse(text);
-    }
-    const parsed = DataSchema.safeParse(data);
-    if (!parsed.success) {
-      const first = parsed.error.issues[0];
-      return { ok: false, error: `Invalid data at ${first.path.join('.')}: ${first.message}` };
-    }
-    return { ok: true, data: parsed.data };
+    return parseBudgetPayload(text);
   } catch (e: any) {
     console.error('fetchRemoteJsonAction: failed to load remote file', e);
     return { ok: false, error: remoteErrorMessage(e) };
@@ -174,19 +178,7 @@ export async function parseLocalJsonAction(_prev: LocalParseState, formData: For
   try {
     const file = formData.get('localJson') as File | null;
     if (!file) return { ok: false, error: 'No file provided' };
-    const text = await file.text();
-    let data: any;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = YAML.parse(text);
-    }
-    const parsed = DataSchema.safeParse(data);
-    if (!parsed.success) {
-      const first = parsed.error.issues[0];
-      return { ok: false, error: `Invalid data at ${first.path.join('.')}: ${first.message}` };
-    }
-    return { ok: true, data: parsed.data };
+    return parseBudgetPayload(await file.text());
   } catch (e: any) {
     console.error('parseLocalJsonAction: failed to parse local file', e);
     return { ok: false, error: 'Could not read the file. Please check that it contains valid JSON or YAML.' };
