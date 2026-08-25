@@ -1,6 +1,7 @@
 import {Budget} from "../entities/raw/Budget";
 import {getAvailableMonths, getAvailableYears, getEntriesForMonth} from "./budget";
 import {monthKey} from "./month";
+import {leastSquaresFit} from "./regression";
 
 /**
  * Pure cashflow logic. No React. This is the test surface that three insight
@@ -84,15 +85,6 @@ export function rollingAverage(values: number[], window: number): number[] {
  * https://math.stackexchange.com/questions/204020
  */
 export function linearRegression(values: number[]): { a: number; b: number } {
-    const n = values.length;
-    const xs = Array.from({length: n}, (_, i) => i + 1);
-    const sumX = xs.reduce((a, b) => a + b, 0);
-    const sumY = values.reduce((a, b) => a + b, 0);
-    const sumXY = values.reduce((a, y, i) => a + y * xs[i], 0);
-    const sumXX = xs.reduce((a, x) => a + x * x, 0);
-    const denom = n * sumXX - sumX * sumX;
-    if (denom === 0) return {a: 0, b: 0};
-    const a = (n * sumXY - sumX * sumY) / denom;
-    const b = (sumY - a * sumX) / n;
-    return {a, b};
+    const xs = values.map((_, i) => i + 1);
+    return leastSquaresFit(xs, values) ?? {a: 0, b: 0};
 }

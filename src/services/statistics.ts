@@ -7,6 +7,7 @@ import {MonthStats} from "../entities/stats/MonthStats";
 import {YearStats} from "../entities/stats/YearStats";
 import {sortMapByNumberValue} from "../Util";
 import {getEntriesForMonth} from "./budget";
+import {leastSquaresFit} from "./regression";
 
 /**
  * Budget statistics. Plain functions — the test surface.
@@ -159,33 +160,21 @@ export function getIncomeSumPerCategoryFromEntries(entries): Map<string, number>
  * https://math.stackexchange.com/questions/204020
  */
 export function getTrendArray(xArray, yArray): number[] {
-    const yTrends = [];
-    const n = xArray.length;
-
-    const sumXY = [];
+    const xs = [];
+    const ys = [];
     _.forEach(xArray, function (x, i) {
         if (typeof yArray[i] !== 'undefined') {
-            sumXY.push(x * yArray[i])
+            xs.push(x);
+            ys.push(yArray[i]);
         }
     });
 
-    const dividend = (n * _.sum(sumXY)) - (_.sum(xArray) * _.sum(yArray));
-    const quotient1 = _.sumBy(xArray, function (x) {
-        return Math.pow(x, 2);
+    const fit = leastSquaresFit(xs, ys);
+    if (!fit) return [];
+
+    return xArray.map(function (x) {
+        return round(fit.a * x + fit.b);
     });
-    const quotient2 = Math.pow(_.sum(xArray), 2)
-    const quotient = (n * quotient1) - quotient2;
-    if (quotient === 0) return yTrends;
-
-    const a = dividend / quotient;
-    const b = (_.sum(yArray) - (a * _.sum(xArray))) / n;
-
-    _.forEach(xArray, function (value) {
-        const y = a * value + b;
-        yTrends.push(round(y));
-    });
-
-    return yTrends;
 }
 
 export function getSum(entries): number {
