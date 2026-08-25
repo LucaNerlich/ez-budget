@@ -1,8 +1,8 @@
 'use client';
 import React, {useEffect, useState} from 'react';
 import {round} from "../../services/statistics";
-import {YearStats} from "../../entities/stats/YearStats";
-import {Category, mapCategoriesToRows} from "./YearContainer";
+import {CategorySum, YearStats} from "../../entities/stats/YearStats";
+import {mapCategoriesToRows} from "./YearContainer";
 
 interface YearStatProps {
     currentYearStats: YearStats,
@@ -10,15 +10,15 @@ interface YearStatProps {
 }
 
 const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) => {
-    const [categories, setCategories] = useState<Category[]>(currentYearStats.categories);
-    const [sortConfig, setSortConfig] = useState<{ key: keyof Category, direction: 'asc' | 'desc' } | null>(null);
-    const [categoryRows, setCategoryRows] = useState([]);
+    const [categories, setCategories] = useState<CategorySum[]>(currentYearStats.categories);
+    const [sortConfig, setSortConfig] = useState<{ key: keyof CategorySum, direction: 'asc' | 'desc' } | null>(null);
+    const [categoryRows, setCategoryRows] = useState<React.ReactElement[]>([]);
 
     useEffect(() => {
         setCategories(currentYearStats.categories);
     }, [currentYearStats.categories]);
 
-    const sortCategories = (key: keyof Category) => {
+    const sortCategories = (key: keyof CategorySum) => {
         if (!categories) return;
         let direction: 'asc' | 'desc' = 'asc';
         if (sortConfig?.key === key && sortConfig.direction === 'asc') {

@@ -1,7 +1,7 @@
 import React from "react";
 import YearSummary from "./YearSummary";
 
-export default function Overview(props) {
+export default function Overview() {
     return (
         <div>
             <h1>

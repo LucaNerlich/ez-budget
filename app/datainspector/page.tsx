@@ -6,6 +6,7 @@ import {jsFriendlyJSONStringify} from '../../src/Util';
 
 export default function DataInspectorPage() {
   const dataContext = useContext(DataContext);
+  if (!dataContext) return null;
 
   return (
     <Layout>
