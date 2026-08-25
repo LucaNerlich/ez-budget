@@ -1,9 +1,26 @@
 'use client';
 import React, {useEffect, useState} from 'react';
 import {round} from "../../services/statistics";
-import {YearStats} from "../../entities/stats/YearStats";
+import {getPositiveNegativeColor} from "../../services/colors";
 import {Category} from "../../entities/stats/Category";
-import {mapCategoriesToRows} from "./YearContainer";
+import {YearStats} from "../../entities/stats/YearStats";
+
+export function mapCategoriesToRows(categories: Category[]) {
+    if (!categories) return;
+    return categories.map((value: Category, index: number) => {
+        return (
+            <tr key={index + 1}>
+                <th scope="row">{index + 1}</th>
+                <td>{value.category}</td>
+                <td>
+                    <span className="amount" style={{color: getPositiveNegativeColor(value.sum)}}>
+                        {value.sum}
+                    </span>
+                </td>
+            </tr>
+        );
+    });
+}
 
 interface YearStatProps {
     currentYearStats: YearStats,
