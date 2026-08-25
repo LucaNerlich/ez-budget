@@ -62,10 +62,7 @@ export function getSumMapForYear(budget: Budget, year: number | string): Map<str
     const yearData = findYear(budget, year);
     if (!yearData) return new Map();
 
-    return sumByCategory(
-        _.flatMap(yearData.months, 'entries'),
-        (entry) => typeof entry.category !== 'undefined' && typeof entry.value !== 'undefined',
-    );
+    return sumByCategory(_.flatMap(yearData.months, 'entries'));
 }
 
 /**
@@ -121,7 +118,7 @@ function getSum(entries: Entry[]): number {
  */
 export function computeStatsData(budget: Budget): YearStats[] {
     const statsData: YearStats[] = [];
-    const years = budget && budget.years ? budget.years : [];
+    const years = budget.years;
 
     for (let i = 0; i < years.length; i++) {
         const yearData: Year = years[i];
@@ -148,7 +145,13 @@ export function computeStatsData(budget: Budget): YearStats[] {
 }
 
 /**
+<<<<<<< HEAD
  * MonthStats for a given year and month from precomputed stats; null when absent.
+=======
+ * MonthStats for a given year and month from precomputed stats.
+ * Returns an empty stats object when absent — callers legitimately query
+ * before a month/year is selected (e.g. the neutral pre-mount state).
+>>>>>>> cleanup/6-defensive
  */
 export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats | null {
     const yearStats = statsData.find((candidate) => candidate.year === year);
@@ -156,8 +159,12 @@ export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, 
 }
 
 /**
- * YearStats for a given year from precomputed stats; null when absent.
+ * YearStats for a given year from precomputed stats. Every requested year must
+ * exist in the stats derived from the same Budget — a miss is an invariant
+ * violation and fails loudly instead of returning a hollow default.
  */
-export function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats | null {
-    return statsData.find((candidate) => candidate.year === year) ?? null;
+export function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats {
+    const found = statsData.find((yearStats: YearStats) => yearStats.year === year);
+    if (!found) throw new Error(`No stats computed for year ${year}`);
+    return found;
 }

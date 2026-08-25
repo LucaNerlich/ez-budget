@@ -80,12 +80,10 @@ export function toBudget(rawInput: unknown): Budget {
 }
 
 export function getAvailableYears(budget: Budget): number[] {
-    if (!budget || !budget.years) return [];
     return budget.years.map((y) => y.year);
 }
 
 export function findYear(budget: Budget, year: number | string): Year | undefined {
-    if (!budget || !budget.years) return undefined;
     return budget.years.find((y) => y.year === Number(year));
 }
 

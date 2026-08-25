@@ -31,7 +31,6 @@ export default function YearContainer() {
         const allYears: YearCategoryContainer[] = []
         availableYears.forEach(year => {
             const statsForYear = getStatsForYear(dataContext.statsContainer, year);
-            if (!statsForYear) return;
             allYears.push({
                 year,
                 statsForYear,

@@ -52,7 +52,7 @@ export default function CashflowTimeline() {
             <Chart type="line" data={data} options={{responsive: true, plugins: {legend: {position: 'bottom'}}}}/>
             <div className="mt-3">
                 {timeline.breakEven && <div>Break‑even Monat: <strong>{timeline.breakEven}</strong></div>}
-                {typeof timeline.runwayMonths === 'number' &&
+                {timeline.runwayMonths !== null &&
                   <div>Runway (bei aktuellem Trend): <strong>{timeline.runwayMonths} Monate</strong></div>}
             </div>
         </div>

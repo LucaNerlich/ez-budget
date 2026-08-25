@@ -31,7 +31,7 @@ export function monthlyCashflow(budget: Budget): CashflowRow[] {
             let income = 0;
             let expense = 0;
             for (let k = 0; k < entries.length; k++) {
-                const v = Number(entries[k].value) || 0;
+                const v = entries[k].value;
                 if (v >= 0) income += v; else expense += v;
             }
             rows.push({year: y, month: m, key: monthKey(y, m), income, expense, net: income + expense});
