@@ -69,8 +69,6 @@ export default function MainInput(props) {
     handleParseResult(localState)
   }, [localState])
 
-// https://share.lucanerlich.com/s/fxSC52oREjRgdWE/download/testdata.json
-
   function useTestData() {
     setSuccess(true)
     dataContext.setDataContainer(testData);
