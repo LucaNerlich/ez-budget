@@ -1,3 +1,5 @@
+import {getRandomItemFromArray} from "./src/Util";
+
 // Cookies
 export const COOKIE_LOAD_VIA_URL: string = 'loadViaUrl'
 export const COOKIE_REMOTE_FILE_URL: string = 'remoteFileUrl'
@@ -36,11 +38,7 @@ const TEST_COMMENTS: { [key: string]: string[] } = {
 };
 
 export function getRandomCommentByCategory(category: string): string | undefined {
-    const items = TEST_COMMENTS[category];
-    if (items) {
-        return items[Math.floor(Math.random() * items.length)];
-    }
-    return undefined;
+    return getRandomItemFromArray(TEST_COMMENTS[category]);
 }
 
 // getRandomFloat(1.5, 3.5, 2); // 👉️ 2.18
