@@ -37,13 +37,6 @@ export function isInYearMonth(input: any, year: number | string, month: number |
 }
 
 /**
- * Is the input date today?
- */
-export function isToday(input: any): boolean {
-    return dayjs(input).isSame(now(), 'day');
-}
-
-/**
  * Does the input date reside between the start and end of the given year?
  */
 export function isInYear(input: any, year: number | string): boolean {

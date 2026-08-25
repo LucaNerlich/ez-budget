@@ -17,16 +17,6 @@ export function getScaleByAmount(amount: number) {
 }
 
 /**
- * An array of `amount` colors between custom start/end colors.
- */
-export function getCustomScaleByAmount(start: string, end: string, amount: number) {
-    return chroma
-        .scale([start, end])
-        .mode('lch')
-        .colors(amount);
-}
-
-/**
  * Theme-aware text color: green for positive, red for negative, muted for zero.
  * Returns CSS custom properties so it adapts to light/dark automatically.
  */

@@ -1,12 +1,13 @@
 // https://stackoverflow.com/a/61957932/4034811
-export function sortMapByNumberValue(map) {
+export function sortMapByNumberValue(map: Map<string, number>): Map<string, number> {
     return new Map([...map.entries()].sort((a, b) => b[1] - a[1]));
 }
 
-export function getRandomItemFromArray(array) {
+export function getRandomItemFromArray<T>(array?: Array<T>): T | undefined {
     if (array) {
         return array[Math.floor(Math.random() * array.length)];
     }
+    return undefined;
 }
 
 export function getDateString(year: number, month: number, day: number): string {
