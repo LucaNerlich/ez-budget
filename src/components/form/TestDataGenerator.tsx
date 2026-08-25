@@ -17,12 +17,12 @@ export default function TestDataGenerator() {
     const [testData, setTestData] = useState<Array<Year>>([]);
 
     function generateTestData() {
-        const generatedData = [];
+        const generatedData: Year[] = [];
 
         function generateEntries(year: number, month: number): Array<Entry> {
             const entries: Array<Entry> = [];
             for (let i = 0; i < entriesToGenerate; i++) {
-                const category = getRandomItemFromArray(TEST_CATEGORIES);
+                const category = getRandomItemFromArray(TEST_CATEGORIES) ?? '';
                 const entryData: Entry = {
                     category: category,
                     date: getDateString(year, month, getRandomFloat(1, latestDayInMonth, 0)),
@@ -46,7 +46,6 @@ export default function TestDataGenerator() {
             return months;
         }
 
-        // generate Years
         for (let i = startYear; i < startYear + yearsToGenerate; i++) {
             const yearData: Year = {
                 year: i,
@@ -61,30 +60,6 @@ export default function TestDataGenerator() {
     useEffect(() => {
         generateTestData();
     }, [])
-
-    /*
-    [
-    {
-        "year": 2021,
-        "months": [
-            {
-                "month": 4,
-                "entries": [
-                    {
-                        "category": "Abonnements",
-                        "value": -10.5,
-                        "date": "2021-04-29"
-                    },
-                    {
-                        "category": "Abonnements",
-                        "value": -5,
-                        "date": "2021-04-30"
-                    }
-                ]
-            },
-      }
-    ]
-     */
 
     return (
         <div>

@@ -4,9 +4,11 @@ import {Month} from "../entities/raw/Month";
 import {Entry} from "../entities/raw/Entry";
 import {Budget} from "../entities/raw/Budget";
 import {MonthStats} from "../entities/stats/MonthStats";
+import {Category} from "../entities/stats/Category";
 import {YearStats} from "../entities/stats/YearStats";
 import {sortMapByNumberValue} from "../Util";
-import {getEntriesForMonth} from "./budget";
+import {findYear, getEntriesForMonth} from "./budget";
+import {leastSquaresFit} from "./regression";
 
 /**
  * Budget statistics. Plain functions — the test surface.
@@ -16,51 +18,40 @@ export function round(float: number): number {
     return Math.round((float + Number.EPSILON) * 100) / 100;
 }
 
+function sumEntryValues(entries: Array<Entry>): number {
+    return entries.reduce((sum, entry) => sum + entry.value, 0);
+}
+
+function sumByCategory(entries: Array<Entry>, predicate?: (entry: Entry) => boolean): Map<string, number> {
+    const sums = new Map<string, number>();
+
+    _.forEach(entries, function (entry) {
+        if (predicate && !predicate(entry)) {
+            return;
+        }
+        const category = entry.category;
+        const value = entry.value;
+        sums.set(category, sums.has(category) ? round(sums.get(category) + value) : value);
+    });
+
+    return sums;
+}
+
 /**
  * Income/expense sum for the given year.
  */
-export function getSumForYear(yearData: Year): number {
-    let sum = 0;
-    const months: Array<Month> = yearData.months;
-
-    for (let i = 0; i < months.length; i++) {
-        const entries = months[i].entries;
-        for (let j = 0; j < entries.length; j++) {
-            sum = sum + entries[j].value;
-        }
-    }
-
-    return sum;
+function getSumForYear(yearData: Year): number {
+    return sumEntryValues(_.flatMap(yearData.months, 'entries'));
 }
 
-export function getCategorySums(monthData: Array<Month>): Map<string, number> {
-    let allEntries = [];
-
-    for (let i = 0; i < monthData.length; i++) {
-        allEntries = allEntries.concat(monthData[i].entries);
-    }
-
-    return getSumPerCategoryFromEntries(allEntries);
+function getCategorySums(monthData: Array<Month>): Map<string, number> {
+    return sumByCategory(_.flatMap(monthData, 'entries'));
 }
 
-export function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
-    const monthStats: Array<MonthStats> = [];
-
-    for (let i = 0; i < monthsData.length; i++) {
-        let sum = 0;
-        const entries: Array<Entry> = monthsData[i].entries;
-
-        for (let j = 0; j < entries.length; j++) {
-            sum = sum + entries[j].value;
-        }
-
-        const monthStat: MonthStats = {} as MonthStats;
-        monthStat.month = monthsData[i].month;
-        monthStat.sum = round(sum);
-        monthStats.push(monthStat);
-    }
-
-    return monthStats;
+function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
+    return monthsData.map(function (monthData): MonthStats {
+        return {month: monthData.month, sum: round(sumEntryValues(monthData.entries))};
+    });
 }
 
 /**
@@ -68,28 +59,10 @@ export function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
  * by month membership, so recurring-derived entries without a `date` are included).
  */
 export function getSumMapForYear(budget: Budget, year: number | string): Map<string, number> {
-    const yearSumMap = new Map();
-    const target = Number(year);
-    const yearData = budget && budget.years ? budget.years.find((y) => y.year === target) : undefined;
-    if (!yearData) return yearSumMap;
+    const yearData = findYear(budget, year);
+    if (!yearData) return new Map();
 
-    _.forEach(yearData.months, function (monthData) {
-        _.forEach(monthData.entries, function (entry) {
-            const category = (entry.category);
-            const value = (entry.value);
-            if (typeof category === 'undefined' || typeof value === 'undefined') {
-                return;
-            }
-            if (yearSumMap.has(category)) {
-                const newSum = round(yearSumMap.get(category) + value);
-                yearSumMap.set(category, newSum)
-            } else {
-                yearSumMap.set(category, value)
-            }
-        });
-    });
-
-    return yearSumMap;
+    return sumByCategory(_.flatMap(yearData.months, 'entries'));
 }
 
 /**
@@ -99,98 +72,44 @@ export function getSumForYearMonth(budget: Budget, year: number | string, month:
     return getSum(getEntriesForMonth(budget, year, month));
 }
 
-export function getSumPerCategoryFromEntries(entries): Map<string, number> {
-    const sums = new Map();
-
-    _.forEach(entries, function (entry) {
-        const category = entry.category;
-        const entryAmount = entry.value;
-        if (sums.has(category)) {
-            const newSum = round(sums.get(category) + entryAmount);
-            sums.set(category, newSum)
-        } else {
-            sums.set(category, entryAmount)
-        }
-    });
-
-    return sums;
+function getSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
+    return sumByCategory(entries);
 }
 
-export function getExpenseSumPerCategoryFromEntries(entries): Map<string, number> {
-    const sums = new Map();
-
-    _.forEach(entries, function (entry) {
-        const category = entry.category;
-        const entryAmount = entry.value;
-        if (entryAmount < 0) {
-            if (sums.has(category)) {
-                const newSum = round(sums.get(category) + entryAmount);
-                sums.set(category, newSum)
-            } else {
-                sums.set(category, entryAmount)
-            }
-        }
-    });
-
-    return sums;
+export function getExpenseSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
+    return sumByCategory(entries, (entry) => entry.value < 0);
 }
 
-export function getIncomeSumPerCategoryFromEntries(entries): Map<string, number> {
-    const sums = new Map();
-
-    _.forEach(entries, function (entry) {
-        const category = entry.category;
-        const entryAmount = entry.value;
-        if (entryAmount > 0) {
-            if (sums.has(category)) {
-                const newSum = round(sums.get(category) + entryAmount);
-                sums.set(category, newSum)
-            } else {
-                sums.set(category, entryAmount)
-            }
-        }
-    });
-
-    return sums;
+export function getIncomeSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
+    return sumByCategory(entries, (entry) => entry.value > 0);
 }
 
 /**
  * Linear trend y-values for the given x/y series.
  * https://math.stackexchange.com/questions/204020
  */
-export function getTrendArray(xArray, yArray): number[] {
-    const yTrends = [];
-    const n = xArray.length;
-
-    const sumXY = [];
+export function getTrendArray(xArray: number[], yArray: Array<number | undefined>): number[] {
+    const xs: number[] = [];
+    const ys: number[] = [];
     _.forEach(xArray, function (x, i) {
-        if (typeof yArray[i] !== 'undefined') {
-            sumXY.push(x * yArray[i])
+        const y = yArray[i];
+        if (typeof y !== 'undefined') {
+            xs.push(x);
+            ys.push(y);
         }
     });
 
-    const dividend = (n * _.sum(sumXY)) - (_.sum(xArray) * _.sum(yArray));
-    const quotient1 = _.sumBy(xArray, function (x) {
-        return Math.pow(x, 2);
+    const fit = leastSquaresFit(xs, ys);
+    if (!fit) return [];
+
+    return xArray.map(function (x) {
+        return round(fit.a * x + fit.b);
     });
-    const quotient2 = Math.pow(_.sum(xArray), 2)
-    const quotient = (n * quotient1) - quotient2;
-    if (quotient === 0) return yTrends;
-
-    const a = dividend / quotient;
-    const b = (_.sum(yArray) - (a * _.sum(xArray))) / n;
-
-    _.forEach(xArray, function (value) {
-        const y = a * value + b;
-        yTrends.push(round(y));
-    });
-
-    return yTrends;
 }
 
-export function getSum(entries): number {
+function getSum(entries: Entry[]): number {
     return round(_.sum(entries.map((item) => {
-        return parseFloat(item.value);
+        return Number(item.value);
     })));
 }
 
@@ -199,7 +118,7 @@ export function getSum(entries): number {
  */
 export function computeStatsData(budget: Budget): YearStats[] {
     const statsData: YearStats[] = [];
-    const years = budget && budget.years ? budget.years : [];
+    const years = budget.years;
 
     for (let i = 0; i < years.length; i++) {
         const yearData: Year = years[i];
@@ -209,55 +128,37 @@ export function computeStatsData(budget: Budget): YearStats[] {
         const categorySumsMap = getCategorySums(yearData.months);
         const sortedCategorySumsMap = sortMapByNumberValue(categorySumsMap);
 
-        const categorySums = [];
+        const categorySums: Category[] = [];
         sortedCategorySumsMap.forEach((value, key) => {
             categorySums.push({category: key, sum: value})
         })
 
-        const yearStatsData: YearStats = {} as YearStats;
-        yearStatsData.year = yearData.year;
-        yearStatsData.sum = round(sumForYear);
-        yearStatsData.months = monthStats;
-        yearStatsData.categories = categorySums;
-
-        statsData.push(yearStatsData);
+        statsData.push({
+            year: yearData.year,
+            sum: round(sumForYear),
+            months: monthStats,
+            categories: categorySums,
+        });
     }
 
     return statsData;
 }
 
 /**
- * MonthStats for a given year and month from precomputed stats.
+ * MonthStats for a given year and month from precomputed stats; null when absent.
  */
-export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats {
-    let monthStat: MonthStats = undefined;
-
-    _.filter(statsData, function (yearStats: YearStats) {
-        if (yearStats.year == year) {
-            const months: Array<MonthStats> = yearStats.months;
-            for (let i = 0; i < months.length; i++) {
-                if (months[i].month == month) {
-                    monthStat = months[i];
-                    return;
-                }
-            }
-        }
-    });
-
-    return monthStat ? monthStat : {} as MonthStats;
+export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats | null {
+    const yearStats = statsData.find((candidate) => candidate.year === year);
+    return yearStats ? yearStats.months.find((m) => m.month === month) ?? null : null;
 }
 
 /**
- * YearStats for a given year from precomputed stats.
+ * YearStats for a given year from precomputed stats. Every requested year must
+ * exist in the stats derived from the same Budget — a miss is an invariant
+ * violation and fails loudly instead of returning a hollow default.
  */
 export function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats {
-    const filteredEntries = _.filter(statsData, function (yearStats: YearStats) {
-        return yearStats.year === year;
-    });
-
-    if (filteredEntries && filteredEntries.length > 0) {
-        return filteredEntries[0];
-    }
-
-    return {} as YearStats;
+    const found = statsData.find((yearStats: YearStats) => yearStats.year === year);
+    if (!found) throw new Error(`No stats computed for year ${year}`);
+    return found;
 }

@@ -2,10 +2,10 @@
 
 import axios from 'axios';
 import YAML from 'yaml';
-import { z } from 'zod';
 import dns from 'node:dns/promises';
 import https from 'node:https';
 import type {LookupFunction} from 'node:net';
+import {BudgetFile, BudgetFileSchema} from '../src/entities/raw/BudgetFile';
 // net.isPrivate is not available; implement our own private IP detection
 
 function isHttpsUrl(url: string): boolean {
@@ -16,39 +16,6 @@ function isHttpsUrl(url: string): boolean {
     return false;
   }
 }
-
-const RecurringSchema = z.object({
-  category: z.string().min(1),
-  value: z.number().finite(),
-  comment: z.string().optional(),
-  from: z.string().regex(/^\d{4}-\d{2}$/),
-  until: z.string().regex(/^\d{4}-\d{2}$/).optional(),
-});
-
-const EntrySchema = z.object({
-  category: z.string().min(1),
-  value: z.number().finite(),
-  comment: z.string().optional(),
-  date: z.string().optional(),
-});
-
-const MonthSchema = z.object({
-  month: z.number().int().min(1).max(12),
-  entries: z.array(EntrySchema).default([]),
-});
-
-const YearSchema = z.object({
-  year: z.number().int().min(1900),
-  months: z.array(MonthSchema).default([]),
-});
-
-const DataSchema = z.union([
-  z.array(YearSchema),
-  z.object({
-    years: z.array(YearSchema),
-    recurring: z.array(RecurringSchema).default([]),
-  }),
-]);
 
 function isPrivateIPv4(ip: string): boolean {
     if (ip === '0.0.0.0') return true; // unspecified
@@ -93,7 +60,26 @@ async function assertRemoteSafe(url: string): Promise<Array<{address: string, fa
     return addrs.map((a) => ({address: a.address, family: a.family}));
 }
 
-export type RemoteFetchState = { ok: boolean; data?: any; error?: string };
+/**
+ * Shared state shape for the upload-parse server actions (remote fetch and
+ * local file parse): the "parse" step of building a Budget at load.
+ */
+export type ParseState = { ok: boolean; data?: BudgetFile; error?: string };
+
+function parseBudgetPayload(text: string): ParseState {
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = YAML.parse(text);
+  }
+  const parsed = BudgetFileSchema.safeParse(data);
+  if (!parsed.success) {
+    const first = parsed.error.issues[0];
+    return { ok: false, error: `Invalid data at ${first.path.join('.')}: ${first.message}` };
+  }
+  return { ok: true, data: parsed.data };
+}
 
 const SAFE_REMOTE_ERRORS: Record<string, string> = {
     'DNS lookup timed out': 'Could not resolve the hostname (request timed out).',
@@ -102,20 +88,22 @@ const SAFE_REMOTE_ERRORS: Record<string, string> = {
     'Refusing to fetch non-standard ports': 'The URL uses a port that is not allowed.',
 };
 
-function remoteErrorMessage(e: any): string {
-    if (e && typeof e.message === 'string' && SAFE_REMOTE_ERRORS[e.message]) {
+function remoteErrorMessage(e: unknown): string {
+    if (e instanceof Error && SAFE_REMOTE_ERRORS[e.message]) {
         return SAFE_REMOTE_ERRORS[e.message];
     }
-    if (e && (e.code === 'ERR_CANCELED' || e.code === 'ECONNABORTED' || e.name === 'AbortError' || e.name === 'CanceledError')) {
-        return 'The request timed out.';
-    }
-    if (e && e.response && typeof e.response.status === 'number') {
-        return `The server responded with status ${e.response.status}.`;
+    if (axios.isAxiosError(e)) {
+        if (e.code === 'ERR_CANCELED' || e.code === 'ECONNABORTED' || e.name === 'AbortError' || e.name === 'CanceledError') {
+            return 'The request timed out.';
+        }
+        if (typeof e.response?.status === 'number') {
+            return `The server responded with status ${e.response.status}.`;
+        }
     }
     return 'Could not load the file. Please check the URL and try again.';
 }
 
-export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formData: FormData): Promise<RemoteFetchState> {
+export async function fetchRemoteJsonAction(_prevState: ParseState, formData: FormData): Promise<ParseState> {
   try {
     const url = String(formData.get('remoteUrl') || '').trim();
     if (!url || !isHttpsUrl(url)) {
@@ -138,59 +126,31 @@ export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formDa
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
-    const response = await axios.get(url, {
+    const response = await axios.get<string>(url, {
       responseType: 'text',
-      signal: controller.signal as any,
+      signal: controller.signal,
       maxContentLength: 2 * 1024 * 1024,
       maxRedirects: 0,
       httpsAgent,
-      transformResponse: (d, h) => d,
+      transformResponse: (d) => d,
       validateStatus: (s) => s >= 200 && s < 400
     });
     clearTimeout(timeout);
 
-    const text: string = response.data;
-    let data: any;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = YAML.parse(text);
-    }
-    const parsed = DataSchema.safeParse(data);
-    if (!parsed.success) {
-      const first = parsed.error.issues[0];
-      return { ok: false, error: `Invalid data at ${first.path.join('.')}: ${first.message}` };
-    }
-    return { ok: true, data: parsed.data };
-  } catch (e: any) {
+    return parseBudgetPayload(response.data);
+  } catch (e) {
     console.error('fetchRemoteJsonAction: failed to load remote file', e);
     return { ok: false, error: remoteErrorMessage(e) };
   }
 }
 
-export type LocalParseState = { ok: boolean; data?: any; error?: string };
-
-export async function parseLocalJsonAction(_prev: LocalParseState, formData: FormData): Promise<LocalParseState> {
+export async function parseLocalJsonAction(_prev: ParseState, formData: FormData): Promise<ParseState> {
   try {
-    const file = formData.get('localJson') as File | null;
-    if (!file) return { ok: false, error: 'No file provided' };
-    const text = await file.text();
-    let data: any;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = YAML.parse(text);
-    }
-    const parsed = DataSchema.safeParse(data);
-    if (!parsed.success) {
-      const first = parsed.error.issues[0];
-      return { ok: false, error: `Invalid data at ${first.path.join('.')}: ${first.message}` };
-    }
-    return { ok: true, data: parsed.data };
-  } catch (e: any) {
+    const file = formData.get('localJson');
+    if (!(file instanceof File)) return { ok: false, error: 'No file provided' };
+    return parseBudgetPayload(await file.text());
+  } catch (e) {
     console.error('parseLocalJsonAction: failed to parse local file', e);
     return { ok: false, error: 'Could not read the file. Please check that it contains valid JSON or YAML.' };
   }
 }
-
-

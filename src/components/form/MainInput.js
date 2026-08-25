@@ -47,35 +47,27 @@ export default function MainInput(props) {
     setCookie(COOKIE_LOAD_VIA_URL, loadViaUrl, {path: '/', expires: expiryDate, sameSite: true, secure: true})
   }, [fileName, remoteFileUrl, loadViaUrl])
 
-  useEffect(() => {
-    if (remoteState && remoteState.ok && remoteState.data) {
-      dataContext.setDataContainer(remoteState.data);
+  function handleParseResult(state) {
+    if (state && state.ok && state.data) {
+      dataContext.setDataContainer(state.data);
       setError(false);
       setSuccess(true);
       setLoading(false);
       router.push(ROUTE_MONTHLY);
-    } else if (remoteState && remoteState.error) {
-      console.error(remoteState.error);
+    } else if (state && state.error) {
+      console.error(state.error);
       setError(true);
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    handleParseResult(remoteState)
   }, [remoteState])
 
   useEffect(() => {
-    if (localState && localState.ok && localState.data) {
-      dataContext.setDataContainer(localState.data);
-      setError(false);
-      setSuccess(true);
-      setLoading(false);
-      router.push(ROUTE_MONTHLY);
-    } else if (localState && localState.error) {
-      console.error(localState.error);
-      setError(true);
-      setLoading(false);
-    }
+    handleParseResult(localState)
   }, [localState])
-
-// https://share.lucanerlich.com/s/fxSC52oREjRgdWE/download/testdata.json
 
   function useTestData() {
     setSuccess(true)

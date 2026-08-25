@@ -12,9 +12,8 @@ import {sortMapByNumberValue} from "../../Util";
 const sliceLabelsPlugin = {
   id: 'sliceLabels',
   afterDatasetsDraw(chart, _args, opts) {
-    if (!opts || !opts.show) return;
-    const dataset = chart.data.datasets[0];
-    const data = (dataset && dataset.data) || [];
+    if (!opts.show) return;
+    const data = chart.data.datasets[0].data;
     const total = data.reduce((sum, v) => sum + Math.abs(v), 0);
     if (!total) return;
 
@@ -37,6 +36,49 @@ const sliceLabelsPlugin = {
   }
 };
 
+function doughnutOptions(showPercent) {
+  return {
+    responsive: true,
+    aspectRatio: 1,
+    plugins: {
+      sliceLabels: {show: showPercent},
+      legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}},
+      title: {display: false},
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const data = ctx.dataset.data;
+            const idx = ctx.dataIndex;
+            const signed = ctx.dataset.rawValues[idx];
+            const total = data.reduce((a, b) => a + Math.abs(b), 0);
+            const pct = total ? Math.round((Math.abs(data[idx]) / total) * 1000) / 10 : 0;
+            const label = ctx.label;
+            if (showPercent) {
+              return `${label}: ${pct}%`;
+            }
+            const val = new Intl.NumberFormat('de-DE').format(signed);
+            return `${label}: ${val}`;
+          }
+        }
+      }
+    }
+  };
+}
+
+function CategoryDoughnut({title, config, showPercent}) {
+  return (
+    <div className="col-12 col-md-6 mb-4">
+      <h3>{title}</h3>
+      <Chart
+        type="doughnut"
+        data={config}
+        plugins={[sliceLabelsPlugin]}
+        options={doughnutOptions(showPercent)}
+      />
+    </div>
+  );
+}
+
 export default function MonthAllChart(props) {
   const dataContext = useContext(DataContext);
 
@@ -44,7 +86,6 @@ export default function MonthAllChart(props) {
   const [showPercent, setShowPercent] = useState(false);
   const [expenseMap, setExpenseMap] = useState(null);
   const [incomeMap, setIncomeMap] = useState(null);
-  // derive configs via useMemo to avoid state loops
 
   useEffect(() => {
     setMonthEntries(getEntriesForMonth(dataContext.budget, props.year, props.month));
@@ -84,7 +125,7 @@ export default function MonthAllChart(props) {
     if (!incomeMap || incomeMap.size === 0) {
       return {labels: [], datasets: [{data: []}]};
     }
-    let sortedMap = new Map([...incomeMap.entries()].sort((a, b) => b[1] - a[1]));
+    const sortedMap = sortMapByNumberValue(incomeMap);
     const labels = [];
     const values = [];
     for (let [key, value] of sortedMap) {
@@ -129,80 +170,10 @@ export default function MonthAllChart(props) {
       {((incomeMap && incomeMap.size > 0) || (expenseMap && expenseMap.size > 0)) &&
         <div className="row text-center">
           {incomeMap && incomeMap.size > 0 &&
-          <div className="col-12 col-md-6 mb-4">
-            <h3>Einzahlungen</h3>
-            {incomeChartConfig.datasets &&
-              <Chart
-                type="doughnut"
-                data={incomeChartConfig}
-                plugins={[sliceLabelsPlugin]}
-                options={{
-                  responsive: true,
-                  aspectRatio: 1,
-                  plugins: {
-                    sliceLabels: {show: showPercent},
-                    legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}},
-                    title: {display: false},
-                    tooltip: {
-                      callbacks: {
-                        label: (ctx) => {
-                          const data = ctx.dataset.data || [];
-                          const idx = ctx.dataIndex ?? 0;
-                          const signed = (ctx.dataset.rawValues && ctx.dataset.rawValues[idx]) || 0;
-                          const total = data.reduce((a, b) => a + Math.abs(b), 0);
-                          const pct = total ? Math.round((Math.abs(data[idx]) / total) * 1000) / 10 : 0;
-                          const label = ctx.label || '';
-                          if (showPercent) {
-                            return `${label}: ${pct}%`;
-                          }
-                          const val = new Intl.NumberFormat('de-DE').format(signed);
-                          return `${label}: ${val}`;
-                        }
-                      }
-                    }
-                  }
-                }}
-              />
-            }
-          </div>
+            <CategoryDoughnut title="Einzahlungen" config={incomeChartConfig} showPercent={showPercent}/>
           }
           {expenseMap && expenseMap.size > 0 &&
-          <div className="col-12 col-md-6 mb-4">
-            <h3>Auszahlungen</h3>
-            {expenseChartConfig.datasets &&
-              <Chart
-                type="doughnut"
-                data={expenseChartConfig}
-                plugins={[sliceLabelsPlugin]}
-                options={{
-                  responsive: true,
-                  aspectRatio: 1,
-                  plugins: {
-                    sliceLabels: {show: showPercent},
-                    legend: {position: 'bottom', labels: {boxWidth: 12, usePointStyle: true}},
-                    title: {display: false},
-                    tooltip: {
-                      callbacks: {
-                        label: (ctx) => {
-                          const data = ctx.dataset.data || [];
-                          const idx = ctx.dataIndex ?? 0;
-                          const signed = (ctx.dataset.rawValues && ctx.dataset.rawValues[idx]) || 0;
-                          const total = data.reduce((a, b) => a + Math.abs(b), 0);
-                          const pct = total ? Math.round((Math.abs(data[idx]) / total) * 1000) / 10 : 0;
-                          const label = ctx.label || '';
-                          if (showPercent) {
-                            return `${label}: ${pct}%`;
-                          }
-                          const val = new Intl.NumberFormat('de-DE').format(signed);
-                          return `${label}: ${val}`;
-                        }
-                      }
-                    }
-                  }
-                }}
-              />
-            }
-          </div>
+            <CategoryDoughnut title="Auszahlungen" config={expenseChartConfig} showPercent={showPercent}/>
           }
           <div className="col-12">
             <div className="form-check form-switch d-inline-block">

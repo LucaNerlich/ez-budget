@@ -1,7 +1,4 @@
-// Colors (chart fills)
-export const RGBA_GREEN = '#15a06a';
-export const RGBA_RED = '#d0563f';
-export const RGBA_WHITE = 'rgba(255,255,255,0.9)';
+import {getRandomItemFromArray} from "./src/Util";
 
 // Cookies
 export const COOKIE_LOAD_VIA_URL: string = 'loadViaUrl'
@@ -41,14 +38,9 @@ const TEST_COMMENTS: { [key: string]: string[] } = {
 };
 
 export function getRandomCommentByCategory(category: string): string | undefined {
-    const items = TEST_COMMENTS[category];
-    if (items) {
-        return items[Math.floor(Math.random() * items.length)];
-    }
-    return undefined;
+    return getRandomItemFromArray(TEST_COMMENTS[category]);
 }
 
-// getRandomFloat(1.5, 3.5, 2); // 👉️ 2.18
 export function getRandomFloat(min: number, max: number, decimals: number): number {
     const str = (Math.random() * (max - min) + min).toFixed(decimals);
 

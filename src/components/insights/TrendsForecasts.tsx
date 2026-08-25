@@ -2,14 +2,16 @@
 import React, {useMemo} from 'react';
 import {now} from '../../services/date';
 import {useCashflow} from '../../services/useCashflow';
-import {linearRegression, rollingAverage} from '../../services/cashflow';
+import {CashflowRow, linearRegression, rollingAverage} from '../../services/cashflow';
+import {monthKey, pad} from '../../services/month';
 import '../../lib/chart';
 import {Chart} from 'react-chartjs-2';
+import {ChartData} from 'chart.js';
 
 export default function TrendsForecasts() {
     const monthly = useCashflow();
 
-    const rollingConfig = useMemo(() => {
+    const rollingConfig = useMemo<ChartData<'line'>>(() => {
         if (!monthly || monthly.length === 0) return {labels: [], datasets: [{data: []}]};
         const income = monthly.map(m => m.income);
         const expense = monthly.map(m => Math.abs(m.expense)); // show as positive magnitude
@@ -24,27 +26,27 @@ export default function TrendsForecasts() {
         };
     }, [monthly]);
 
-    const yoyConfig = useMemo(() => {
+    const yoyConfig = useMemo<ChartData<'bar'>>(() => {
         const nowYear = now().year();
         const prevYear = nowYear - 1;
-        const thisYear = monthly.filter(m => m.year === nowYear);
-        const lastYear = monthly.filter(m => m.year === prevYear);
+        const thisYear: CashflowRow[] = monthly.filter(m => m.year === nowYear);
+        const lastYear: CashflowRow[] = monthly.filter(m => m.year === prevYear);
         if (thisYear.length === 0 || lastYear.length === 0) return {labels: [], datasets: [{data: []}]};
         const labels = Array.from({length: 12}, (_, i) => i + 1);
-        const valFor = (arr: any[], m: number) => {
+        const valFor = (arr: CashflowRow[], m: number) => {
             const f = arr.find(x => x.month === m);
             return f ? f.net : 0;
         };
         const deltas = labels.map(m => Math.round((valFor(thisYear, m) - valFor(lastYear, m)) * 100) / 100);
         return {
-            labels: labels.map(m => String(m).padStart(2, '0')),
+            labels: labels.map(pad),
             datasets: [
                 {label: 'YoY Delta (Netto)', data: deltas, backgroundColor: deltas.map(v => v >= 0 ? '#2a7' : '#e33')}
             ]
         };
     }, [monthly]);
 
-    const forecastConfig = useMemo(() => {
+    const forecastConfig = useMemo<ChartData<'line'>>(() => {
         if (!monthly || monthly.length < 3) return {labels: [], datasets: [{data: []}]};
         const net = monthly.map(m => m.net);
         const labelsHist = monthly.map(m => m.key);
@@ -57,17 +59,19 @@ export default function TrendsForecasts() {
         });
         const labelsFc = Array.from({length: horizon}, (_, i) => {
             const last = monthly[monthly.length - 1];
-            const base = new Date(`${last.year}-${String(last.month).padStart(2, '0')}-01`);
-            const d = new Date(base.getFullYear(), base.getMonth() + i + 1, 1);
-            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            // Built from numbers, not "YYYY-MM-01" — that ISO string would parse
+            // as UTC and shift the month in negative-offset timezones.
+            const d = new Date(last.year, last.month + i, 1);
+            return monthKey(d.getFullYear(), d.getMonth() + 1);
         });
+        const historyPadding: Array<number | null> = Array.from({length: net.length}, () => null);
         return {
             labels: [...labelsHist, ...labelsFc],
             datasets: [
                 {label: 'Netto (historisch)', data: net, borderColor: '#226ebd', backgroundColor: 'transparent'},
                 {
                     label: 'Forecast (6M)',
-                    data: [...Array(net.length).fill(null), ...forecast],
+                    data: [...historyPadding, ...forecast],
                     borderColor: '#999',
                     borderDash: [6, 6],
                     backgroundColor: 'transparent'

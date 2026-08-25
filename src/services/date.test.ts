@@ -16,6 +16,11 @@ describe('isInYearMonth', () => {
         expect(isInYearMonth('2024-01-31T23:59:00Z', 2024, 2)).toBe(false);
         expect(isInYearMonth('2024-01-31T23:59:00Z', 2024, 1)).toBe(true);
     });
+
+    it('is false for undefined and null input', () => {
+        expect(isInYearMonth(undefined, 2024, 1)).toBe(false);
+        expect(isInYearMonth(null, 2024, 1)).toBe(false);
+    });
 });
 
 describe('isInYear', () => {
@@ -28,5 +33,10 @@ describe('isInYear', () => {
     it('attributes full timestamps by their date portion, not the local instant', () => {
         expect(isInYear('2024-01-01T00:30:00Z', 2024)).toBe(true);
         expect(isInYear('2024-01-01T00:30:00Z', 2023)).toBe(false);
+    });
+
+    it('is false for undefined and null input', () => {
+        expect(isInYear(undefined, 2024)).toBe(false);
+        expect(isInYear(null, 2024)).toBe(false);
     });
 });

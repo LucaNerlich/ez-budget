@@ -4,21 +4,22 @@ import {now} from "../../services/date";
 import {jsFriendlyJSONStringify} from "../../Util";
 import {Entry} from "../../entities/raw/Entry";
 
-export default function JsonDataGeneratorForm(props) {
+export default function JsonDataGeneratorForm() {
 
-    const generatorForm = useRef(null);
-    const focusRef = useRef(null)
-    const [entries, setEntries] = useState([]);
+    const generatorForm = useRef<HTMLFormElement | null>(null);
+    const focusRef = useRef<HTMLInputElement | null>(null)
+    const [entries, setEntries] = useState<Entry[]>([]);
 
     useEffect(() => {
-        focusRef.current.focus()
+        focusRef.current?.focus()
     }, [])
 
-    const onSubmit = async (e) => {
+    const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const category = e.target[0].value;
-        const value = e.target[1].value;
-        const comment = e.target[2].value;
+        const formData = new FormData(e.currentTarget);
+        const category = String(formData.get('category') ?? '');
+        const value = String(formData.get('value') ?? '');
+        const comment = String(formData.get('comment') ?? '');
 
         const newEntry: Entry = {
             category: category,
@@ -32,30 +33,20 @@ export default function JsonDataGeneratorForm(props) {
         setEntries([...entries, newEntry]);
 
         // reset form
-        if (generatorForm) {
-            generatorForm.current.reset();
-        }
+        generatorForm.current?.reset();
         if (focusRef.current) {
             focusRef.current.focus();
         }
     };
 
-    /*
-  todo date? maybe default immer aktueller Monat der 1.?
-  reuse dateinput von ezbudget 1.0?
-
-  maybe use focus trap to cycle through form with tab
-  https://github.com/focus-trap/focus-trap
-   */
-
     return (
         <div>
-            <strong>WORK IN PROGRESS</strong>
             <form ref={generatorForm} onSubmit={onSubmit}>
                 <div className="row">
                     <div className="col">
                         <label htmlFor="category" className="form-label">Kategorie*</label>
                         <input type="text"
+                               name="category"
                                ref={focusRef}
                                className="form-control"
                                required
@@ -65,6 +56,7 @@ export default function JsonDataGeneratorForm(props) {
                     <div className="col">
                         <label htmlFor="value" className="form-label">Summe*</label>
                         <input type="number"
+                               name="value"
                                className="form-control"
                                required
                                id="value"
@@ -76,6 +68,7 @@ export default function JsonDataGeneratorForm(props) {
                     <div className="col">
                         <label htmlFor="comment" className="form-label">Kommentar</label>
                         <input type="text"
+                               name="comment"
                                className="form-control"
                                id="comment"
                                placeholder="DB Ticket nach Hamburg"/>
