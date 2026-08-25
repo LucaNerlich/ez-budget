@@ -59,8 +59,9 @@ export default function TrendsForecasts() {
         });
         const labelsFc = Array.from({length: horizon}, (_, i) => {
             const last = monthly[monthly.length - 1];
-            const base = new Date(`${monthKey(last.year, last.month)}-01`);
-            const d = new Date(base.getFullYear(), base.getMonth() + i + 1, 1);
+            // Built from numbers, not "YYYY-MM-01" — that ISO string would parse
+            // as UTC and shift the month in negative-offset timezones.
+            const d = new Date(last.year, last.month + i, 1);
             return monthKey(d.getFullYear(), d.getMonth() + 1);
         });
         const historyPadding: Array<number | null> = Array.from({length: net.length}, () => null);

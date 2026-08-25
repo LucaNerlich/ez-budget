@@ -53,6 +53,9 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) 
         setCategoryRows(mapCategoriesToRows(categories));
     }, [categories])
 
+    const ariaSortFor = (key: keyof Category): 'ascending' | 'descending' | 'none' =>
+        sortConfig?.key === key ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending') : 'none';
+
     return (
         <div>
             <h3>{currentYearStats.year} - Gewinn: {round(currentYearStats.sum)}</h3>
@@ -61,11 +64,20 @@ const YearStatComponent: React.FC<YearStatProps> = ({currentYearStats, opened}) 
               <summary className="mt-3"><p style={{display: 'inline'}}>Ergebnis pro Kategorie</p></summary>
               <div className="table-responsive">
                 <table className="table">
+                  <caption className="visually-hidden">Ergebnis pro Kategorie {currentYearStats.year}</caption>
                   <thead>
                   <tr>
                     <th scope="col">#</th>
-                    <th scope="col" onClick={() => sortCategories('category')}>Kategorie</th>
-                    <th scope="col" onClick={() => sortCategories('sum')}>Summe</th>
+                    <th scope="col" aria-sort={ariaSortFor('category')}>
+                      <button type="button" className="btn btn-link p-0" onClick={() => sortCategories('category')}>
+                        Kategorie
+                      </button>
+                    </th>
+                    <th scope="col" aria-sort={ariaSortFor('sum')}>
+                      <button type="button" className="btn btn-link p-0" onClick={() => sortCategories('sum')}>
+                        Summe
+                      </button>
+                    </th>
                   </tr>
                   </thead>
                   <tbody>

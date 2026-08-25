@@ -30,6 +30,7 @@ function dateOnly(input: string | null | undefined): string | null | undefined {
  * Does the input date reside between the start and end of the given year and month?
  */
 export function isInYearMonth(input: string | null | undefined, year: number, month: number): boolean {
+    if (input == null) return false;
     const date = dayjs(dateOnly(input));
     const start = dayjs(`${year}-${pad(month)}-01`);
     const end = start.endOf('month');
@@ -40,6 +41,7 @@ export function isInYearMonth(input: string | null | undefined, year: number, mo
  * Does the input date reside between the start and end of the given year?
  */
 export function isInYear(input: string | null | undefined, year: number): boolean {
+    if (input == null) return false;
     const start = `${year}-01-01`;
     const end = `${year}-12-31`;
     const date = dayjs(dateOnly(input));

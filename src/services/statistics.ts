@@ -145,13 +145,7 @@ export function computeStatsData(budget: Budget): YearStats[] {
 }
 
 /**
-<<<<<<< HEAD
  * MonthStats for a given year and month from precomputed stats; null when absent.
-=======
- * MonthStats for a given year and month from precomputed stats.
- * Returns an empty stats object when absent — callers legitimately query
- * before a month/year is selected (e.g. the neutral pre-mount state).
->>>>>>> cleanup/6-defensive
  */
 export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, month: number): MonthStats | null {
     const yearStats = statsData.find((candidate) => candidate.year === year);
