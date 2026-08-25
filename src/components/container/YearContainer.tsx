@@ -2,6 +2,7 @@
 import React, {useContext, useEffect, useState} from "react";
 import {DataContext} from "../../providers/DataProvider";
 import {DataContextType} from "../../entities/raw/DataContextType";
+import {Category} from "../../entities/stats/Category";
 import {YearStats} from "../../entities/stats/YearStats";
 import {now} from "../../services/date";
 import {getAvailableYears} from "../../services/budget";
@@ -13,11 +14,6 @@ interface YearCategoryContainer {
     year: number,
     statsForYear: YearStats,
     categoriesForYear: any
-}
-
-export interface Category {
-    category: string,
-    sum: number,
 }
 
 export function mapCategoriesToRows(categories: Category[]) {

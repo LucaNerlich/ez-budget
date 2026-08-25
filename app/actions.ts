@@ -93,7 +93,11 @@ async function assertRemoteSafe(url: string): Promise<Array<{address: string, fa
     return addrs.map((a) => ({address: a.address, family: a.family}));
 }
 
-export type RemoteFetchState = { ok: boolean; data?: any; error?: string };
+/**
+ * Shared state shape for the upload-parse server actions (remote fetch and
+ * local file parse): the "parse" step of building a Budget at load.
+ */
+export type ParseState = { ok: boolean; data?: any; error?: string };
 
 const SAFE_REMOTE_ERRORS: Record<string, string> = {
     'DNS lookup timed out': 'Could not resolve the hostname (request timed out).',
@@ -115,7 +119,7 @@ function remoteErrorMessage(e: any): string {
     return 'Could not load the file. Please check the URL and try again.';
 }
 
-export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formData: FormData): Promise<RemoteFetchState> {
+export async function fetchRemoteJsonAction(_prevState: ParseState, formData: FormData): Promise<ParseState> {
   try {
     const url = String(formData.get('remoteUrl') || '').trim();
     if (!url || !isHttpsUrl(url)) {
@@ -168,9 +172,7 @@ export async function fetchRemoteJsonAction(_prevState: RemoteFetchState, formDa
   }
 }
 
-export type LocalParseState = { ok: boolean; data?: any; error?: string };
-
-export async function parseLocalJsonAction(_prev: LocalParseState, formData: FormData): Promise<LocalParseState> {
+export async function parseLocalJsonAction(_prev: ParseState, formData: FormData): Promise<ParseState> {
   try {
     const file = formData.get('localJson') as File | null;
     if (!file) return { ok: false, error: 'No file provided' };

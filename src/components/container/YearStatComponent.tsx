@@ -2,7 +2,8 @@
 import React, {useEffect, useState} from 'react';
 import {round} from "../../services/statistics";
 import {YearStats} from "../../entities/stats/YearStats";
-import {Category, mapCategoriesToRows} from "./YearContainer";
+import {Category} from "../../entities/stats/Category";
+import {mapCategoriesToRows} from "./YearContainer";
 
 interface YearStatProps {
     currentYearStats: YearStats,
