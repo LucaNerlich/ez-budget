@@ -84,7 +84,7 @@ export default function MonthAllChart(props) {
     if (!incomeMap || incomeMap.size === 0) {
       return {labels: [], datasets: [{data: []}]};
     }
-    let sortedMap = new Map([...incomeMap.entries()].sort((a, b) => b[1] - a[1]));
+    const sortedMap = sortMapByNumberValue(incomeMap);
     const labels = [];
     const values = [];
     for (let [key, value] of sortedMap) {

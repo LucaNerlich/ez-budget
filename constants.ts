@@ -1,7 +1,6 @@
 // Colors (chart fills)
 export const RGBA_GREEN = '#15a06a';
 export const RGBA_RED = '#d0563f';
-export const RGBA_WHITE = 'rgba(255,255,255,0.9)';
 
 // Cookies
 export const COOKIE_LOAD_VIA_URL: string = 'loadViaUrl'
@@ -48,7 +47,6 @@ export function getRandomCommentByCategory(category: string): string | undefined
     return undefined;
 }
 
-// getRandomFloat(1.5, 3.5, 2); // 👉️ 2.18
 export function getRandomFloat(min: number, max: number, decimals: number): number {
     const str = (Math.random() * (max - min) + min).toFixed(decimals);
 

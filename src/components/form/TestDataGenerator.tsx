@@ -62,30 +62,6 @@ export default function TestDataGenerator() {
         generateTestData();
     }, [])
 
-    /*
-    [
-    {
-        "year": 2021,
-        "months": [
-            {
-                "month": 4,
-                "entries": [
-                    {
-                        "category": "Abonnements",
-                        "value": -10.5,
-                        "date": "2021-04-29"
-                    },
-                    {
-                        "category": "Abonnements",
-                        "value": -5,
-                        "date": "2021-04-30"
-                    }
-                ]
-            },
-      }
-    ]
-     */
-
     return (
         <div>
             <div className="btn-group" role="group" aria-label="Basic mixed styles example">
