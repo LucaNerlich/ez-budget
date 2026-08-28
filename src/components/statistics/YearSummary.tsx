@@ -51,6 +51,7 @@ export default function YearSummary() {
     return (
         <div>
             <table className="table table-striped">
+                <caption className="visually-hidden">Ergebnis pro Jahr und Monat</caption>
                 <thead>
                 <tr>
                     <th scope="col">#</th>

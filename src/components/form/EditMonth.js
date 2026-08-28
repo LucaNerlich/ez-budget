@@ -3,6 +3,7 @@ import React, {useContext, useState} from "react";
 import {DataContext} from "../../providers/DataContext";
 import {getEntriesForMonth} from "../../services/budget";
 import {getPositiveNegativeColor} from "../../services/colors";
+import {monthName} from "../../services/month";
 import orderBy from 'lodash/orderBy';
 
 const sortableColumns = [
@@ -39,8 +40,15 @@ export default function EditMonth(props) {
   const ariaSortFor = (field) =>
     field === sortField ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none';
 
+  // Renders pre-hydration with a neutral {0, 0} month, which monthName()
+  // rejects — fall back to a plain caption until a real month is selected.
+  const caption = props.month >= 1 && props.month <= 12
+    ? `Einträge ${monthName(props.month)} ${props.year}`
+    : 'Einträge';
+
   return (
     <table className="table">
+      <caption className="visually-hidden">{caption}</caption>
       <thead>
       <tr>
         <th scope="col">#</th>
