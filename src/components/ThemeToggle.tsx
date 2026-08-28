@@ -1,17 +1,27 @@
 "use client";
-import React, {useEffect, useState} from "react";
+import React, {useSyncExternalStore} from "react";
+import {useMounted} from "../services/useToday";
 
 type Theme = "light" | "dark";
 
-export default function ThemeToggle() {
-    const [theme, setTheme] = useState<Theme>("light");
-    const [mounted, setMounted] = useState(false);
+const themeSubscribe = (onStoreChange: () => void) => {
+    window.addEventListener("ez-theme-change", onStoreChange);
+    return () => window.removeEventListener("ez-theme-change", onStoreChange);
+};
 
-    useEffect(() => {
-        const current = document.documentElement.getAttribute("data-bs-theme") === "dark" ? "dark" : "light";
-        setTheme(current);
-        setMounted(true);
-    }, []);
+function getThemeSnapshot(): Theme {
+    return document.documentElement.getAttribute("data-bs-theme") === "dark" ? "dark" : "light";
+}
+
+function getThemeServerSnapshot(): Theme {
+    return "light";
+}
+
+export default function ThemeToggle() {
+    // The DOM attribute is the source of truth; useSyncExternalStore reads it
+    // safely during SSR/hydration (server snapshot "light") and after mount.
+    const theme = useSyncExternalStore(themeSubscribe, getThemeSnapshot, getThemeServerSnapshot);
+    const mounted = useMounted();
 
     function toggle() {
         const next: Theme = theme === "dark" ? "light" : "dark";
@@ -21,7 +31,6 @@ export default function ThemeToggle() {
         } catch (e) {
             // ignore persistence failures (e.g. private mode)
         }
-        setTheme(next);
         window.dispatchEvent(new Event("ez-theme-change"));
     }
 

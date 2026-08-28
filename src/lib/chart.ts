@@ -1,43 +1,18 @@
-import {
-    ArcElement,
-    BarController,
-    BarElement,
-    CategoryScale,
-    Chart as ChartJS,
-    DoughnutController,
-    Legend,
-    LinearScale,
-    LineController,
-    LineElement,
-    PieController,
-    PointElement,
-    TimeScale,
-    Title,
-    Tooltip
-} from 'chart.js';
+/**
+ * Chart.js setup, loaded on demand next to the first chart. Registers the
+ * controllers react-chartjs-2 needs and aligns typography/colors with the
+ * active design theme.
+ */
 
-ChartJS.register(
-    ArcElement,
-    BarElement,
-    CategoryScale,
-    LinearScale,
-    Tooltip,
-    Legend,
-    TimeScale,
-    PointElement,
-    LineElement,
-    PieController,
-    DoughnutController,
-    BarController,
-    LineController,
-    Title
-);
+type ChartJs = (typeof import('chart.js'))['Chart'];
+
+let initPromise: Promise<void> | null = null;
 
 /**
  * Align Chart.js typography/colors with the active design theme. Reads the live
  * computed token values so charts adapt when the user toggles light/dark.
  */
-function applyChartTheme() {
+function applyChartTheme(ChartJS: ChartJs) {
     if (typeof window === 'undefined') return;
     const styles = getComputedStyle(document.documentElement);
     const ink = styles.getPropertyValue('--text-muted').trim() || '#5e6b62';
@@ -52,13 +27,45 @@ function applyChartTheme() {
     ChartJS.defaults.font.size = 12;
 }
 
-applyChartTheme();
+async function initialize(): Promise<void> {
+    const chartJs = await import('chart.js');
+    const {Chart: ChartJS} = chartJs;
 
-if (typeof window !== 'undefined') {
-    // Re-theme already-mounted charts when the user toggles light/dark.
-    window.addEventListener('ez-theme-change', () => {
-        applyChartTheme();
-        Object.values(ChartJS.instances).forEach((c) => c.update());
-    });
+    ChartJS.register(
+        chartJs.ArcElement,
+        chartJs.BarController,
+        chartJs.BarElement,
+        chartJs.CategoryScale,
+        chartJs.DoughnutController,
+        chartJs.Legend,
+        chartJs.LinearScale,
+        chartJs.LineController,
+        chartJs.LineElement,
+        chartJs.PieController,
+        chartJs.PointElement,
+        chartJs.TimeScale,
+        chartJs.Title,
+        chartJs.Tooltip
+    );
+
+    applyChartTheme(ChartJS);
+
+    if (typeof window !== 'undefined') {
+        // Re-theme already-mounted charts when the user toggles light/dark.
+        window.addEventListener('ez-theme-change', () => {
+            applyChartTheme(ChartJS);
+            Object.values(ChartJS.instances).forEach((c) => c.update());
+        });
+    }
 }
 
+/**
+ * Idempotent: registers Chart.js components and applies the theme exactly once.
+ * Must complete before the first chart renders.
+ */
+export function initChartJs(): Promise<void> {
+    if (!initPromise) {
+        initPromise = initialize();
+    }
+    return initPromise;
+}

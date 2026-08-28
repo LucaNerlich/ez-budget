@@ -1,7 +1,7 @@
 "use client";
 import React, {useContext} from 'react';
 import Layout from '../../src/components/Layout';
-import {DataContext} from '../../src/providers/DataProvider';
+import {DataContext} from '../../src/providers/DataContext';
 import {jsFriendlyJSONStringify} from '../../src/Util';
 
 export default function DataInspectorPage() {

@@ -11,7 +11,7 @@ import {
     ROUTE_TESTDATA,
     ROUTE_TESTDATA_GENERATOR
 } from "../../routes";
-import {DataContext} from "../providers/DataProvider";
+import {DataContext} from "../providers/DataContext";
 
 export default function Footer() {
     const [removeCookie] = useCookies();
