@@ -1,17 +1,17 @@
 "use client";
-import React, {useMemo} from 'react';
+import React from 'react';
 import {now} from '../../services/date';
 import {useCashflow} from '../../services/useCashflow';
 import {CashflowRow, linearRegression, rollingAverage} from '../../services/cashflow';
 import {monthKey, pad} from '../../services/month';
-import '../../lib/chart';
-import {Chart} from 'react-chartjs-2';
+import LazyChart from '../charts/LazyChart';
 import {ChartData} from 'chart.js';
 
 export default function TrendsForecasts() {
     const monthly = useCashflow();
 
-    const rollingConfig = useMemo<ChartData<'line'>>(() => {
+    // Derived during render — the React Compiler caches these.
+    const rollingConfig: ChartData<'line'> = (() => {
         if (!monthly || monthly.length === 0) return {labels: [], datasets: [{data: []}]};
         const income = monthly.map(m => m.income);
         const expense = monthly.map(m => Math.abs(m.expense)); // show as positive magnitude
@@ -24,9 +24,9 @@ export default function TrendsForecasts() {
                 {label: 'Ø Ausgaben (12M)', data: rollingAverage(expense, window), borderColor: '#e33', backgroundColor: 'transparent'}
             ]
         };
-    }, [monthly]);
+    })();
 
-    const yoyConfig = useMemo<ChartData<'bar'>>(() => {
+    const yoyConfig: ChartData<'bar'> = (() => {
         const nowYear = now().year();
         const prevYear = nowYear - 1;
         const thisYear: CashflowRow[] = monthly.filter(m => m.year === nowYear);
@@ -44,9 +44,9 @@ export default function TrendsForecasts() {
                 {label: 'YoY Delta (Netto)', data: deltas, backgroundColor: deltas.map(v => v >= 0 ? '#2a7' : '#e33')}
             ]
         };
-    }, [monthly]);
+    })();
 
-    const forecastConfig = useMemo<ChartData<'line'>>(() => {
+    const forecastConfig: ChartData<'line'> = (() => {
         if (!monthly || monthly.length < 3) return {labels: [], datasets: [{data: []}]};
         const net = monthly.map(m => m.net);
         const labelsHist = monthly.map(m => m.key);
@@ -78,7 +78,7 @@ export default function TrendsForecasts() {
                 }
             ]
         };
-    }, [monthly]);
+    })();
 
     return (
         <div className="mt-4">
@@ -86,18 +86,18 @@ export default function TrendsForecasts() {
             <div className="row g-4">
                 <div className="col-12">
                     <h3>12‑Monats‑Durchschnitt</h3>
-                    <Chart type="line" data={rollingConfig}
-                           options={{responsive: true, plugins: {legend: {position: 'bottom'}}}}/>
+                    <LazyChart type="line" data={rollingConfig}
+                               options={{responsive: true, plugins: {legend: {position: 'bottom'}}}}/>
                 </div>
                 <div className="col-12 col-md-6">
                     <h3>Year‑over‑Year (Netto)</h3>
-                    <Chart type="bar" data={yoyConfig}
-                           options={{responsive: true, plugins: {legend: {display: false}}, aspectRatio: 1}}/>
+                    <LazyChart type="bar" data={yoyConfig}
+                               options={{responsive: true, plugins: {legend: {display: false}}, aspectRatio: 1}}/>
                 </div>
                 <div className="col-12 col-md-6">
                     <h3>Forecast (6 Monate)</h3>
-                    <Chart type="line" data={forecastConfig}
-                           options={{responsive: true, plugins: {legend: {position: 'bottom'}}, aspectRatio: 1}}/>
+                    <LazyChart type="line" data={forecastConfig}
+                               options={{responsive: true, plugins: {legend: {position: 'bottom'}}, aspectRatio: 1}}/>
                 </div>
             </div>
         </div>

@@ -1,21 +1,32 @@
 "use client";
-import React, {useContext, useEffect, useState} from "react";
-import {DataContext} from "../../providers/DataProvider";
+import React, {useContext, useState} from "react";
+import {DataContext} from "../../providers/DataContext";
 import {getEntriesForMonth} from "../../services/budget";
 import {getPositiveNegativeColor} from "../../services/colors";
+import {monthName} from "../../services/month";
 import orderBy from 'lodash/orderBy';
+
+const sortableColumns = [
+  {field: 'category', label: 'Kategorie'},
+  {field: 'comment', label: 'Comment'},
+  {field: 'value', label: 'Summe'},
+];
 
 export default function EditMonth(props) {
   const dataContext = useContext(DataContext);
   const [sortField, setSortField] = useState("");
   const [sortOrder, setSortOrder] = useState('asc');
-  const [monthEntries, setMonthEntries] = useState([]);
-  const [sortedData, setSortedData] = useState([]);
 
-  useEffect(() => {
-    setMonthEntries(getEntriesForMonth(dataContext.budget, props.year, props.month));
-  }, [dataContext.budget, props.year, props.month]);
+  // Derived from context during render — the React Compiler caches this.
+  const monthEntries = getEntriesForMonth(dataContext.budget, props.year, props.month);
 
+  const sortedData = sortField === 'date'
+    ? monthEntries.toSorted((a, b) => {
+        const dateA = new Date(a[sortField]);
+        const dateB = new Date(b[sortField]);
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      })
+    : (sortField ? orderBy(monthEntries, [sortField], [sortOrder]) : monthEntries);
 
   const handleSort = (field) => {
     if (field === sortField) {
@@ -26,36 +37,33 @@ export default function EditMonth(props) {
     }
   };
 
-  useEffect(() => {
-    if (sortField === 'date') { // the date field should be compared as Date
-      setSortedData([...monthEntries].sort((a, b) => {
-        let dateA = new Date(a[sortField]);
-        let dateB = new Date(b[sortField]);
+  const ariaSortFor = (field) =>
+    field === sortField ? (sortOrder === 'asc' ? 'ascending' : 'descending') : 'none';
 
-        if (sortOrder === 'asc') {
-          return dateA - dateB;
-        } else {
-          return dateB - dateA;
-        }
-      }));
-    } else { // sorting for string and number fields
-      setSortedData(orderBy(monthEntries, [sortField], [sortOrder]));
-    }
-  }, [monthEntries, sortOrder, sortField])
+  // Renders pre-hydration with a neutral {0, 0} month, which monthName()
+  // rejects — fall back to a plain caption until a real month is selected.
+  const caption = props.month >= 1 && props.month <= 12
+    ? `Einträge ${monthName(props.month)} ${props.year}`
+    : 'Einträge';
 
   return (
     <table className="table">
+      <caption className="visually-hidden">{caption}</caption>
       <thead>
       <tr>
         <th scope="col">#</th>
-        <th scope="col" onClick={() => handleSort('category')}>Kategorie</th>
-        <th scope="col" onClick={() => handleSort('comment')}>Comment</th>
-        <th scope="col" onClick={() => handleSort('value')}>Summe</th>
+        {sortableColumns.map((column) => (
+          <th scope="col" key={column.field} aria-sort={ariaSortFor(column.field)}>
+            <button type="button" className="btn btn-link p-0" onClick={() => handleSort(column.field)}>
+              {column.label}
+            </button>
+          </th>
+        ))}
       </tr>
       </thead>
       <tbody>
       {sortedData.map((item, index) => (
-        <tr key={index}>
+        <tr key={`${item.category}|${item.comment || ''}|${item.date || ''}|${item.value}`}>
           <th scope="row">{index + 1}</th>
           <td>{item.category}</td>
           <td>

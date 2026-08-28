@@ -105,7 +105,7 @@ export function getAvailableMonths(budget: Budget, year: number | string): numbe
 export function getEntriesForMonth(budget: Budget, year: number | string, month: number | string): Entry[] {
     const foundMonth = findMonth(budget, year, month);
     if (!foundMonth) return [];
-    return [...foundMonth.entries].sort((a, b) => {
+    return foundMonth.entries.toSorted((a, b) => {
         const nameA = a.category.toUpperCase();
         const nameB = b.category.toUpperCase();
         if (nameA < nameB) return -1;

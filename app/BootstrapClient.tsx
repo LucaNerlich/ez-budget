@@ -1,12 +1,11 @@
 "use client";
 
 import {useEffect} from 'react';
+import {loadBootstrapJs} from '../src/lib/bootstrap';
 
 export default function BootstrapClient() {
   useEffect(() => {
-    import('bootstrap/dist/js/bootstrap.bundle.min.js');
+    loadBootstrapJs();
   }, []);
   return null;
 }
-
-

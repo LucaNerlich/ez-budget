@@ -1,12 +1,13 @@
 "use client";
-import React, {useContext, useEffect, useMemo, useState} from "react";
+import React, {useContext, useState} from "react";
 import {getScaleByAmount} from "../../services/colors";
-import '../../lib/chart';
-import {Chart} from 'react-chartjs-2';
+import LazyChart from './LazyChart';
 import {getExpenseSumPerCategoryFromEntries, getIncomeSumPerCategoryFromEntries} from "../../services/statistics";
-import {DataContext} from "../../providers/DataProvider";
+import {DataContext} from "../../providers/DataContext";
 import {getEntriesForMonth} from "../../services/budget";
 import {sortMapByNumberValue} from "../../Util";
+
+const numberFormat = new Intl.NumberFormat('de-DE');
 
 // Draws "x%" centered on each slice when enabled via options.plugins.sliceLabels.show
 const sliceLabelsPlugin = {
@@ -56,7 +57,7 @@ function doughnutOptions(showPercent) {
             if (showPercent) {
               return `${label}: ${pct}%`;
             }
-            const val = new Intl.NumberFormat('de-DE').format(signed);
+            const val = numberFormat.format(signed);
             return `${label}: ${val}`;
           }
         }
@@ -65,11 +66,80 @@ function doughnutOptions(showPercent) {
   };
 }
 
+function buildExpenseChartConfig(expenseMap) {
+  if (!expenseMap || expenseMap.size === 0) {
+    return {labels: [], datasets: [{data: []}]};
+  }
+  const sortedMap = sortMapByNumberValue(expenseMap);
+  const labels = [];
+  const signedValues = [];
+  const magnitudes = [];
+  for (let [key, value] of sortedMap) {
+    labels.push(key);
+    signedValues.push(value);
+    magnitudes.push(Math.abs(value));
+  }
+
+  return {
+    labels,
+    datasets: [{
+      label: '',
+      data: magnitudes,
+      backgroundColor: getScaleByAmount(labels.length),
+      rawValues: signedValues
+    }]
+  };
+}
+
+function buildIncomeChartConfig(incomeMap) {
+  if (!incomeMap || incomeMap.size === 0) {
+    return {labels: [], datasets: [{data: []}]};
+  }
+  const sortedMap = sortMapByNumberValue(incomeMap);
+  const labels = [];
+  const values = [];
+  for (let [key, value] of sortedMap) {
+    labels.push(key);
+    values.push(value);
+  }
+
+  // Group small slices into "Andere"
+  const total = values.reduce((a, b) => a + b, 0);
+  const maxSlices = 8;
+  const minShare = 0.05; // 5%
+  const groupedLabels = [];
+  const groupedValues = [];
+  let others = 0;
+  for (let i = 0; i < labels.length; i++) {
+    const share = total ? values[i] / total : 0;
+    if (i >= maxSlices || share < minShare) {
+      others += values[i];
+    } else {
+      groupedLabels.push(labels[i]);
+      groupedValues.push(values[i]);
+    }
+  }
+  if (others > 0) {
+    groupedLabels.push('Andere');
+    groupedValues.push(others);
+  }
+
+  return {
+    labels: groupedLabels,
+    datasets: [{
+      label: '',
+      data: groupedValues,
+      backgroundColor: getScaleByAmount(groupedLabels.length),
+      rawValues: groupedValues
+    }]
+  };
+}
+
 function CategoryDoughnut({title, config, showPercent}) {
   return (
     <div className="col-12 col-md-6 mb-4">
       <h3>{title}</h3>
-      <Chart
+      <LazyChart
         type="doughnut"
         data={config}
         plugins={[sliceLabelsPlugin]}
@@ -82,88 +152,14 @@ function CategoryDoughnut({title, config, showPercent}) {
 export default function MonthAllChart(props) {
   const dataContext = useContext(DataContext);
 
-  const [monthEntries, setMonthEntries] = useState([]);
+  // Derived from context during render — the React Compiler caches these.
+  const monthEntries = getEntriesForMonth(dataContext.budget, props.year, props.month);
+  const expenseMap = getExpenseSumPerCategoryFromEntries(monthEntries);
+  const incomeMap = getIncomeSumPerCategoryFromEntries(monthEntries);
   const [showPercent, setShowPercent] = useState(false);
-  const [expenseMap, setExpenseMap] = useState(null);
-  const [incomeMap, setIncomeMap] = useState(null);
 
-  useEffect(() => {
-    setMonthEntries(getEntriesForMonth(dataContext.budget, props.year, props.month));
-  }, [dataContext.budget, props.year, props.month]);
-
-  useEffect(() => {
-    setExpenseMap(getExpenseSumPerCategoryFromEntries(monthEntries));
-    setIncomeMap(getIncomeSumPerCategoryFromEntries(monthEntries));
-  }, [monthEntries]);
-
-  const expenseChartConfig = useMemo(() => {
-    if (!expenseMap || expenseMap.size === 0) {
-      return {labels: [], datasets: [{data: []}]};
-    }
-    const sortedMap = sortMapByNumberValue(expenseMap);
-    const labels = [];
-    const signedValues = [];
-    const magnitudes = [];
-    for (let [key, value] of sortedMap) {
-      labels.push(key);
-      signedValues.push(value);
-      magnitudes.push(Math.abs(value));
-    }
-
-    return {
-      labels,
-      datasets: [{
-        label: '',
-        data: magnitudes,
-        backgroundColor: getScaleByAmount(labels.length),
-        rawValues: signedValues
-      }]
-    };
-  }, [expenseMap]);
-
-  const incomeChartConfig = useMemo(() => {
-    if (!incomeMap || incomeMap.size === 0) {
-      return {labels: [], datasets: [{data: []}]};
-    }
-    const sortedMap = sortMapByNumberValue(incomeMap);
-    const labels = [];
-    const values = [];
-    for (let [key, value] of sortedMap) {
-      labels.push(key);
-      values.push(value);
-    }
-
-    // Group small slices into "Andere"
-    const total = values.reduce((a, b) => a + b, 0);
-    const maxSlices = 8;
-    const minShare = 0.05; // 5%
-    const groupedLabels = [];
-    const groupedValues = [];
-    let others = 0;
-    for (let i = 0; i < labels.length; i++) {
-      const share = total ? values[i] / total : 0;
-      if (i >= maxSlices || share < minShare) {
-        others += values[i];
-      } else {
-        groupedLabels.push(labels[i]);
-        groupedValues.push(values[i]);
-      }
-    }
-    if (others > 0) {
-      groupedLabels.push('Andere');
-      groupedValues.push(others);
-    }
-
-    return {
-      labels: groupedLabels,
-      datasets: [{
-        label: '',
-        data: groupedValues,
-        backgroundColor: getScaleByAmount(groupedLabels.length),
-        rawValues: groupedValues
-      }]
-    };
-  }, [incomeMap]);
+  const expenseChartConfig = buildExpenseChartConfig(expenseMap);
+  const incomeChartConfig = buildIncomeChartConfig(incomeMap);
 
   return (
     <div className="container">

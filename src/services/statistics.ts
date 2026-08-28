@@ -1,4 +1,6 @@
-import * as _ from "lodash";
+import forEach from "lodash/forEach";
+import flatMap from "lodash/flatMap";
+import sum from "lodash/sum";
 import {Year} from "../entities/raw/Year";
 import {Month} from "../entities/raw/Month";
 import {Entry} from "../entities/raw/Entry";
@@ -25,7 +27,7 @@ function sumEntryValues(entries: Array<Entry>): number {
 function sumByCategory(entries: Array<Entry>, predicate?: (entry: Entry) => boolean): Map<string, number> {
     const sums = new Map<string, number>();
 
-    _.forEach(entries, function (entry) {
+    forEach(entries, function (entry) {
         if (predicate && !predicate(entry)) {
             return;
         }
@@ -41,11 +43,11 @@ function sumByCategory(entries: Array<Entry>, predicate?: (entry: Entry) => bool
  * Income/expense sum for the given year.
  */
 function getSumForYear(yearData: Year): number {
-    return sumEntryValues(_.flatMap(yearData.months, 'entries'));
+    return sumEntryValues(flatMap(yearData.months, 'entries'));
 }
 
 function getCategorySums(monthData: Array<Month>): Map<string, number> {
-    return sumByCategory(_.flatMap(monthData, 'entries'));
+    return sumByCategory(flatMap(monthData, 'entries'));
 }
 
 function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
@@ -62,7 +64,7 @@ export function getSumMapForYear(budget: Budget, year: number | string): Map<str
     const yearData = findYear(budget, year);
     if (!yearData) return new Map();
 
-    return sumByCategory(_.flatMap(yearData.months, 'entries'));
+    return sumByCategory(flatMap(yearData.months, 'entries'));
 }
 
 /**
@@ -91,7 +93,7 @@ export function getIncomeSumPerCategoryFromEntries(entries: Entry[]): Map<string
 export function getTrendArray(xArray: number[], yArray: Array<number | undefined>): number[] {
     const xs: number[] = [];
     const ys: number[] = [];
-    _.forEach(xArray, function (x, i) {
+    forEach(xArray, function (x, i) {
         const y = yArray[i];
         if (typeof y !== 'undefined') {
             xs.push(x);
@@ -108,7 +110,7 @@ export function getTrendArray(xArray: number[], yArray: Array<number | undefined
 }
 
 function getSum(entries: Entry[]): number {
-    return round(_.sum(entries.map((item) => {
+    return round(sum(entries.map((item) => {
         return Number(item.value);
     })));
 }
