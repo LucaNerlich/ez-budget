@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.4] - 2026-08-28
+
+### Security
+- Loading a budget file via URL is now hardened against SSRF: DNS results are pinned, redirects are blocked, and private/internal IP detection was expanded.
+- pnpm now enforces a 7-day release age check and a trust policy to protect against supply-chain attacks.
+
+### Fixed
+- Trend lines, rolling averages, and year-over-year comparisons in the insights now calculate correct values, and recurring entries are attributed to the correct months.
+- The monthly view now shows correct results for months that contain only expenses, and category tables no longer show stale data after switching months.
+- Tables are now fully keyboard-accessible: sort buttons work with the keyboard, announce their sort state, and all tables have hidden captions for screen readers.
+- The forecast no longer shifts months in timezones behind UTC.
+
+### Changed
+- Charts and the Bootstrap script bundle now load on demand, noticeably speeding up the initial page load.
+- The site now uses the system font stack instead of remote Google Fonts — faster loading and better privacy.
+- General code cleanup: React best practices applied (react-doctor score 47 → 100), dead code removed, and uploaded files validated through one shared schema.
+- Dependencies updated (Next.js, React and others).
+
 ## [3.5.3] - 2026-07-25
 
 ### Fixed
