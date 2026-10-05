@@ -15,7 +15,8 @@
   },
   "engines": {
     "node": "^22",
-    "npm": "^10"
+    "npm": "^10",
+    "pnpm": "^12"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
