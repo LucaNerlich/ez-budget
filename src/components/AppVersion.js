@@ -1,7 +1,6 @@
-import React, {memo} from 'react'
 import packageJson from '../../package.json'
 
-function AppVersion(props) {
+export default function AppVersion(props) {
   const {
     builtBy,
   } = props
@@ -14,5 +13,3 @@ function AppVersion(props) {
                                                     href='https://pnn-it.de'>pnn-it.de</a></span>}</p>
   )
 }
-
-export default memo(AppVersion)

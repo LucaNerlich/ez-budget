@@ -1,11 +1,13 @@
+import {Dispatch, SetStateAction} from "react";
 import {YearStats} from "../stats/YearStats";
 import {Budget} from "./Budget";
+import {BudgetFile} from "./BudgetFile";
 
 export interface DataContextType {
-    dataContainer: Array<any>,
-    setDataContainer: Function,
+    dataContainer: BudgetFile,
+    setDataContainer: Dispatch<SetStateAction<BudgetFile>>,
     budget: Budget,
     fileName: string,
-    setFileName: Function,
+    setFileName: Dispatch<SetStateAction<string>>,
     statsContainer: Array<YearStats>
 }

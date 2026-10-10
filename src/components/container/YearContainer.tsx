@@ -1,70 +1,29 @@
 "use client";
-import React, {useContext, useEffect, useState} from "react";
-import {DataContext} from "../../providers/DataProvider";
-import {DataContextType} from "../../entities/raw/DataContextType";
+import React, {useContext} from "react";
+import {DataContext} from "../../providers/DataContext";
 import {YearStats} from "../../entities/stats/YearStats";
 import {now} from "../../services/date";
 import {getAvailableYears} from "../../services/budget";
 import {getStatsForYear} from "../../services/statistics";
-import {getPositiveNegativeColor} from "../../services/colors";
+import {useMounted} from "../../services/useToday";
 import YearStatComponent from "./YearStatComponent";
 
 interface YearCategoryContainer {
     year: number,
     statsForYear: YearStats,
-    categoriesForYear: any
-}
-
-export interface Category {
-    category: string,
-    sum: number,
-}
-
-export function mapCategoriesToRows(categories: Category[]) {
-    if (!categories) return;
-    return categories.map((value: Category, index: number) => {
-        return (
-            <tr key={index + 1}>
-                <th scope="row">{index + 1}</th>
-                <td>{value.category}</td>
-                <td>
-                    <span className="amount" style={{color: getPositiveNegativeColor(value.sum)}}>
-                        {value.sum}
-                    </span>
-                </td>
-            </tr>
-        );
-    });
 }
 
 export default function YearContainer() {
-    // @ts-ignore
-    const dataContext: DataContextType = useContext(DataContext);
+    const dataContext = useContext(DataContext);
+    if (!dataContext) throw new Error('YearContainer requires a DataProvider');
 
-    const [yearCategoryContainers, setYearCategoryContainers] = useState<YearCategoryContainer[]>([])
     // avoid a hydration mismatch at year boundaries: "opened" is date-dependent
-    const [mounted, setMounted] = useState(false);
+    const mounted = useMounted();
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    useEffect(() => {
-        const availableYears: number[] = getAvailableYears(dataContext.budget);
-
-        const allYears: YearCategoryContainer[] = []
-        availableYears.forEach(year => {
-            const statsForYear = getStatsForYear(dataContext.statsContainer, year);
-            const categoriesForYear = mapCategoriesToRows(statsForYear.categories);
-            allYears.push({
-                year,
-                statsForYear,
-                categoriesForYear
-            })
-        })
-        allYears.reverse();
-        setYearCategoryContainers(allYears);
-    }, [dataContext.budget, dataContext.statsContainer]);
+    // Derived from context during render — the React Compiler caches this.
+    const yearCategoryContainers: YearCategoryContainer[] = getAvailableYears(dataContext.budget)
+        .map((year) => ({year, statsForYear: getStatsForYear(dataContext.statsContainer, year)}))
+        .reverse();
 
     return (
         <div>

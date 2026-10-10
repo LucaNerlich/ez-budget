@@ -1,8 +1,7 @@
 /**
  * Single source for month formatting: zero-padding, German names, and YYYY-MM keys.
- * Replaces the scattered 12-case switches, INDEX_MONTH_MAP, and inline ternaries.
  */
-export const MONTH_NAMES_DE: Record<number, string> = {
+const MONTH_NAMES_DE: Record<number, string> = {
     1: 'Januar',
     2: 'Februar',
     3: 'März',
@@ -18,27 +17,25 @@ export const MONTH_NAMES_DE: Record<number, string> = {
 };
 
 /**
- * Zero-pad a 1..12 month to two digits ("01".."12"). Out-of-range input is
- * returned as-is (preserves the previous getValidMonthString fallback).
+ * Zero-pad a month to two digits ("01".."12").
  */
-export function pad(month: number | string): string {
-    const n = Number(month);
-    if (Number.isInteger(n) && n >= 1 && n <= 12) {
-        return String(n).padStart(2, '0');
-    }
-    return String(month);
+export function pad(month: number): string {
+    return String(month).padStart(2, '0');
 }
 
 /**
- * German month name for 1..12, or "ERROR" for anything else.
+ * German month name for 1..12. Anything else is an invariant violation and
+ * fails loudly instead of rendering a placeholder.
  */
-export function monthName(month: number | string): string {
-    return MONTH_NAMES_DE[Number(month)] ?? 'ERROR';
+export function monthName(month: number): string {
+    const name = MONTH_NAMES_DE[month];
+    if (!name) throw new Error(`Unknown month: ${month}`);
+    return name;
 }
 
 /**
  * "YYYY-MM" key for a (year, month) pair.
  */
-export function monthKey(year: number | string, month: number | string): string {
+export function monthKey(year: number, month: number): string {
     return `${year}-${pad(month)}`;
 }

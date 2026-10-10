@@ -9,7 +9,7 @@ import {
   ROUTE_STATISTICS,
   ROUTE_YEARLY
 } from "../../routes";
-import {DataContext} from "../providers/DataProvider";
+import {DataContext} from "../providers/DataContext";
 import isEmpty from 'lodash/isEmpty';
 import ThemeToggle from "./ThemeToggle";
 

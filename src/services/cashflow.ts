@@ -1,10 +1,11 @@
 import {Budget} from "../entities/raw/Budget";
 import {getAvailableMonths, getAvailableYears, getEntriesForMonth} from "./budget";
 import {monthKey} from "./month";
+import {leastSquaresFit} from "./regression";
 
 /**
- * Pure cashflow logic. No React. This is the test surface that three insight
- * modules used to each re-implement.
+ * Pure Cashflow logic over a resolved Budget. No React — the test surface;
+ * useCashflow() is the thin adapter.
  *
  * Invariants: expense stays negative; net = income + expense; rows are sorted
  * ascending by key ("YYYY-MM") and carry raw (unrounded) numbers.
@@ -30,7 +31,7 @@ export function monthlyCashflow(budget: Budget): CashflowRow[] {
             let income = 0;
             let expense = 0;
             for (let k = 0; k < entries.length; k++) {
-                const v = Number(entries[k].value) || 0;
+                const v = entries[k].value;
                 if (v >= 0) income += v; else expense += v;
             }
             rows.push({year: y, month: m, key: monthKey(y, m), income, expense, net: income + expense});
@@ -84,15 +85,6 @@ export function rollingAverage(values: number[], window: number): number[] {
  * https://math.stackexchange.com/questions/204020
  */
 export function linearRegression(values: number[]): { a: number; b: number } {
-    const n = values.length;
-    const xs = Array.from({length: n}, (_, i) => i + 1);
-    const sumX = xs.reduce((a, b) => a + b, 0);
-    const sumY = values.reduce((a, b) => a + b, 0);
-    const sumXY = values.reduce((a, y, i) => a + y * xs[i], 0);
-    const sumXX = xs.reduce((a, x) => a + x * x, 0);
-    const denom = n * sumXX - sumX * sumX;
-    if (denom === 0) return {a: 0, b: 0};
-    const a = (n * sumXY - sumX * sumY) / denom;
-    const b = (sumY - a * sumX) / n;
-    return {a, b};
+    const xs = values.map((_, i) => i + 1);
+    return leastSquaresFit(xs, values) ?? {a: 0, b: 0};
 }
