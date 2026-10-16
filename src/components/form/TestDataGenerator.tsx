@@ -5,15 +5,17 @@ import {Year} from "../../entities/raw/Year";
 import {Month} from "../../entities/raw/Month";
 import {Entry} from "../../entities/raw/Entry";
 import {getDateString, getRandomItemFromArray, jsFriendlyJSONStringify} from "../../Util";
+import {useMounted} from "../../services/useToday";
 
 const latestDayInMonth: number = 28; // to avoid generating invalid dates
 const monthsToGenerate: number = 12;
 const startYear: number = 2019;
 const yearsToGenerate: number = 10;
-const entriesPerMonth: number = getRandomFloat(15, 30, 0);
 
 function generateTestData(): Array<Year> {
     const generatedData: Year[] = [];
+    // Drawn per generation so each run produces its own entry count.
+    const entriesPerMonth: number = getRandomFloat(15, 30, 0);
 
     function generateEntries(year: number, month: number): Array<Entry> {
         const entries: Array<Entry> = [];
@@ -54,6 +56,7 @@ function generateTestData(): Array<Year> {
 }
 
 export default function TestDataGenerator() {
+    const mounted = useMounted();
     const [testData, setTestData] = useState<Array<Year>>(() => generateTestData());
 
     return (
@@ -62,7 +65,7 @@ export default function TestDataGenerator() {
                 <button type="button" onClick={() => setTestData(generateTestData())} className="mt-3 btn btn-primary">
                     Testdaten generieren
                 </button>
-                {testData && testData.length > 0 &&
+                {mounted && testData && testData.length > 0 &&
                   <a
                     href={`data:text/json;charset=utf-8,${encodeURIComponent(jsFriendlyJSONStringify(testData))}`}
                     className="mt-3 btn btn-success linkdecoration__none"
@@ -72,7 +75,7 @@ export default function TestDataGenerator() {
                 }
             </div>
 
-            {testData && testData.length > 0 &&
+            {mounted && testData && testData.length > 0 &&
               <div>
                 <hr/>
                 <pre className="shadow">{jsFriendlyJSONStringify(testData)}</pre>
