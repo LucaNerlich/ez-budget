@@ -5,7 +5,6 @@ import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataContext";
 import {fetchRemoteJsonAction, parseLocalJsonAction} from '../../../app/actions'
 import testData from '../../testdata.yaml'
-import isEmpty from 'lodash/isEmpty';
 import {useRouter} from 'next/navigation'
 import {ROUTE_MONTHLY} from "../../../routes";
 
@@ -159,7 +158,7 @@ export default function MainInput() {
         </div>
       </div>
 
-      {success && !isEmpty(dataContext.dataContainer) &&
+      {success && dataContext.budget.years.length > 0 &&
         <div className="mt-3 alert alert-success" role="alert">
           Erfolgreich eingelesen.
         </div>
