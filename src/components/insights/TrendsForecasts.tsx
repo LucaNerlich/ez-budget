@@ -2,7 +2,7 @@
 import React from 'react';
 import {now} from '../../services/date';
 import {useCashflow} from '../../services/useCashflow';
-import {CashflowRow, linearRegression, rollingAverage} from '../../services/cashflow';
+import {CashflowRow, linearRegression, rollingAverage, yoyDeltas} from '../../services/cashflow';
 import {monthKey, pad} from '../../services/month';
 import LazyChart from '../charts/LazyChart';
 import {ChartData} from 'chart.js';
@@ -33,15 +33,7 @@ export default function TrendsForecasts() {
         const lastYear: CashflowRow[] = monthly.filter(m => m.year === prevYear);
         if (thisYear.length === 0 || lastYear.length === 0) return {labels: [], datasets: [{data: []}]};
         const labels = Array.from({length: 12}, (_, i) => i + 1);
-        const valFor = (arr: CashflowRow[], m: number): number | null => {
-            const f = arr.find(x => x.month === m);
-            return f ? f.net : null;
-        };
-        const deltas: Array<number | null> = labels.map(m => {
-            const current = valFor(thisYear, m);
-            const previous = valFor(lastYear, m);
-            return current === null || previous === null ? null : Math.round((current - previous) * 100) / 100;
-        });
+        const deltas = yoyDeltas(thisYear, lastYear);
         return {
             labels: labels.map(pad),
             datasets: [

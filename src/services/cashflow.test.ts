@@ -1,6 +1,6 @@
 import {describe, expect, it} from 'vitest';
 import {Budget} from '../entities/raw/Budget';
-import {cumulativeByYear, linearRegression, monthlyCashflow, rollingAverage, totalCumulative} from './cashflow';
+import {cumulativeByYear, linearRegression, monthlyCashflow, rollingAverage, totalCumulative, yoyDeltas} from './cashflow';
 
 const budget: Budget = {
     years: [
@@ -87,5 +87,26 @@ describe('linearRegression', () => {
 
     it('returns zero slope/intercept for a single point (denominator 0)', () => {
         expect(linearRegression([42])).toEqual({a: 0, b: 0});
+    });
+});
+
+describe('yoyDeltas', () => {
+    const lastYear = [
+        {year: 2025, month: 11, key: '2025-11', income: 100, expense: -40, net: 60},
+        {year: 2025, month: 12, key: '2025-12', income: 100, expense: -50, net: 50},
+    ];
+    const thisYear = [
+        {year: 2026, month: 12, key: '2026-12', income: 120, expense: -50, net: 70},
+    ];
+
+    it('yields null for months absent from either year and the rounded delta for present ones', () => {
+        expect(yoyDeltas(thisYear, lastYear)).toEqual([
+            null, null, null, null, null, null, null, null, null, null, null, 20,
+        ]);
+    });
+
+    it('keeps a real zero delta instead of a null', () => {
+        const flat = [{year: 2026, month: 12, key: '2026-12', income: 100, expense: -50, net: 50}];
+        expect(yoyDeltas(flat, lastYear)[11]).toBe(0);
     });
 });

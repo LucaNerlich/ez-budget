@@ -81,6 +81,18 @@ export function rollingAverage(values: number[], window: number): number[] {
 }
 
 /**
+ * Year-over-year net deltas for months 1–12: null when either year lacks the
+ * month, so charts skip it instead of plotting a fabricated zero.
+ */
+export function yoyDeltas(thisYear: CashflowRow[], lastYear: CashflowRow[]): Array<number | null> {
+    return Array.from({length: 12}, (_, i) => {
+        const current = thisYear.find((row) => row.month === i + 1)?.net ?? null;
+        const previous = lastYear.find((row) => row.month === i + 1)?.net ?? null;
+        return current === null || previous === null ? null : Math.round((current - previous) * 100) / 100;
+    });
+}
+
+/**
  * Least-squares fit over x = 1..n. Returns slope (a) and intercept (b).
  * https://math.stackexchange.com/questions/204020
  */
