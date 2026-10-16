@@ -85,4 +85,12 @@ describe('defaultMonthFor', () => {
         expect(defaultMonthFor(b, {year: 0, month: 0})).toEqual({year: 0, month: 0});
         expect(defaultMonthFor(toBudget([]), {year: 2026, month: 10})).toEqual({year: 2026, month: 10});
     });
+
+    it('skips a latest year without months and lands on the newest one that has them', () => {
+        const b = toBudget([
+            {year: 2024, months: [{month: 5, entries: [{category: 'A', value: 10}]}]},
+            {year: 2026, months: []},
+        ]);
+        expect(defaultMonthFor(b, {year: 2026, month: 10})).toEqual({year: 2024, month: 5});
+    });
 });
