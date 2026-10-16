@@ -65,7 +65,10 @@ async function initialize(): Promise<void> {
  */
 export function initChartJs(): Promise<void> {
     if (!initPromise) {
-        initPromise = initialize();
+        initPromise = initialize().catch((error) => {
+            initPromise = null; // a failed load may be retried by the next caller
+            throw error;
+        });
     }
     return initPromise;
 }
