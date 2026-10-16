@@ -48,10 +48,13 @@ function isPrivateAddress(ip: string): boolean {
 async function assertRemoteSafe(url: string): Promise<Array<{address: string, family: number}>> {
     const u = new URL(url);
     const hostname = u.hostname;
+    let dnsTimeout: ReturnType<typeof setTimeout> | undefined;
     const addrs = await Promise.race([
         dns.lookup(hostname, {all: true}),
-        new Promise<never>((_, reject) => setTimeout(() => reject(new Error('DNS lookup timed out')), 10000)),
-    ]);
+        new Promise<never>((_, reject) => {
+            dnsTimeout = setTimeout(() => reject(new Error('DNS lookup timed out')), 10000);
+        }),
+    ]).finally(() => clearTimeout(dnsTimeout));
     if (!addrs || addrs.length === 0) throw new Error('Could not resolve host');
     if (addrs.some((a) => isPrivateAddress(a.address))) throw new Error('Refusing to fetch private network addresses');
     // Restrict ports to standard HTTP/HTTPS
@@ -133,9 +136,8 @@ export async function fetchRemoteJsonAction(_prevState: ParseState, formData: Fo
       maxRedirects: 0,
       httpsAgent,
       transformResponse: (d) => d,
-      validateStatus: (s) => s >= 200 && s < 400
-    });
-    clearTimeout(timeout);
+      validateStatus: (s) => s >= 200 && s < 300
+    }).finally(() => clearTimeout(timeout));
 
     return parseBudgetPayload(response.data);
   } catch (e) {
