@@ -1,5 +1,5 @@
 "use client";
-import React, {useActionState, useContext, useEffect, useState} from "react";
+import React, {useActionState, useContext, useEffect, useRef, useState} from "react";
 import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataContext";
@@ -9,7 +9,7 @@ import isEmpty from 'lodash/isEmpty';
 import {useRouter} from 'next/navigation'
 import {ROUTE_MONTHLY} from "../../../routes";
 
-export default function MainInput(props) {
+export default function MainInput() {
   const dataContext = useContext(DataContext);
   const router = useRouter();
   const [cookies, setCookie] = useCookies();
@@ -24,11 +24,22 @@ export default function MainInput(props) {
     // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
     setRemoteFileUrl(cookies[COOKIE_REMOTE_FILE_URL] ? cookies[COOKIE_REMOTE_FILE_URL] : "")
     // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
-    setLoadViaUrl(cookies[COOKIE_LOAD_VIA_URL] ? cookies[COOKIE_LOAD_VIA_URL] === 'true' : false)
+    setLoadViaUrl(cookies[COOKIE_LOAD_VIA_URL] === true)
   }, [cookies])
 
-  // persist the last used source as cookies
+  // persist the last used source as cookies — but only user-driven changes:
+  // a mount-time write would clobber the stored values the restore effect just
+  // read (re-render loop), and writing empty defaults would undo a footer-side
+  // "Cookies löschen" on this page.
+  const persistedOnce = useRef(false);
   useEffect(() => {
+    if (!persistedOnce.current) {
+      persistedOnce.current = true;
+      return;
+    }
+    if (!remoteFileUrl && !loadViaUrl) {
+      return;
+    }
     let expiryDate = new Date()
     expiryDate.setTime(expiryDate.getTime() + (365 * 24 * 60 * 60 * 1000));
 
@@ -77,10 +88,9 @@ export default function MainInput(props) {
     setError(false);
   }
 
-  function handleFileSelected(e) {
+  function handleFileSelected() {
     setSuccess(false);
     setError(false);
-    return e.target.files[0]?.name ?? null;
   }
 
   function useTestData() {
