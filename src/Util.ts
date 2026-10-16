@@ -18,9 +18,8 @@ export function getDateString(year: number, month: number, day: number): string 
 }
 
 /**
- * Pretty-print JSON for display: 4-space indent, normalized newlines.
+ * Pretty-print JSON for display: 4-space indent.
  */
 export function jsFriendlyJSONStringify<S>(s: S): string {
-    const json = JSON.stringify(s, null, 4);
-    return json.replace(/\r?\n/g, '\n');
+    return JSON.stringify(s, null, 4);
 }
