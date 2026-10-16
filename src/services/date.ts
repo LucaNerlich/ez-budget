@@ -1,12 +1,4 @@
 import dayjs from 'dayjs';
-import isBetween from 'dayjs/plugin/isBetween';
-import {pad} from './month';
-
-dayjs.extend(isBetween);
-
-/**
- * Date predicates over the budget data. Plain functions — the test surface.
- */
 
 /**
  * Current moment as a dayjs. A function (not a captured constant) so callers
@@ -14,36 +6,4 @@ dayjs.extend(isBetween);
  */
 export function now() {
     return dayjs(new Date());
-}
-
-/**
- * Date-only portion of an input: strips time-of-day from strings starting with
- * "YYYY-MM-DD" (e.g. "2024-01-01T00:30:00Z") so month/year attribution does not
- * depend on the viewer's timezone. Missing input passes through untouched.
- */
-function dateOnly(input: string | null | undefined): string | null | undefined {
-    if (typeof input !== 'string') return input;
-    return /^\d{4}-\d{2}-\d{2}/.test(input) ? input.slice(0, 10) : input;
-}
-
-/**
- * Does the input date reside between the start and end of the given year and month?
- */
-export function isInYearMonth(input: string | null | undefined, year: number, month: number): boolean {
-    if (input == null) return false;
-    const date = dayjs(dateOnly(input));
-    const start = dayjs(`${year}-${pad(month)}-01`);
-    const end = start.endOf('month');
-    return date.isBetween(start, end, 'month', '[]');
-}
-
-/**
- * Does the input date reside between the start and end of the given year?
- */
-export function isInYear(input: string | null | undefined, year: number): boolean {
-    if (input == null) return false;
-    const start = `${year}-01-01`;
-    const end = `${year}-12-31`;
-    const date = dayjs(dateOnly(input));
-    return date.isBetween(dayjs(start), dayjs(end), 'day', '[]');
 }
