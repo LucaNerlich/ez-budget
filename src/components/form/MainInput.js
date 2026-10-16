@@ -9,7 +9,7 @@ import isEmpty from 'lodash/isEmpty';
 import {useRouter} from 'next/navigation'
 import {ROUTE_MONTHLY} from "../../../routes";
 
-export default function MainInput(props) {
+export default function MainInput() {
   const dataContext = useContext(DataContext);
   const router = useRouter();
   const [cookies, setCookie] = useCookies();
@@ -24,7 +24,7 @@ export default function MainInput(props) {
     // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
     setRemoteFileUrl(cookies[COOKIE_REMOTE_FILE_URL] ? cookies[COOKIE_REMOTE_FILE_URL] : "")
     // react-doctor-disable-next-line react-hooks-js/set-state-in-effect
-    setLoadViaUrl(cookies[COOKIE_LOAD_VIA_URL] ? cookies[COOKIE_LOAD_VIA_URL] === 'true' : false)
+    setLoadViaUrl(cookies[COOKIE_LOAD_VIA_URL] === true)
   }, [cookies])
 
   // persist the last used source as cookies
@@ -77,10 +77,9 @@ export default function MainInput(props) {
     setError(false);
   }
 
-  function handleFileSelected(e) {
+  function handleFileSelected() {
     setSuccess(false);
     setError(false);
-    return e.target.files[0]?.name ?? null;
   }
 
   function useTestData() {
