@@ -14,7 +14,7 @@ import {
 import {DataContext} from "../providers/DataContext";
 
 export default function Footer() {
-    const [removeCookie] = useCookies();
+    const [, , removeCookie] = useCookies();
     const dataContext = useContext(DataContext);
 
     function deleteCookies() {
