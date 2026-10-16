@@ -166,7 +166,7 @@ export default function MainInput() {
 
       {error &&
         <div className="mt-3 alert alert-danger" role="alert">
-          Fehler beim Upload.
+          {remoteState.error || localState.error || 'Fehler beim Upload.'}
         </div>
       }
     </div>
