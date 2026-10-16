@@ -9,6 +9,11 @@ import {sortMapByNumberValue} from "../../Util";
 
 const numberFormat = new Intl.NumberFormat('de-DE');
 
+// Percentage of a slice's magnitude within the dataset total, one decimal.
+function sharePercent(value, total) {
+  return total ? Math.round((Math.abs(value) / total) * 1000) / 10 : 0;
+}
+
 // Draws "x%" centered on each slice when enabled via options.plugins.sliceLabels.show
 const sliceLabelsPlugin = {
   id: 'sliceLabels',
@@ -25,7 +30,7 @@ const sliceLabelsPlugin = {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     meta.data.forEach((arc, i) => {
-      const pct = Math.round((Math.abs(data[i]) / total) * 1000) / 10;
+      const pct = sharePercent(data[i], total);
       if (pct < 4) return; // skip tiny slices to avoid clutter
       const {x, y} = arc.tooltipPosition();
       ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
@@ -52,7 +57,7 @@ function doughnutOptions(showPercent) {
             const idx = ctx.dataIndex;
             const signed = ctx.dataset.rawValues[idx];
             const total = data.reduce((a, b) => a + Math.abs(b), 0);
-            const pct = total ? Math.round((Math.abs(data[idx]) / total) * 1000) / 10 : 0;
+            const pct = sharePercent(data[idx], total);
             const label = ctx.label;
             if (showPercent) {
               return `${label}: ${pct}%`;
@@ -66,71 +71,48 @@ function doughnutOptions(showPercent) {
   };
 }
 
-function buildExpenseChartConfig(expenseMap) {
-  if (!expenseMap || expenseMap.size === 0) {
-    return {labels: [], datasets: [{data: []}]};
-  }
-  const sortedMap = sortMapByNumberValue(expenseMap);
+function buildCategoryConfig(map, {groupSmall = false} = {}) {
+  const sortedMap = sortMapByNumberValue(map);
   const labels = [];
   const signedValues = [];
-  const magnitudes = [];
-  for (let [key, value] of sortedMap) {
+  for (const [key, value] of sortedMap) {
     labels.push(key);
     signedValues.push(value);
-    magnitudes.push(Math.abs(value));
   }
 
-  return {
-    labels,
-    datasets: [{
-      label: '',
-      data: magnitudes,
-      backgroundColor: getScaleByAmount(labels.length),
-      rawValues: signedValues
-    }]
-  };
-}
+  let outLabels = labels;
+  let outValues = signedValues;
 
-function buildIncomeChartConfig(incomeMap) {
-  if (!incomeMap || incomeMap.size === 0) {
-    return {labels: [], datasets: [{data: []}]};
-  }
-  const sortedMap = sortMapByNumberValue(incomeMap);
-  const labels = [];
-  const values = [];
-  for (let [key, value] of sortedMap) {
-    labels.push(key);
-    values.push(value);
-  }
-
-  // Group small slices into "Andere"
-  const total = values.reduce((a, b) => a + b, 0);
-  const maxSlices = 8;
-  const minShare = 0.05; // 5%
-  const groupedLabels = [];
-  const groupedValues = [];
-  let others = 0;
-  for (let i = 0; i < labels.length; i++) {
-    const share = total ? values[i] / total : 0;
-    if (i >= maxSlices || share < minShare) {
-      others += values[i];
-    } else {
-      groupedLabels.push(labels[i]);
-      groupedValues.push(values[i]);
+  if (groupSmall) {
+    // Group small slices into "Andere"
+    const total = signedValues.reduce((a, b) => a + b, 0);
+    const maxSlices = 8;
+    const minShare = 0.05; // 5%
+    outLabels = [];
+    outValues = [];
+    let others = 0;
+    for (let i = 0; i < labels.length; i++) {
+      const share = total ? signedValues[i] / total : 0;
+      if (i >= maxSlices || share < minShare) {
+        others += signedValues[i];
+      } else {
+        outLabels.push(labels[i]);
+        outValues.push(signedValues[i]);
+      }
+    }
+    if (others > 0) {
+      outLabels.push('Andere');
+      outValues.push(others);
     }
   }
-  if (others > 0) {
-    groupedLabels.push('Andere');
-    groupedValues.push(others);
-  }
 
   return {
-    labels: groupedLabels,
+    labels: outLabels,
     datasets: [{
       label: '',
-      data: groupedValues,
-      backgroundColor: getScaleByAmount(groupedLabels.length),
-      rawValues: groupedValues
+      data: outValues.map((value) => Math.abs(value)),
+      backgroundColor: getScaleByAmount(outLabels.length),
+      rawValues: outValues
     }]
   };
 }
@@ -158,8 +140,8 @@ export default function MonthAllChart(props) {
   const incomeMap = getIncomeSumPerCategoryFromEntries(monthEntries);
   const [showPercent, setShowPercent] = useState(false);
 
-  const expenseChartConfig = buildExpenseChartConfig(expenseMap);
-  const incomeChartConfig = buildIncomeChartConfig(incomeMap);
+  const expenseChartConfig = buildCategoryConfig(expenseMap);
+  const incomeChartConfig = buildCategoryConfig(incomeMap, {groupSmall: true});
 
   return (
     <div className="container">
