@@ -19,31 +19,25 @@ export default function EditMonth(props) {
   // Derived from context during render — the React Compiler caches this.
   const monthEntries = getEntriesForMonth(dataContext.budget, props.year, props.month);
 
-  const sortedData = sortField === 'date'
+  const sortedData = sortField
     ? monthEntries.toSorted((a, b) => {
-        const dateA = new Date(a[sortField]);
-        const dateB = new Date(b[sortField]);
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+        const left = a[sortField];
+        const right = b[sortField];
+        if (left == null && right == null) {
+          return 0;
+        }
+        if (left == null) {
+          return 1; // missing values last in asc, like the previous orderBy behavior
+        }
+        if (right == null) {
+          return -1;
+        }
+        const comparison = typeof left === 'number' && typeof right === 'number'
+          ? left - right
+          : String(left).localeCompare(String(right));
+        return sortOrder === 'asc' ? comparison : -comparison;
       })
-    : (sortField
-      ? monthEntries.toSorted((a, b) => {
-          const left = a[sortField];
-          const right = b[sortField];
-          if (left == null && right == null) {
-            return 0;
-          }
-          if (left == null) {
-            return 1; // missing values last in asc, like the previous orderBy behavior
-          }
-          if (right == null) {
-            return -1;
-          }
-          const comparison = typeof left === 'number' && typeof right === 'number'
-            ? left - right
-            : String(left).localeCompare(String(right));
-          return sortOrder === 'asc' ? comparison : -comparison;
-        })
-      : monthEntries);
+    : monthEntries;
 
   const handleSort = (field) => {
     if (field === sortField) {
