@@ -18,7 +18,7 @@ export default function SavingsKPIs() {
     const incomeYear = thisYear.reduce((a, b) => a + b.income, 0);
     const expenseYear = thisYear.reduce((a, b) => a + b.expense, 0); // negative
     const netYear = incomeYear + expenseYear;
-    const savingsRateYear = incomeYear > 0 ? Math.round(((netYear) / incomeYear) * 1000) / 10 : 0;
+    const savingsRateYear = incomeYear > 0 ? Math.round(((netYear) / incomeYear) * 1000) / 10 : null;
 
     // Average monthly savings (across all data)
     const avgMonthlySavings = Math.round((rows.reduce((a, b) => a + b.net, 0) / rows.length) * 100) / 100;
@@ -36,7 +36,7 @@ export default function SavingsKPIs() {
                     <div className="card h-100">
                         <div className="card-body">
                             <div>Sparquote (dieses Jahr)</div>
-                            <strong>{savingsRateYear}%</strong>
+                            <strong>{savingsRateYear === null ? '–' : `${savingsRateYear}%`}</strong>
                         </div>
                     </div>
                 </div>
