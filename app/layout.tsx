@@ -35,7 +35,6 @@ export const metadata: Metadata = {
         siteName: 'EzBudget',
         title: 'EzBudget',
         description: 'Simple budget tracker – upload YAML/JSON and view monthly/yearly results.',
-        url: '/',
         locale: 'de_DE',
         images: ['/icons/euro_symbol.svg'],
     },
