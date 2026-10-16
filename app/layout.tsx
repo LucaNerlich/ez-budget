@@ -29,9 +29,6 @@ export const metadata: Metadata = {
         address: false,
         telephone: false,
     },
-    alternates: {
-        canonical: '/',
-    },
     metadataBase: new URL((process.env.NEXT_PUBLIC_SITE_URL || 'https://ez-budget.lucanerlich.com').replace(/\/$/, '')),
     openGraph: {
         type: 'website',
@@ -59,7 +56,6 @@ export const metadata: Metadata = {
             'max-snippet': -1,
         },
     },
-    manifest: '/icons/favicons/site.webmanifest',
     icons: {
         icon: [
             { url: '/icons/favicons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
