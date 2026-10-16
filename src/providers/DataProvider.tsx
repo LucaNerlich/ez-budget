@@ -8,7 +8,6 @@ import {DataContextType} from "../entities/raw/DataContextType";
 import {BudgetFile} from "../entities/raw/BudgetFile";
 
 export default function DataProvider({children}: { children: React.ReactNode }) {
-    const [fileName, setFileName] = useState("");
     const [dataContainer, setDataContainer] = useState<BudgetFile>([]);
 
     // Resolve the raw upload into a Budget once per change (recurring expanded here).
@@ -22,8 +21,6 @@ export default function DataProvider({children}: { children: React.ReactNode }) 
         dataContainer,
         setDataContainer,
         budget,
-        fileName,
-        setFileName,
         statsContainer
     };
 
