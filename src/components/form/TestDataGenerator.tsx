@@ -68,7 +68,7 @@ export default function TestDataGenerator() {
                 {mounted && testData && testData.length > 0 &&
                   <a
                     href={`data:text/json;charset=utf-8,${encodeURIComponent(jsFriendlyJSONStringify(testData))}`}
-                    className="mt-3 btn btn-success linkdecoration__none"
+                    className="mt-3 btn btn-success"
                     download="testdata.json">
                     Testdaten herunterladen
                   </a>
