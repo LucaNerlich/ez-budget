@@ -1,5 +1,5 @@
 "use client";
-import React, {useActionState, useContext, useEffect, useState} from "react";
+import React, {useActionState, useContext, useEffect, useRef, useState} from "react";
 import {useCookies} from "react-cookie";
 import {COOKIE_LOAD_VIA_URL, COOKIE_REMOTE_FILE_URL} from "../../../constants";
 import {DataContext} from "../../providers/DataContext";
@@ -27,8 +27,19 @@ export default function MainInput() {
     setLoadViaUrl(cookies[COOKIE_LOAD_VIA_URL] === true)
   }, [cookies])
 
-  // persist the last used source as cookies
+  // persist the last used source as cookies — but only user-driven changes:
+  // a mount-time write would clobber the stored values the restore effect just
+  // read (re-render loop), and writing empty defaults would undo a footer-side
+  // "Cookies löschen" on this page.
+  const persistedOnce = useRef(false);
   useEffect(() => {
+    if (!persistedOnce.current) {
+      persistedOnce.current = true;
+      return;
+    }
+    if (!remoteFileUrl && !loadViaUrl) {
+      return;
+    }
     let expiryDate = new Date()
     expiryDate.setTime(expiryDate.getTime() + (365 * 24 * 60 * 60 * 1000));
 
