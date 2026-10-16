@@ -4,7 +4,6 @@ import {DataContext} from "../../providers/DataContext";
 import {getEntriesForMonth} from "../../services/budget";
 import {getPositiveNegativeColor} from "../../services/colors";
 import {monthName} from "../../services/month";
-import orderBy from 'lodash/orderBy';
 
 const sortableColumns = [
   {field: 'category', label: 'Kategorie'},
@@ -26,7 +25,16 @@ export default function EditMonth(props) {
         const dateB = new Date(b[sortField]);
         return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
       })
-    : (sortField ? orderBy(monthEntries, [sortField], [sortOrder]) : monthEntries);
+    : (sortField
+      ? monthEntries.toSorted((a, b) => {
+          const left = a[sortField];
+          const right = b[sortField];
+          const comparison = typeof left === 'number' && typeof right === 'number'
+            ? left - right
+            : String(left ?? '').localeCompare(String(right ?? ''));
+          return sortOrder === 'asc' ? comparison : -comparison;
+        })
+      : monthEntries);
 
   const handleSort = (field) => {
     if (field === sortField) {

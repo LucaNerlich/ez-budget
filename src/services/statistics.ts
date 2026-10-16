@@ -1,6 +1,3 @@
-import forEach from "lodash/forEach";
-import flatMap from "lodash/flatMap";
-import sum from "lodash/sum";
 import {Year} from "../entities/raw/Year";
 import {Month} from "../entities/raw/Month";
 import {Entry} from "../entities/raw/Entry";
@@ -27,14 +24,14 @@ function sumEntryValues(entries: Array<Entry>): number {
 function sumByCategory(entries: Array<Entry>, predicate?: (entry: Entry) => boolean): Map<string, number> {
     const sums = new Map<string, number>();
 
-    forEach(entries, function (entry) {
+    for (const entry of entries) {
         if (predicate && !predicate(entry)) {
-            return;
+            continue;
         }
         const category = entry.category;
         const value = entry.value;
-        sums.set(category, sums.has(category) ? round(sums.get(category) + value) : value);
-    });
+        sums.set(category, sums.has(category) ? round((sums.get(category) ?? 0) + value) : value);
+    }
 
     return sums;
 }
@@ -43,11 +40,11 @@ function sumByCategory(entries: Array<Entry>, predicate?: (entry: Entry) => bool
  * Income/expense sum for the given year.
  */
 function getSumForYear(yearData: Year): number {
-    return sumEntryValues(flatMap(yearData.months, 'entries'));
+    return sumEntryValues(yearData.months.flatMap((month) => month.entries));
 }
 
 function getCategorySums(monthData: Array<Month>): Map<string, number> {
-    return sumByCategory(flatMap(monthData, 'entries'));
+    return sumByCategory(monthData.flatMap((month) => month.entries));
 }
 
 function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
@@ -64,14 +61,14 @@ export function getSumMapForYear(budget: Budget, year: number | string): Map<str
     const yearData = findYear(budget, year);
     if (!yearData) return new Map();
 
-    return sumByCategory(flatMap(yearData.months, 'entries'));
+    return sumByCategory(yearData.months.flatMap((month) => month.entries));
 }
 
 /**
  * Income/expense sum for the given year and month of the resolved Budget.
  */
 export function getSumForYearMonth(budget: Budget, year: number | string, month: number | string): number {
-    return getSum(getEntriesForMonth(budget, year, month));
+    return round(sumEntryValues(getEntriesForMonth(budget, year, month)));
 }
 
 function getSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
@@ -93,13 +90,13 @@ export function getIncomeSumPerCategoryFromEntries(entries: Entry[]): Map<string
 export function getTrendArray(xArray: number[], yArray: Array<number | undefined>): number[] {
     const xs: number[] = [];
     const ys: number[] = [];
-    forEach(xArray, function (x, i) {
+    for (let i = 0; i < xArray.length; i++) {
         const y = yArray[i];
         if (typeof y !== 'undefined') {
-            xs.push(x);
+            xs.push(xArray[i]);
             ys.push(y);
         }
-    });
+    }
 
     const fit = leastSquaresFit(xs, ys);
     if (!fit) return [];
@@ -107,12 +104,6 @@ export function getTrendArray(xArray: number[], yArray: Array<number | undefined
     return xArray.map(function (x) {
         return round(fit.a * x + fit.b);
     });
-}
-
-function getSum(entries: Entry[]): number {
-    return round(sum(entries.map((item) => {
-        return Number(item.value);
-    })));
 }
 
 /**

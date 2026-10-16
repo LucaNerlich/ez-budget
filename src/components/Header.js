@@ -10,13 +10,12 @@ import {
   ROUTE_YEARLY
 } from "../../routes";
 import {DataContext} from "../providers/DataContext";
-import isEmpty from 'lodash/isEmpty';
 import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const dataContext = useContext(DataContext);
   const pathname = usePathname();
-  const hasData = !isEmpty(dataContext.dataContainer);
+  const hasData = dataContext.budget.years.length > 0;
 
   const links = [
     {href: ROUTE_MONTHLY, label: "Monat"},
