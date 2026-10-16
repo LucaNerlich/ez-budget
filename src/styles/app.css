@@ -41,9 +41,6 @@
     --radius-sm: 11px;
     --radius-xs: 8px;
 
-    --breakpoint-md: 1200px;
-    --color-red: var(--neg);
-    --color-green: var(--pos);
     color-scheme: light;
 }
 
@@ -179,10 +176,7 @@ hr {
 }
 
 /* Numbers: monospaced, tabular so columns align */
-.num,
 .amount,
-td.amount,
-.kpi-value,
 pre {
     font-family: var(--font-mono), ui-monospace, "SF Mono", monospace;
     font-variant-numeric: tabular-nums;
@@ -400,10 +394,6 @@ pre {
     background-color: var(--accent-soft) !important;
 }
 
-.table th {
-    cursor: pointer;
-}
-
 .table-responsive {
     border-radius: var(--radius);
 }
@@ -579,7 +569,6 @@ pre {
 }
 
 /* --- Charts -------------------------------------------------------------- */
-.chart-card,
 canvas {
     max-width: 100%;
 }
@@ -608,33 +597,6 @@ footer {
 
 footer .btn-link {
     padding-inline: 0.35rem;
-}
-
-/* --- Utilities ----------------------------------------------------------- */
-.red { color: var(--neg); }
-.green { color: var(--pos); }
-
-.dot {
-    height: 22px;
-    width: 22px;
-    border-radius: 50%;
-    display: inline-block;
-}
-
-.dot__green { background-color: var(--pos); }
-.dot__red { background-color: var(--neg); }
-
-.linkdecoration__none {
-    text-decoration: none;
-    color: var(--accent-contrast);
-}
-
-@media only screen and (min-width: 576px) {
-    .mobile__show { display: none; }
-}
-
-@media only screen and (max-width: 575.98px) {
-    .mobile__hide { display: none; }
 }
 
 /* --- Motion -------------------------------------------------------------- */
