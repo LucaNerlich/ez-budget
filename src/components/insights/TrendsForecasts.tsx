@@ -33,15 +33,23 @@ export default function TrendsForecasts() {
         const lastYear: CashflowRow[] = monthly.filter(m => m.year === prevYear);
         if (thisYear.length === 0 || lastYear.length === 0) return {labels: [], datasets: [{data: []}]};
         const labels = Array.from({length: 12}, (_, i) => i + 1);
-        const valFor = (arr: CashflowRow[], m: number) => {
+        const valFor = (arr: CashflowRow[], m: number): number | null => {
             const f = arr.find(x => x.month === m);
-            return f ? f.net : 0;
+            return f ? f.net : null;
         };
-        const deltas = labels.map(m => Math.round((valFor(thisYear, m) - valFor(lastYear, m)) * 100) / 100);
+        const deltas: Array<number | null> = labels.map(m => {
+            const current = valFor(thisYear, m);
+            const previous = valFor(lastYear, m);
+            return current === null || previous === null ? null : Math.round((current - previous) * 100) / 100;
+        });
         return {
             labels: labels.map(pad),
             datasets: [
-                {label: 'YoY Delta (Netto)', data: deltas, backgroundColor: deltas.map(v => v >= 0 ? '#2a7' : '#e33')}
+                {
+                    label: 'YoY Delta (Netto)',
+                    data: deltas,
+                    backgroundColor: deltas.map(v => v === null ? 'transparent' : v >= 0 ? '#2a7' : '#e33')
+                }
             ]
         };
     })();
