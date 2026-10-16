@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {getAvailableMonths, getAvailableYears, getEntriesForMonth, toBudget} from './budget';
+import {defaultMonthFor, getAvailableMonths, getAvailableYears, getEntriesForMonth, toBudget} from './budget';
 
 describe('toBudget — input shape', () => {
     it('accepts a bare Year[] array', () => {
@@ -63,5 +63,34 @@ describe('lookups', () => {
     it('returns [] for missing year/month', () => {
         expect(getAvailableMonths(b, 1999)).toEqual([]);
         expect(getEntriesForMonth(b, 2024, 12)).toEqual([]);
+    });
+});
+
+describe('defaultMonthFor', () => {
+    const b = toBudget([
+        {year: 2023, months: [{month: 5, entries: []}, {month: 7, entries: []}]},
+        {year: 2024, months: [{month: 2, entries: []}, {month: 11, entries: []}]},
+    ]);
+
+    it('keeps today when the budget covers it', () => {
+        expect(defaultMonthFor(b, {year: 2024, month: 2})).toEqual({year: 2024, month: 2});
+    });
+
+    it('falls back to the latest available month when today is absent', () => {
+        expect(defaultMonthFor(b, {year: 2026, month: 10})).toEqual({year: 2024, month: 11});
+        expect(defaultMonthFor(b, {year: 2024, month: 6})).toEqual({year: 2024, month: 11});
+    });
+
+    it('passes the neutral pre-hydration value and empty budgets through', () => {
+        expect(defaultMonthFor(b, {year: 0, month: 0})).toEqual({year: 0, month: 0});
+        expect(defaultMonthFor(toBudget([]), {year: 2026, month: 10})).toEqual({year: 2026, month: 10});
+    });
+
+    it('skips a latest year without months and lands on the newest one that has them', () => {
+        const b = toBudget([
+            {year: 2024, months: [{month: 5, entries: [{category: 'A', value: 10}]}]},
+            {year: 2026, months: []},
+        ]);
+        expect(defaultMonthFor(b, {year: 2026, month: 10})).toEqual({year: 2024, month: 5});
     });
 });

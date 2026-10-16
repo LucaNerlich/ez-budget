@@ -100,6 +100,26 @@ export function getAvailableMonths(budget: Budget, year: number | string): numbe
 }
 
 /**
+ * Month to open a view on: today when the budget covers it, otherwise the latest
+ * available month of the newest year that actually has months (a year block may
+ * be empty — YearSchema defaults months to []). A neutral {year: 0} today
+ * (pre-hydration) passes through, so the server and first client render agree.
+ */
+export function defaultMonthFor(budget: Budget, today: { year: number; month: number }): { year: number; month: number } {
+    if (today.year === 0) return today;
+    const years = getAvailableYears(budget);
+    if (years.length === 0) return today;
+    if (getAvailableMonths(budget, today.year).includes(today.month)) return today;
+    for (const year of [...years].sort((a, b) => b - a)) {
+        const months = getAvailableMonths(budget, year);
+        if (months.length > 0) {
+            return {year, month: Math.max(...months)};
+        }
+    }
+    return today;
+}
+
+/**
  * Entries for one month, sorted by category. Returns [] when the month is absent.
  */
 export function getEntriesForMonth(budget: Budget, year: number | string, month: number | string): Entry[] {

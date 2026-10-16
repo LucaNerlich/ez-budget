@@ -1,6 +1,6 @@
 "use client";
 import React, {useContext, useState} from "react";
-import {getAvailableMonths, getAvailableYears} from "../../services/budget";
+import {defaultMonthFor, getAvailableMonths, getAvailableYears} from "../../services/budget";
 import {getStatsForYearMonth, round} from "../../services/statistics";
 import EditMonth from "../form/EditMonth";
 import dynamic from 'next/dynamic';
@@ -18,9 +18,10 @@ export default function MonthContainer() {
     const mounted = useMounted();
     const today = useToday();
 
-    // user-selected override; falls back to today (neutral {0, 0} until hydrated)
+    // user-selected override; otherwise today when the file covers it, else the
+    // latest available month ({0, 0} stays neutral until hydrated)
     const [selected, setSelected] = useState<{year: number, month: number} | null>(null);
-    const yearMonth = selected ?? today;
+    const yearMonth = selected ?? defaultMonthFor(dataContext.budget, today);
 
     const availableYears = getAvailableYears(dataContext.budget);
     const availableMonths = getAvailableMonths(dataContext.budget, yearMonth.year);
