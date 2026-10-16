@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.5.5] - 2026-10-16
+
+### Fixed
+- Loading a budget via URL now shows the actual reason (status code, timeout, blocked address) in the upload alert, and redirect responses no longer masquerade as broken files.
+- Uploaded files with duplicate years or months, impossible or inverted recurring ranges, or misspelled top-level keys are rejected instead of producing silently wrong totals.
+- The "Cookies löschen" button in the footer works again and removes both stored cookies.
+- The "via URL" preference now survives a reload.
+- The monthly view opens on the latest available month (skipping empty years) when the file does not include the current month.
+- Year-over-year charts no longer invent deltas for months without data, and the savings rate shows "–" instead of "0%" when it cannot be computed.
+- Charts recover automatically after a failed chart.js load instead of staying broken until a reload.
+- The test-data page no longer ships megabytes of random data in the HTML and no longer reports a hydration mismatch.
+- Category totals round consistently, including single-entry categories.
+- The sitemap lists /insights again.
+- Pages no longer declare themselves the homepage via canonical and og:url metadata.
+
+### Changed
+- Removed lodash and @popperjs/core in favour of native language features and the bundled Bootstrap script — smaller install and bundle.
+- The sample data file is served from a single source, so the download and the in-app sample always match.
+- Removed dead code, styles and config (unused CSS selectors and tokens, unused context state, lint placeholder, no-op helpers) and cleaned up the chart and table internals.
+- pnpm is now pinned via the packageManager field; dependencies were updated (including Next 16.3.8).
+
 ## [3.5.4] - 2026-08-28
 
 ### Security
