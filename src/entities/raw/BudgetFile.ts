@@ -11,8 +11,11 @@ const RecurringSchema = z.object({
     category: z.string().min(1),
     value: z.number().finite(),
     comment: z.string().optional(),
-    from: z.string().regex(/^\d{4}-\d{2}$/),
-    until: z.string().regex(/^\d{4}-\d{2}$/).optional(),
+    from: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
+    until: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).optional(),
+}).refine((rule) => !rule.until || rule.until >= rule.from, {
+    path: ['until'],
+    message: 'until must not be earlier than from',
 });
 
 const EntrySchema = z.object({
@@ -32,13 +35,53 @@ const YearSchema = z.object({
     months: z.array(MonthSchema).default([]),
 });
 
+/**
+ * Reject a repeated year, or a repeated month within one year: lookups use the
+ * first match while the aggregators iterate every occurrence, so duplicates
+ * would silently render different totals per view.
+ */
+function addDuplicatePeriodIssues(years: Array<z.infer<typeof YearSchema>>, basePath: Array<string | number>, ctx: z.RefinementCtx) {
+    const seenYears = new Set<number>();
+    years.forEach((yearData, yearIndex) => {
+        const yearPath = [...basePath, yearIndex];
+        if (seenYears.has(yearData.year)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: [...yearPath, 'year'],
+                message: `duplicate year ${yearData.year}`,
+            });
+        } else {
+            seenYears.add(yearData.year);
+        }
+
+        const seenMonths = new Set<number>();
+        yearData.months.forEach((monthData, monthIndex) => {
+            if (seenMonths.has(monthData.month)) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: [...yearPath, 'months', monthIndex, 'month'],
+                    message: `duplicate month ${monthData.month} in ${yearData.year}`,
+                });
+            } else {
+                seenMonths.add(monthData.month);
+            }
+        });
+    });
+}
+
 export const BudgetFileSchema = z.union([
     z.array(YearSchema),
     z.object({
         years: z.array(YearSchema),
         recurring: z.array(RecurringSchema).default([]),
-    }),
-]);
+    }).strict(),
+]).superRefine((file, ctx) => {
+    if (Array.isArray(file)) {
+        addDuplicatePeriodIssues(file, [], ctx);
+    } else {
+        addDuplicatePeriodIssues(file.years, ['years'], ctx);
+    }
+});
 
 /**
  * A validated raw upload. Structurally compatible with Year[] / Recurring[],
