@@ -96,14 +96,3 @@ export function getStatsForYearMonth(statsData: Array<YearStats>, year: number, 
     const yearStats = statsData.find((candidate) => candidate.year === year);
     return yearStats ? yearStats.months.find((m) => m.month === month) ?? null : null;
 }
-
-/**
- * YearStats for a given year from precomputed stats. Every requested year must
- * exist in the stats derived from the same Budget — a miss is an invariant
- * violation and fails loudly instead of returning a hollow default.
- */
-export function getStatsForYear(statsData: Array<YearStats>, year: number): YearStats {
-    const found = statsData.find((yearStats: YearStats) => yearStats.year === year);
-    if (!found) throw new Error(`No stats computed for year ${year}`);
-    return found;
-}
