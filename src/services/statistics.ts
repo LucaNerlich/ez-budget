@@ -6,8 +6,6 @@ import {MonthStats} from "../entities/stats/MonthStats";
 import {Category} from "../entities/stats/Category";
 import {YearStats} from "../entities/stats/YearStats";
 import {sortMapByNumberValue} from "../Util";
-import {findYear, getEntriesForMonth} from "./budget";
-import {leastSquaresFit} from "./regression";
 
 /**
  * Budget statistics. Plain functions — the test surface.
@@ -29,8 +27,7 @@ function sumByCategory(entries: Array<Entry>, predicate?: (entry: Entry) => bool
             continue;
         }
         const category = entry.category;
-        const value = entry.value;
-        sums.set(category, sums.has(category) ? round((sums.get(category) ?? 0) + value) : value);
+        sums.set(category, round((sums.get(category) ?? 0) + entry.value));
     }
 
     return sums;
@@ -53,57 +50,12 @@ function getMonthStats(monthsData: Array<Month>): Array<MonthStats> {
     });
 }
 
-/**
- * Map of yearly sum per category, over the resolved Budget (entries are attributed
- * by month membership, so recurring-derived entries without a `date` are included).
- */
-export function getSumMapForYear(budget: Budget, year: number | string): Map<string, number> {
-    const yearData = findYear(budget, year);
-    if (!yearData) return new Map();
-
-    return sumByCategory(yearData.months.flatMap((month) => month.entries));
-}
-
-/**
- * Income/expense sum for the given year and month of the resolved Budget.
- */
-export function getSumForYearMonth(budget: Budget, year: number | string, month: number | string): number {
-    return round(sumEntryValues(getEntriesForMonth(budget, year, month)));
-}
-
-function getSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
-    return sumByCategory(entries);
-}
-
 export function getExpenseSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
     return sumByCategory(entries, (entry) => entry.value < 0);
 }
 
 export function getIncomeSumPerCategoryFromEntries(entries: Entry[]): Map<string, number> {
     return sumByCategory(entries, (entry) => entry.value > 0);
-}
-
-/**
- * Linear trend y-values for the given x/y series.
- * https://math.stackexchange.com/questions/204020
- */
-export function getTrendArray(xArray: number[], yArray: Array<number | undefined>): number[] {
-    const xs: number[] = [];
-    const ys: number[] = [];
-    for (let i = 0; i < xArray.length; i++) {
-        const y = yArray[i];
-        if (typeof y !== 'undefined') {
-            xs.push(xArray[i]);
-            ys.push(y);
-        }
-    }
-
-    const fit = leastSquaresFit(xs, ys);
-    if (!fit) return [];
-
-    return xArray.map(function (x) {
-        return round(fit.a * x + fit.b);
-    });
 }
 
 /**
